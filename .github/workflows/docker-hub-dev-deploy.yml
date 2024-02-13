@@ -51,7 +51,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script:
-            cd /home/ec2-user
+            cd "/home/ec2-user"
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_READ_ONLY }}
             sudo docker-compose --env-file=config/env/dev.env -f docker-compose.yml -p backend up -d
             sudo docker container prune -f
