@@ -18,6 +18,9 @@ jobs:
         run: |
           git submodule update --remote --recursive
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
       - name: Build
         run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}:${{secrets.DOCKERHUB_TAG}} .
 
