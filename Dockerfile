@@ -18,4 +18,4 @@ COPY --from=builder /app/build/libs/*.jar /app/app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT java -jar /app/app.jar —Dspring.profiles.active=dev
+ENTRYPOINT java -jar —Dspring.profiles.active=dev /app/app.jar 
