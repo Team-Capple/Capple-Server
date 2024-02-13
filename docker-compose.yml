@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  spring-application:
+    container_name: capple-dev
+    image: ${DOCKER_USER_NAME}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    ports:
+      - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
