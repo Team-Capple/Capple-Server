@@ -19,7 +19,7 @@ jobs:
           git submodule update --remote --recursive
 
       - name: Build
-        run: docker --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}:${{secrets.DOCKERHUB_TAG}} .
+        run: docker build --no-cache -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}:${{secrets.DOCKERHUB_TAG}} .
 
       - name: Dockerhub login
         uses: docker/login-action@v3
