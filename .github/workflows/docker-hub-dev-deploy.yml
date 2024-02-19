@@ -31,7 +31,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN_READ_WRITE }}
 
       - name: Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ SECRETS.DOCKERHUB_IMAGENAME}}:${{secrets.DOCKERHUB_TAG }}
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME}}:${{secrets.DOCKERHUB_TAG }}
 
       - name: Copy docker-compose.yml
         uses: appleboy/scp-action@master
@@ -53,6 +53,9 @@ jobs:
           script: |
             cd /home/ec2-user 
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN_READ_ONLY }}
+            sudo docker container stop capple-dev
+            sudo docker container rm capple-dev
+            sudo docker image rm  ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME}}:${{secrets.DOCKERHUB_TAG }}
             sudo docker-compose --env-file=config/env/dev.env -f docker-compose.yml -p backend up -d
             sudo docker container prune -f
             sudo docker image prune -a -f
