@@ -42,7 +42,7 @@ task copySubmodule(type: Copy) {
 	include '*.yml'
 	into './src/main/resources'
 }
-processResources.dependsOn('copySubmoduleTest')
+processTestResources.dependsOn('copySubmoduleTest')
 task copySubmoduleTest(type: Copy) {
 	from './config'
 	include '*.yml'
