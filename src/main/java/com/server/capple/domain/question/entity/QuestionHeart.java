@@ -10,7 +10,6 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLRestriction("deleted_at is null")
 public class QuestionHeart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
