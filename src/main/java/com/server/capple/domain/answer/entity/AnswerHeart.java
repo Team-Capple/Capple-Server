@@ -1,6 +1,7 @@
-package com.server.capple.domain.question.entity;
+package com.server.capple.domain.answer.entity;
 
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.question.entity.Question;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
@@ -11,7 +12,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
-public class QuestionHeart {
+public class AnswerHeart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
@@ -21,7 +22,7 @@ public class QuestionHeart {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "question_id", nullable = false)
-    private Question question;
+    @JoinColumn(name = "answer_id", nullable = false)
+    private Answer answer;
 
 }
