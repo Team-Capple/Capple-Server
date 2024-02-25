@@ -16,6 +16,7 @@ public enum GlobalErrorCode implements ErrorCodeInterface {
     SERVER_ERROR("GLOBAL005", "서버 에러, 관리자에게 문의해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
     ACCESS_DENIED("GLOBAL006", "올바르지 않은 권한입니다.", HttpStatus.FORBIDDEN),
     NOT_VALID_ARGUMENT_ERROR("GLOBAL007", "올바르지 않은 Argument Type입니다.", HttpStatus.BAD_REQUEST),
+    VALIDATION_ERROR("GLOBAL007", "Validation Error입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String code;
