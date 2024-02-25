@@ -1,9 +1,9 @@
-package com.server.capple.global.exception.errorCode;
+package com.server.capple.global.exception;
 
 import org.springframework.http.HttpStatus;
 
 public interface ErrorCode {
-    String getErrorcode();
+    String getErrorCode();
 
     String getMessage();
 

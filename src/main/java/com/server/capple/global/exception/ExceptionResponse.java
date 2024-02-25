@@ -1,4 +1,4 @@
-package com.server.capple.global.exception.errorCode;
+package com.server.capple.global.exception;
 
 import java.time.LocalDateTime;
 import lombok.Getter;

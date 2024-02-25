@@ -1,4 +1,4 @@
-package com.server.capple.global.exception.errorCode;
+package com.server.capple.global.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
