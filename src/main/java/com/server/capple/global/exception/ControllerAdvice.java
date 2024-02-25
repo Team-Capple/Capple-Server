@@ -43,7 +43,7 @@ public class ControllerAdvice {
         return handleExceptionInternal(GlobalErrorCode.NOT_VALID_ARGUMENT_ERROR.getErrorCode());
     }
 
-    
+
 
     private ResponseEntity<BaseResponse<String>> handlerExceptionInternal(
             ErrorCode errorCode) {
