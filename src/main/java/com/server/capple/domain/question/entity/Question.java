@@ -27,7 +27,7 @@ public class Question extends BaseEntity {
     private String content;
 
     @ColumnDefault("0")
-    private String heartCount;
+    private int heartCount;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
