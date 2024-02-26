@@ -15,7 +15,10 @@ import org.springframework.data.redis.core.RedisHash;
 public class AnswerHeart {
 
     @Id
+    private String id;
+
     private Long answerId;
     private Long memberId;
+    private Long heartCount;
 
 }
