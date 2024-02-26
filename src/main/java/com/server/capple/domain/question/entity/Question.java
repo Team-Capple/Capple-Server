@@ -26,6 +26,9 @@ public class Question extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private QuestionStatus questionStatus;
+
     @ColumnDefault("0")
     private int heartCount;
 
