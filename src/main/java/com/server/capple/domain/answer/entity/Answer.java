@@ -29,6 +29,4 @@ public class Answer extends BaseEntity {
     @JoinColumn(name="question_id", nullable = false)
     private Question question;
 
-    @ColumnDefault("0")
-    private int heartCount;
 }

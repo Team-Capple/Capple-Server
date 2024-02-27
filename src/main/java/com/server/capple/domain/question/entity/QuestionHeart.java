@@ -18,6 +18,5 @@ public class QuestionHeart {
 
     private Long answerId;
     private Long memberId;
-    private Long heartCount;
 
 }

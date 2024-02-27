@@ -29,9 +29,6 @@ public class Question extends BaseEntity {
     @Column(nullable = false)
     private QuestionStatus questionStatus;
 
-    @ColumnDefault("0")
-    private int heartCount;
-
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<Answer> answers = new ArrayList<>();
