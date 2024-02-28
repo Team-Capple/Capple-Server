@@ -19,7 +19,7 @@ import org.hibernate.annotations.SQLRestriction;
 public class Answer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id", nullable = false)
@@ -28,5 +28,8 @@ public class Answer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="question_id", nullable = false)
     private Question question;
+
+    @Column(nullable = false)
+    private String content;
 
 }
