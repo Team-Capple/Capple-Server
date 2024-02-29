@@ -7,4 +7,6 @@ public interface AdminQuestionService {
 
     QuestionId createQuestion(QuestionCreate request);
 
+    QuestionId deleteQuestion(Long questionId);
+
 }
