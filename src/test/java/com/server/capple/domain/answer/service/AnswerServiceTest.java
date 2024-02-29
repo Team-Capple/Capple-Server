@@ -39,7 +39,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
         //when
         Long answerId = answerService.createAnswer(member,question.getId(),request).getAnswerId();
         Answer answer = answerService.findAnswer(answerId);
-        List<String> tags = tagService.getTags(question.getId()).getTags();
+        List<String> tags = tagService.getTagsByQuestion(question.getId()).getTags();
 
         //then
         assertEquals("나는 와플을 좋아하는 사람이 좋아", answer.getContent());
