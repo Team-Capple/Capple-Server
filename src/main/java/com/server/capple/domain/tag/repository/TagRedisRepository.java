@@ -41,9 +41,9 @@ public class TagRedisRepository implements Serializable {
     }
 
     //질문에 달린 모든 tag 이름과 사용횟수 조회
-    public Set<ZSetOperations.TypedTuple<String>> getTags(Long questionId) {
+    public Set<String> getTags(Long questionId) {
         String question = questionId.toString();
-        return zSetOperations.rangeWithScores(question, 0, -1);
+        return zSetOperations.reverseRange(question, 0, -1);
     }
 
 

@@ -6,14 +6,13 @@ import com.server.capple.domain.tag.mapper.TagMapper;
 import com.server.capple.domain.tag.repository.TagRedisRepository;
 import com.server.capple.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.ZSetOperations.TypedTuple;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,10 +35,8 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagResponse.TagInfos getTags(Long questionId) {
-        Set<TypedTuple<String>> typedTuples = tagRedisRepository.getTags(questionId);
-        return new TagResponse.TagInfos(typedTuples.stream()
-                .map(TypedTuple::getValue)
-                .collect(Collectors.toList()));
+        Set<String> typedTuples = tagRedisRepository.getTags(questionId);
+        return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
     }
 
 
