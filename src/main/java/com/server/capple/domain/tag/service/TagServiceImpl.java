@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +35,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<TypedTuple<String>> getTags(Long questionId) {
-        return tagRedisRepository.getTags(questionId);
+    public TagResponse.TagInfos getTags(Long questionId) {
+        Set<TypedTuple<String>> typedTuples = tagRedisRepository.getTags(questionId);
+        return new TagResponse.TagInfos(typedTuples.stream()
+                .map(TypedTuple::getValue)
+                .collect(Collectors.toList()));
     }
+
 
     @Override
     @Transactional

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Member 서비스의 ")
 @SpringBootTest
@@ -38,15 +39,15 @@ public class AnswerServiceTest extends ServiceTestConfig {
         //when
         Long answerId = answerService.createAnswer(member,question.getId(),request).getAnswerId();
         Answer answer = answerService.findAnswer(answerId);
-        Set<TypedTuple<String>> tags = tagService.getTags(question.getId());
+        List<String> tags = tagService.getTags(question.getId()).getTags();
 
         //then
         assertEquals("나는 와플을 좋아하는 사람이 좋아", answer.getContent());
         assertEquals("#와플유니버시티 #와플",answer.getTags());
         assertEquals(2, tags.size());
-        for (TypedTuple<String> tuple : tags) {
-            System.out.println(tuple.getValue() + " " + tuple.getScore());
-        }
+        assertTrue(tags.contains("#와플"));
+        assertTrue(tags.contains("#와플유니버시티"));
+
     }
 
 }
