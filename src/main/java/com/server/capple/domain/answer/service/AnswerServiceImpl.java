@@ -6,6 +6,7 @@ import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
     private final QuestionService questionService;
     private final AnswerMapper answerMapper;
-
+    private final MemberService memberService;
     @Transactional
     @Override
     public AnswerResponse.AnswerId createAnswer(Member loginMember, Long questionId, AnswerRequest request) {
