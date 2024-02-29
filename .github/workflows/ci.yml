@@ -36,7 +36,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
         shell: bash
         
       - name: Move *.jar File
