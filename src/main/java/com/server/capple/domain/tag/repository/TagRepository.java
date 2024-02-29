@@ -1,8 +1,50 @@
 package com.server.capple.domain.tag.repository;
 
-import com.server.capple.domain.tag.Tag;
-import org.springframework.data.repository.CrudRepository;
 
-public interface TagRepository extends CrudRepository<Tag, String> {
+import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Repository;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+
+@Repository
+@RequiredArgsConstructor
+public class TagRepository implements Serializable {
+    @Resource(name = "redisTemplate")
+    private ZSetOperations<String, String> zSetOperations;
+
+    //지금 뜨는 키워드 조회를 위한 tag 저장, tagCount update
+    public void saveTags(List<String> tags) {
+        tags.forEach(tag -> {
+            Double count = zSetOperations.score("tags", tag);
+            if (count == null)
+                zSetOperations.add("tags", tag, 1.0);
+            else
+                zSetOperations.incrementScore("tags", tag, 1.0);
+        });
+    }
+
+    //질문에 따른 tag 저장, tagCount update
+    public void saveQuestionTags(Long questionId, List<String> tags) {
+        String question = questionId.toString();
+
+        tags.forEach(tag -> {
+            Double count = zSetOperations.score(question, tag);
+            if (count == null)
+                zSetOperations.add(question, tag, 1.0);
+            else
+                zSetOperations.incrementScore(question, tag, 1.0);
+        });
+    }
+
+    //질문에 달린 모든 tag 이름과 사용횟수 조회
+    public Set<ZSetOperations.TypedTuple<String>> getTags(Long questionId) {
+        String question = questionId.toString();
+        return zSetOperations.rangeWithScores(question, 0, -1);
+    }
+
 
 }
