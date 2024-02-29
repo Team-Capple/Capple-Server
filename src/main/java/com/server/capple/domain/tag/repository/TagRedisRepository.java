@@ -18,26 +18,21 @@ public class TagRedisRepository implements Serializable {
 
     //지금 뜨는 키워드 조회를 위한 tag 저장, tagCount update
     public void saveTags(List<String> tags) {
-        tags.forEach(tag -> {
-            Double count = zSetOperations.score("tags", tag);
-            if (count == null)
-                zSetOperations.add("tags", tag, 1.0);
-            else
-                zSetOperations.incrementScore("tags", tag, 1.0);
-        });
+        tags.forEach(tag -> updateTagCount("tags", tag));
     }
 
     //질문에 따른 tag 저장, tagCount update
     public void saveQuestionTags(Long questionId, List<String> tags) {
         String question = questionId.toString();
+        tags.forEach(tag -> updateTagCount(question, tag));
+    }
 
-        tags.forEach(tag -> {
-            Double count = zSetOperations.score(question, tag);
-            if (count == null)
-                zSetOperations.add(question, tag, 1.0);
-            else
-                zSetOperations.incrementScore(question, tag, 1.0);
-        });
+    private void updateTagCount(String key, String tag) {
+        Double count = zSetOperations.score(key, tag);
+        if (count == null)
+            zSetOperations.add(key, tag, 1.0);
+        else
+            zSetOperations.incrementScore(key, tag, 1.0);
     }
 
     //해당 question 답변에 많이 쓰인 태그 조회
