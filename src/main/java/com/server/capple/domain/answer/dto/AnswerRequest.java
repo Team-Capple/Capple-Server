@@ -21,5 +21,5 @@ public class AnswerRequest {
     private String answer;
 
     @Builder.Default
-    private List<String> keywords = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 }

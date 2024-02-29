@@ -12,7 +12,7 @@ public class AnswerMapper {
         return Answer.builder()
                 .member(member)
                 .question(question)
-                .tags(String.join(" ", request.getKeywords()))
+                .tags(String.join(" ", request.getTags()))
                 .content(request.getAnswer())
                 .build();
     }
