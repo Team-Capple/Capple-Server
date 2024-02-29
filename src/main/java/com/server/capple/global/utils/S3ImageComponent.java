@@ -47,7 +47,10 @@ public class S3ImageComponent {
     private String getFileExtension(String fileName) {
         return fileName.substring(fileName.lastIndexOf("."));
     }
-    private String getOriginalFileName(String fileName) { return fileName.substring(0, fileName.lastIndexOf(".")); }
+
+    private String getOriginalFileName(String fileName) {
+        return fileName.substring(0, fileName.lastIndexOf("."));
+    }
 
     /**
      * 버킷에서 이미지 삭제
