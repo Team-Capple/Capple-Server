@@ -40,8 +40,8 @@ public class TagRedisRepository implements Serializable {
         });
     }
 
-    //질문에 달린 모든 tag 이름과 사용횟수 조회
-    public Set<String> getTags(Long questionId) {
+    //해당 question 답변에 많이 쓰인 태그 조회
+    public Set<String> getTagsByQuestion(Long questionId) {
         String question = questionId.toString();
         return zSetOperations.reverseRange(question, 0, -1);
     }

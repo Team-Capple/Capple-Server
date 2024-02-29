@@ -26,7 +26,7 @@ public class TagController {
             "path variable 으로 questionId를 주세요." )
     @GetMapping("/{questionId}")
     public BaseResponse<TagResponse.TagInfos> getPopularTagsByQuestion(@PathVariable(name = "questionId") Long questionId) {
-        return BaseResponse.onSuccess(tagService.getTags(questionId));
+        return BaseResponse.onSuccess(tagService.getTagsByQuestion(questionId));
     }
 
 }

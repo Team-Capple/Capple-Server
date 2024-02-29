@@ -12,7 +12,7 @@ import java.util.Set;
 public interface TagService {
     void saveQuestionTags(Long questionId, List<String> tags);
     void saveTags(List<String> tags);
-    TagResponse.TagInfos getTags(Long questionId);
+    TagResponse.TagInfos getTagsByQuestion(Long questionId);
     void findOrCreateTag(String tagName);
     TagResponse.TagInfos searchTags(String keyword);
 

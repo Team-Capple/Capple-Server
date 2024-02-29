@@ -34,8 +34,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagResponse.TagInfos getTags(Long questionId) {
-        Set<String> typedTuples = tagRedisRepository.getTags(questionId);
+    public TagResponse.TagInfos getTagsByQuestion(Long questionId) {
+        Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId);
         return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
     }
 
