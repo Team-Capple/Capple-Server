@@ -35,10 +35,10 @@ public class TagRedisRepository implements Serializable {
             zSetOperations.incrementScore(key, tag, 1.0);
     }
 
-    //해당 question 답변에 많이 쓰인 태그 조회
+    //해당 question 답변에 많이 쓰인 태그 7개 조회
     public Set<String> getTagsByQuestion(Long questionId) {
         String question = questionId.toString();
-        return zSetOperations.reverseRange(question, 0, -1);
+        return zSetOperations.reverseRange(question, 0, 7);
     }
 
 
