@@ -20,10 +20,10 @@ public class AnswerController {
     private final AnswerService answerService;
 
     @Operation(summary = "답변 생성 API", description = " 답변 생성 API 입니다." +
-            "pathvariable 으로 questionId를 주세요." )
-    @PostMapping
+            "pathvariable 으로 questionId를 주세요.")
+    @PostMapping("/{questionId}")
     public BaseResponse<AnswerResponse.AnswerId> createAnswer(Member member, @PathVariable(value = "questionId") Long questionId,
                                                               @RequestBody @Valid AnswerRequest request) {
-        return BaseResponse.onSuccess(answerService.createAnswer(member,questionId, request));
+        return BaseResponse.onSuccess(answerService.createAnswer(member, questionId, request));
     }
 }

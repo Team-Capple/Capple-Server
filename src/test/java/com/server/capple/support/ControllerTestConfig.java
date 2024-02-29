@@ -1,27 +1,27 @@
 package com.server.capple.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
-import com.server.capple.domain.question.repository.QuestionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 @SpringBootTest
-public abstract class ServiceTestConfig {
+@AutoConfigureMockMvc
+public abstract class ControllerTestConfig {
     @Autowired
-    protected MemberRepository memberRepository;
+    protected MockMvc mockMvc;
     @Autowired
-    protected QuestionRepository questionRepository;
-
+    protected ObjectMapper objectMapper;
     protected Member member;
     protected Question question;
-
 
     @BeforeEach
     public void setUp() {
@@ -30,22 +30,19 @@ public abstract class ServiceTestConfig {
     }
 
     protected Member createMember() {
-        return memberRepository.save(
-                Member.builder()
-                        .email("tnals2384@gmail.com")
-                        .nickname("루시")
-                        .profileImage("lucy.jpg")
-                        .build()
-        );
+        return Member.builder()
+                .email("tnals2384@gmail.com")
+                .nickname("루시")
+                .profileImage("lucy.jpg")
+                .build();
     }
 
     protected Question createQuestion() {
-        return questionRepository.save(
-                Question.builder()
-                        .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
-                        .questionStatus(QuestionStatus.ONGOING)
-                        .build()
-        );
+        return Question.builder()
+                .id(1L)
+                .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
+                .questionStatus(QuestionStatus.ONGOING)
+                .build();
     }
 
     protected AnswerRequest getAnswerRequest() {
