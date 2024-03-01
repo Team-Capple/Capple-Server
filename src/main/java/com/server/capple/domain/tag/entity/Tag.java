@@ -1,9 +1,7 @@
 package com.server.capple.domain.tag.entity;
 
-import com.server.capple.domain.answer.entity.Answer;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Builder

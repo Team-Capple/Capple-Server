@@ -16,7 +16,7 @@ public class TagController {
     private final TagService tagService;
 
     @Operation(summary = "키워드 검색 API", description = " 키워드 검색 API 입니다." +
-            "requestparam 으로 keyword를 주세요." )
+            "request param 으로 keyword를 주세요." )
     @GetMapping("/search")
     public BaseResponse<TagResponse.TagInfos> searchTag(@RequestParam(name = "keyword") String keyword) {
         return BaseResponse.onSuccess(tagService.searchTags(keyword));

@@ -21,6 +21,7 @@ public class TagServiceImpl implements TagService {
     private final TagRedisRepository tagRedisRepository;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
+
     //전체 tag 저장, count update
     @Override
     public void saveTags(List<String> tags) {
@@ -30,7 +31,7 @@ public class TagServiceImpl implements TagService {
     //질문 별 tag 저장, count update
     @Override
     public void saveQuestionTags(Long questionId, List<String> tags) {
-        tagRedisRepository.saveQuestionTags(questionId,tags);
+        tagRedisRepository.saveQuestionTags(questionId, tags);
     }
 
     @Override

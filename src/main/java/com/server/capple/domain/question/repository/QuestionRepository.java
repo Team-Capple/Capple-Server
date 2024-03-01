@@ -1,6 +1,5 @@
 package com.server.capple.domain.question.repository;
 
-import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.question.entity.Question;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;

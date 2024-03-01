@@ -37,13 +37,14 @@ public class AnswerServiceImpl implements AnswerService {
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
 
+        //rdb에 태그 저장
         request.getTags().forEach(tagService::findOrCreateTag);
 
         //redis에 태그 저장
         tagService.saveTags(request.getTags());
 
         //온에어 질문일 경우, redis 질문 별 태그 저장
-        if(question.getQuestionStatus().equals(QuestionStatus.ONGOING))
+        if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
             tagService.saveQuestionTags(questionId, request.getTags());
 
         return new AnswerResponse.AnswerId(answer.getId());

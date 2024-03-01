@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 
-public interface AnswerRepository extends JpaRepository<Answer,Long> {
+public interface AnswerRepository extends JpaRepository<Answer, Long> {
     @Query("select a from Answer a where a.id = :answerId and a.deletedAt is null")
     Optional<Answer> findById(@Param("answerId") Long answerId);
 }
