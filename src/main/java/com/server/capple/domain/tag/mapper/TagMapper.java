@@ -14,7 +14,7 @@ public class TagMapper {
 
         List<String> tagNames = tags.stream()
                 .map(Tag::getTagName)
-                .collect(Collectors.toList());
+                .toList();
 
         return TagResponse.TagInfos.builder()
                 .tags(tagNames)
