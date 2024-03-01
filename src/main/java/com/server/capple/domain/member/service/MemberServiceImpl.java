@@ -17,7 +17,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(
-                () -> new RestApiException(MemberErrorCode.Member_NOT_FOUND)
+                () -> new RestApiException(MemberErrorCode.MEMEBER_NOT_FOUND)
         );
     }
 }
