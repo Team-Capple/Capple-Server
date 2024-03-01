@@ -33,7 +33,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
     @DisplayName("답변 생성 API 테스트")
     public void createAnswerTest() throws Exception {
         //given
-        final String url = "/answers/{questionId}";
+        final String url = "/answers/question/{questionId}";
 
         AnswerRequest request = getAnswerRequest();
         AnswerResponse.AnswerId response = new AnswerResponse.AnswerId(1L);
