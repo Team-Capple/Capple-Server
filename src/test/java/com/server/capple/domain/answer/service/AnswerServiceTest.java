@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("Member 서비스의 ")
+@DisplayName("Answer 서비스의 ")
 @SpringBootTest
 public class AnswerServiceTest extends ServiceTestConfig {
 
