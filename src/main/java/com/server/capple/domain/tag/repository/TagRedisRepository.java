@@ -18,13 +18,14 @@ public class TagRedisRepository implements Serializable {
 
     //지금 뜨는 키워드 조회를 위한 tag 저장, tagCount update
     public void saveTags(List<String> tags) {
-        tags.forEach(tag -> updateTagCount("tags", tag));
+        String key = "tags";
+        tags.forEach(tag -> updateTagCount(key, tag));
     }
 
     //질문에 따른 tag 저장, tagCount update
     public void saveQuestionTags(Long questionId, List<String> tags) {
-        String question = questionId.toString();
-        tags.forEach(tag -> updateTagCount(question, tag));
+        String key = "questionTag-"+ questionId.toString();
+        tags.forEach(tag -> updateTagCount(key, tag));
     }
 
     private void updateTagCount(String key, String tag) {
