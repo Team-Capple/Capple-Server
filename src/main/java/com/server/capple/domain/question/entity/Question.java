@@ -4,8 +4,6 @@ import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.Builder.Default;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -22,17 +20,13 @@ import java.util.List;
 public class Question extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private QuestionStatus questionStatus;
+    private Long id;
 
     @Column(nullable = false)
     private String content;
 
-    @ColumnDefault("0")
-    private int heartCount;
+    @Column(nullable = false)
+    private QuestionStatus questionStatus;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default

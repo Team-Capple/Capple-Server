@@ -29,7 +29,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     @Transactional
     public QuestionId deleteQuestion(Long questionId) {
         Question question = adminQuestionRepository.findById(questionId).orElseThrow(() -> new RestApiException(
-                QuestionErrorCode.EMPTY_QUESTION));
+                QuestionErrorCode.QUESTION_NOT_FOUND));
 
         question.delete();
 
