@@ -26,4 +26,12 @@ public class AnswerController {
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.createAnswer(member, questionId, request));
     }
+
+    @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
+            "pathvariable 으로 answerId를 주세요.")
+    @PatchMapping("/{answerId}")
+    public BaseResponse<AnswerResponse.AnswerId> updateAnswer(Member member, @PathVariable(value = "answerId") Long answerId,
+                                                              @RequestBody @Valid AnswerRequest request) {
+        return BaseResponse.onSuccess(answerService.updateAnswer(member, answerId, request));
+    }
 }
