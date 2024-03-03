@@ -44,7 +44,7 @@ public class AnswerServiceImpl implements AnswerService {
         tagService.saveTags(request.getTags());
 
         //온에어 질문일 경우, redis 질문 별 태그 저장
-        if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
+        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
             tagService.saveQuestionTags(questionId, request.getTags());
 
         return new AnswerResponse.AnswerId(answer.getId());

@@ -1,7 +1,6 @@
 package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.question.dto.request.QuestionRequest.QuestionCreate;
-import com.server.capple.domain.question.dto.response.QuestionResponse;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionId;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.mapper.QuestionMapper;
