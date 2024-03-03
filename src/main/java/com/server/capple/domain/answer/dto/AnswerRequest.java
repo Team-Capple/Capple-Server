@@ -4,6 +4,7 @@ package com.server.capple.domain.answer.dto;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,10 @@ public class AnswerRequest {
 
     @Builder.Default
     private List<String> tags = new ArrayList<>();
+
+    @Data
+    @Builder
+    private static class AnswerGetList {
+        private String questionId;
+    }
 }

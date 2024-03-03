@@ -26,4 +26,14 @@ public class AnswerController {
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.createAnswer(member, questionId, request));
     }
+
+    @Operation(summary = "질문에 대한 답변 조회 API", description = "특정 질문에 대한 답변리스트를 조회하는 API입니다."
+            + "pathVariable으로 questionId를 주세요."
+            + "조회할 질문의 개수를 param으로 입력해주세요.")
+    @GetMapping("/question/{questionId}")
+    public BaseResponse<AnswerResponse.AnswerList> getAnswerList(
+            @PathVariable(value = "questionId") Long questionId,
+            @RequestParam int numberOfAnswer) {
+        return BaseResponse.onSuccess(answerService.getAnswerList(questionId, numberOfAnswer));
+    }
 }

@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerRepository;
@@ -14,6 +15,8 @@ import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +58,18 @@ public class AnswerServiceImpl implements AnswerService {
         return answerRepository.findById(answerId).orElseThrow(
                 () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
+    }
+
+    @Override
+    public AnswerList getAnswerList(Long questionId, int numberOfAnswer) {
+        Pageable pageable = PageRequest.of(0, numberOfAnswer);
+
+        return answerMapper.toAnswerList(
+                answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
+                -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
+                        .stream()
+                        .map(answerMapper::toAnswerInfo)
+                        .toList());
     }
 
 }
