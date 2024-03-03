@@ -1,4 +1,5 @@
 package com.server.capple.domain.question.service;
+
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
@@ -24,19 +25,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionSummary getQuestionSummary(QuestionStatus questionStatus) {
-        System.out.println("1");
-        System.out.println(questionStatus.toString());
-        System.out.println("2");
-        System.out.println(questionStatus.name());
-        if (questionStatus == QuestionStatus.OLD) {
-            return questionMapper.toQuestionSummary(questionRepository.findByLastOldQuestion(questionStatus).orElseThrow(()
-                    -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
-        }
-//        else if (questionStatus == QuestionStatus.LIVE) {
-//            return questionMapper.toQuestionSummary(questionRepository.findByLiveQuestion(questionStatus.name()).orElseThrow(()
-//            -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
-//        }
-
-        return null;
+        return questionMapper.toQuestionSummary(questionRepository.findByQuestionStatusAndLivedAt(questionStatus).orElseThrow(()
+                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
     }
 }

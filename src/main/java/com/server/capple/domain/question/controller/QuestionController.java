@@ -21,7 +21,7 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @Operation(summary = "실시간 답변 현황(3개 - 최신순) 조회 API", description = "실시간 답변 현황을 조회합니다.")
+    @Operation(summary = "실시간 질문 조회 API", description = "실시간 질문을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -30,6 +30,10 @@ public class QuestionController {
         return BaseResponse.onSuccess(questionService.getQuestionSummary(QuestionStatus.LIVE));
     }
 
+    @Operation(summary = "최근 지난 질문 조회 API", description = "최근 지난 질문을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
     @GetMapping("/lastOld")
     private BaseResponse<QuestionSummary> getLastOldQuestionSummary() {
         return BaseResponse.onSuccess(questionService.getQuestionSummary(QuestionStatus.OLD));

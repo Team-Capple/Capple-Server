@@ -13,11 +13,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     @Query("select q from Question q where q.id = :questionId and q.deletedAt is null")
     Optional<Question> findById(@Param("questionId") Long questionId);
 
-//    // 현재 진행중인 질문을 가져오는 메서드
-//    @Query("SELECT q FROM Question q WHERE q.questionStatus =: questionStatus AND q.deletedAt IS NULL")
-//    Optional<Question> findByLiveQuestion(@Param("questionStatus") String questionStatus);
-
-    // 가장 최근에 지난 질문을 가져오는 메서드
+    // QuestionStatus에 따라 livedAt에 가장 최신인 Question을 가져오는 쿼리
     @Query("SELECT q FROM Question q WHERE q.questionStatus = :questionStatus AND q.deletedAt IS NULL ORDER BY q.livedAt DESC LIMIT 1")
-    Optional<Question> findByLastOldQuestion(@Param("questionStatus") QuestionStatus questionStatus);
+    Optional<Question> findByQuestionStatusAndLivedAt(@Param("questionStatus") QuestionStatus questionStatus);
 }
