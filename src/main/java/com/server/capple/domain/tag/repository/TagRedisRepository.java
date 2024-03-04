@@ -14,7 +14,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TagRedisRepository implements Serializable {
     public static final String TAGS_KEY = "tags";
-    public static final String QUESTION_TAGS_KEY = "questionTag-";
+    public static final String QUESTION_TAGS_KEY_PREFIX = "questionTag-";
 
     @Resource(name = "redisTemplate")
     private ZSetOperations<String, String> zSetOperations;
@@ -26,16 +26,16 @@ public class TagRedisRepository implements Serializable {
 
     //질문에 따른 tag 저장, tagCount update
     public void saveQuestionTags(Long questionId, List<String> tags) {
-        String key = QUESTION_TAGS_KEY + questionId.toString();
+        String key = QUESTION_TAGS_KEY_PREFIX + questionId.toString();
         tags.forEach(tag -> increaseTagCount(key, tag));
     }
 
     public void deleteTags(List<String> tags) {
-        tags.forEach(tag-> decreaseTagCount(TAGS_KEY, tag));
+        tags.forEach(tag -> decreaseTagCount(TAGS_KEY, tag));
     }
 
     public void deleteQuestionTags(Long questionId, List<String> tags) {
-        String key = QUESTION_TAGS_KEY + questionId.toString();
+        String key = QUESTION_TAGS_KEY_PREFIX + questionId.toString();
         tags.forEach(tag -> decreaseTagCount(key, tag));
     }
 
@@ -58,7 +58,7 @@ public class TagRedisRepository implements Serializable {
     //해당 question 답변에 많이 쓰인 태그 7개 조회
     public Set<String> getTagsByQuestion(Long questionId) {
         String question = questionId.toString();
-    return zSetOperations.reverseRange(QUESTION_TAGS_KEY+question, 0, 7);
+        return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, 7);
     }
 
 

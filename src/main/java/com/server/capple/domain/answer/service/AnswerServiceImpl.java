@@ -4,6 +4,7 @@ import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
+import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
@@ -30,6 +31,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerMapper answerMapper;
     private final MemberService memberService;
     private final TagService tagService;
+    private final AnswerHeartRedisRepository answerHeartRedisRepository;
 
     @Transactional
     @Override
@@ -90,8 +92,8 @@ public class AnswerServiceImpl implements AnswerService {
 
     }
 
-    @Transactional
     @Override
+    @Transactional
     public AnswerResponse.AnswerId deleteAnswer(Member loginMember, Long answerId) {
         Answer answer = findAnswer(answerId);
         Question question = answer.getQuestion();
@@ -114,9 +116,11 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    @Transactional
-    public AnswerResponse.AnswerId toggleAnswerHeart(Member loginMember, Long answerId) {
-        return new AnswerResponse.AnswerId(answerId);
+    public AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
+        Member member = memberService.findMember(loginMember.getId());
+
+        Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(),answerId);
+        return new AnswerResponse.AnswerLike(answerId, isLiked);
     }
 
     @Override
@@ -137,7 +141,4 @@ public class AnswerServiceImpl implements AnswerService {
         return Arrays.stream(answer.getTags().split(" "))
                 .filter(tag -> !tag.isEmpty()).toList();
     }
-
-
-
 }

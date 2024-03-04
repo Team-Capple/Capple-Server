@@ -9,4 +9,11 @@ public class AnswerResponse {
     public static class AnswerId {
         private Long answerId;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class AnswerLike {
+        private Long answerId;
+        private Boolean isLiked;
+    }
 }

@@ -11,7 +11,7 @@ public interface AnswerService {
      Answer findAnswer(Long answerId);
      AnswerResponse.AnswerId updateAnswer(Member member, Long answerId, AnswerRequest request);
      AnswerResponse.AnswerId deleteAnswer(Member loginMember, Long answerId);
-    AnswerResponse.AnswerId toggleAnswerHeart(Member loginMember, Long answerId);
+    AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId);
 
 
 }
