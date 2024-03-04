@@ -2,6 +2,7 @@ package com.server.capple.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.capple.domain.answer.dto.AnswerRequest;
+import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
@@ -22,11 +23,13 @@ public abstract class ControllerTestConfig {
     protected ObjectMapper objectMapper;
     protected Member member;
     protected Question question;
+    protected Answer answer;
 
     @BeforeEach
     public void setUp() {
         member = createMember();
         question = createQuestion();
+        answer = createAnswer();
     }
 
     protected Member createMember() {
@@ -42,6 +45,16 @@ public abstract class ControllerTestConfig {
                 .id(1L)
                 .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
                 .questionStatus(QuestionStatus.ONGOING)
+                .build();
+    }
+
+    protected Answer createAnswer() {
+        return Answer.builder()
+                .id(1L)
+                .content("나는 무자비한 사람이 좋아")
+                .tags("#무자비 #와플 ")
+                .question(question)
+                .member(member)
                 .build();
     }
 

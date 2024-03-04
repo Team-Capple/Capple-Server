@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -44,6 +44,52 @@ public class AnswerControllerTest extends ControllerTestConfig {
         ResultActions resultActions = this.mockMvc.perform(post(url, question.getId())
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(objectMapper.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.code").value("COMMON200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
+                .andExpect(jsonPath("$.result.answerId").value(1L));
+    }
+
+    @Test
+    @DisplayName("답변 수정 API 테스트")
+    public void updateAnswerTest() throws Exception {
+        //given
+        final String url = "/answers/{answerId}";
+
+        AnswerRequest request = getAnswerRequest();
+        AnswerResponse.AnswerId response = new AnswerResponse.AnswerId(1L);
+
+        doReturn(response).when(answerService).updateAnswer(any(Member.class), any(Long.class), any(AnswerRequest.class));
+
+        //when
+        ResultActions resultActions = this.mockMvc.perform(patch(url, answer.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(request)));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.code").value("COMMON200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
+                .andExpect(jsonPath("$.result.answerId").value(1L));
+    }
+
+    @Test
+    @DisplayName("답변 삭제 API 테스트")
+    public void deleteAnswerTest() throws Exception {
+        //given
+        final String url = "/answers/{answerId}";
+
+        AnswerResponse.AnswerId response = new AnswerResponse.AnswerId(1L);
+
+        doReturn(response).when(answerService).deleteAnswer(any(Member.class), any(Long.class));
+
+        //when
+        ResultActions resultActions = this.mockMvc.perform(delete(url, answer.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         //then
         resultActions.andExpect(status().isOk())
