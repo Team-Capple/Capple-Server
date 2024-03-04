@@ -1,6 +1,6 @@
 package com.server.capple.domain.question.controller;
 
-import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
+import com.server.capple.domain.question.dto.response.QuestionResponse.MainQuestion;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.global.common.BaseResponse;
@@ -21,22 +21,22 @@ public class QuestionController {
 
     private final QuestionService questionService;
 
-    @Operation(summary = "실시간 질문 조회 API", description = "실시간 질문을 조회합니다.")
+    @Operation(summary = "메인 질문 조회 API", description = "메인 질문을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
-    @GetMapping("/live")
-    private BaseResponse<QuestionSummary> getLiveQuestionSummary() {
-        return BaseResponse.onSuccess(questionService.getQuestionSummary(QuestionStatus.LIVE));
+    @GetMapping
+    private BaseResponse<MainQuestion> getLiveQuestionSummary() {
+        return BaseResponse.onSuccess(questionService.getMainQuestion(QuestionStatus.LIVE));
     }
 
-    @Operation(summary = "최근 지난 질문 조회 API", description = "최근 지난 질문을 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-    })
-    @GetMapping("/lastOld")
-    private BaseResponse<QuestionSummary> getLastOldQuestionSummary() {
-        return BaseResponse.onSuccess(questionService.getQuestionSummary(QuestionStatus.OLD));
-    }
+//    @Operation(summary = "최근 지난 질문 조회 API", description = "최근 지난 질문을 조회합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+//    })
+//    @GetMapping("/lastOld")
+//    private BaseResponse<QuestionSummary> getLastOldQuestionSummary() {
+//        return BaseResponse.onSuccess(questionService.getQuestionSummary(QuestionStatus.OLD));
+//    }
 
 }

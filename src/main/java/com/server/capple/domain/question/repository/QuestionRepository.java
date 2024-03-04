@@ -15,5 +15,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     // QuestionStatus에 따라 livedAt에 가장 최신인 Question을 가져오는 쿼리
     @Query("SELECT q FROM Question q WHERE q.questionStatus = :questionStatus AND q.deletedAt IS NULL ORDER BY q.livedAt DESC LIMIT 1")
-    Optional<Question> findByQuestionStatusAndLivedAt(@Param("questionStatus") QuestionStatus questionStatus);
+    Optional<Question> findByQuestionOrderByLivedAt();
+
+    Optional<Question> findFirstByOrderByLivedAtDesc();
 }
