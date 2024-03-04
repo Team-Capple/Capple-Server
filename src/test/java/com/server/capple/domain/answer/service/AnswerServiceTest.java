@@ -1,6 +1,7 @@
 package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
+import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.support.ServiceTestConfig;
@@ -26,7 +27,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
     @Test
     @DisplayName("Answer 생성 테스트")
     @Transactional
-    public void createAnswer() {
+    public void createAnswerTest() {
         //given
         AnswerRequest request = getAnswerRequest();
 
@@ -47,7 +48,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
     @Test
     @DisplayName("Answer 수정 테스트")
     @Transactional
-    public void updateAnswer() {
+    public void updateAnswerTest() {
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, question.getId(), request).getAnswerId();
@@ -76,7 +77,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
     @Test
     @DisplayName("Answer 삭제 테스트")
     @Transactional
-    public void deleteAnswer() {
+    public void deleteAnswerTest() {
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, question.getId(), request).getAnswerId();
@@ -90,6 +91,22 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         assertEquals(0, tags.size());
         assertNotNull(answer.getDeletedAt());
+
+    }
+
+    @Test
+    @DisplayName("Answer 좋아요/취소 테스트")
+    @Transactional
+    public void toggleAnswerHeartTest() {
+        //when
+        AnswerResponse.AnswerLike answerLike = answerService.toggleAnswerHeart(member, answer.getId());
+        //then
+        assertEquals(Boolean.TRUE,answerLike.getIsLiked());
+
+        //when
+        AnswerResponse.AnswerLike answerLike2 = answerService.toggleAnswerHeart(member, answer.getId());
+        //then
+        assertEquals(Boolean.FALSE,answerLike2.getIsLiked());
 
     }
 

@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -97,5 +98,28 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.answerId").value(1L));
+    }
+
+    @Test
+    @DisplayName("Answer 좋아요/취소 테스트")
+    public void toggleAnswerHeartTest()  throws Exception {
+        //given
+        final String url = "/answers/{answerId}/heart";
+
+        AnswerResponse.AnswerLike response = new AnswerResponse.AnswerLike(1L, Boolean.TRUE);
+
+        doReturn(response).when(answerService).toggleAnswerHeart(any(Member.class), any(Long.class));
+
+        //when
+        ResultActions resultActions = this.mockMvc.perform(post(url, answer.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.code").value("COMMON200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
+                .andExpect(jsonPath("$.result.answerId").value(1L))
+                .andExpect(jsonPath("$.result.isLiked").value(Boolean.TRUE));
     }
 }
