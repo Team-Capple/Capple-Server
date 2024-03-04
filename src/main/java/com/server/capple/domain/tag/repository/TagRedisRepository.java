@@ -58,7 +58,7 @@ public class TagRedisRepository implements Serializable {
     //해당 question 답변에 많이 쓰인 태그 7개 조회
     public Set<String> getTagsByQuestion(Long questionId) {
         String question = questionId.toString();
-        return zSetOperations.reverseRange(question, 0, 7);
+    return zSetOperations.reverseRange(QUESTION_TAGS_KEY+question, 0, 7);
     }
 
 
