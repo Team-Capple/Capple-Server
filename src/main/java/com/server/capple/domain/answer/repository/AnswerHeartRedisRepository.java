@@ -13,10 +13,8 @@ import static java.lang.Boolean.TRUE;
 @Repository
 @RequiredArgsConstructor
 public class AnswerHeartRedisRepository implements Serializable {
-
     public static final String ANSWER_HEART_KEY_PREFIX = "answerHeart-";
     public static final String MEMBER_KEY_PREFIX = "member-";
-
 
     @Resource(name = "redisTemplate")
     private SetOperations<String, String> setOperations;

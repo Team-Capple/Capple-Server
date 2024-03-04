@@ -17,7 +17,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
-
     private final TagRedisRepository tagRedisRepository;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
@@ -60,11 +59,10 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public void updateQuestionTags(Long questionId, List<String> addedTags,List<String>  removedTags) {
-        saveQuestionTags(questionId,addedTags);
-        deleteQuestionTags(questionId,removedTags);
+    public void updateQuestionTags(Long questionId, List<String> addedTags, List<String> removedTags) {
+        saveQuestionTags(questionId, addedTags);
+        deleteQuestionTags(questionId, removedTags);
     }
-
 
 
     @Override

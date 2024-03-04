@@ -119,7 +119,7 @@ public class AnswerServiceImpl implements AnswerService {
     public AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
 
-        Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(),answerId);
+        Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
         return new AnswerResponse.AnswerLike(answerId, isLiked);
     }
 

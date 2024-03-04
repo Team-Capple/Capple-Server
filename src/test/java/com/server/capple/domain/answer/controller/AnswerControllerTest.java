@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -26,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AnswerControllerTest extends ControllerTestConfig {
-
     @MockBean
     private AnswerService answerService;
 
@@ -102,7 +100,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
 
     @Test
     @DisplayName("Answer 좋아요/취소 테스트")
-    public void toggleAnswerHeartTest()  throws Exception {
+    public void toggleAnswerHeartTest() throws Exception {
         //given
         final String url = "/answers/{answerId}/heart";
 

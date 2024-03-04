@@ -64,5 +64,4 @@ public abstract class ControllerTestConfig {
                 .tags(List.of("#와플유니버시티", "#와플"))
                 .build();
     }
-
 }

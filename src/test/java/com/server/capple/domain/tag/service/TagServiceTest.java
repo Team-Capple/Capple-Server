@@ -54,8 +54,5 @@ public class TagServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals("#와플", tags.getTags().get(0));
-
     }
-
-
 }

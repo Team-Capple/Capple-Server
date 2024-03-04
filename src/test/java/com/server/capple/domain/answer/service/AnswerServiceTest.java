@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("Answer 서비스의 ")
 @SpringBootTest
 public class AnswerServiceTest extends ServiceTestConfig {
-
     @Autowired
     private AnswerService answerService;
     @Autowired
@@ -101,13 +100,12 @@ public class AnswerServiceTest extends ServiceTestConfig {
         //when
         AnswerResponse.AnswerLike answerLike = answerService.toggleAnswerHeart(member, answer.getId());
         //then
-        assertEquals(Boolean.TRUE,answerLike.getIsLiked());
+        assertEquals(Boolean.TRUE, answerLike.getIsLiked());
 
         //when
         AnswerResponse.AnswerLike answerLike2 = answerService.toggleAnswerHeart(member, answer.getId());
         //then
-        assertEquals(Boolean.FALSE,answerLike2.getIsLiked());
+        assertEquals(Boolean.FALSE, answerLike2.getIsLiked());
 
     }
-
 }

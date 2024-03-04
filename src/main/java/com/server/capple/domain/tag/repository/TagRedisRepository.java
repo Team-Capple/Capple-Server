@@ -60,6 +60,4 @@ public class TagRedisRepository implements Serializable {
         String question = questionId.toString();
         return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, 7);
     }
-
-
 }

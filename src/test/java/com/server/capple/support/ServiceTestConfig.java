@@ -74,5 +74,4 @@ public abstract class ServiceTestConfig {
                 .tags(List.of("#와플유니버시티", "#와플"))
                 .build();
     }
-
 }

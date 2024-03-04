@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TagControllerTest extends ControllerTestConfig {
+
     @MockBean
     private TagService tagService;
 
@@ -66,6 +67,4 @@ public class TagControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.tags").exists());
     }
-
-
 }
