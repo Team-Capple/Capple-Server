@@ -61,12 +61,11 @@ public class AnswerServiceImpl implements AnswerService {
         Question question = answer.getQuestion();
         checkPermission(loginMember, answer);
 
-        //현재 답변의 태그들
-        List<String> answerTags = Arrays.stream(answer.getTags().split(" "))
-                .filter(tag -> !tag.isEmpty()).toList();
-
         //rdb에 태그 update
         request.getTags().forEach(tagService::findOrCreateTag);
+
+        //현재 답변의 태그들
+        List<String> answerTags = getCurrentAnswerTags(answer);
 
         //추가된 태그들
         List<String> addedTags = new ArrayList<>(request.getTags());
@@ -84,6 +83,7 @@ public class AnswerServiceImpl implements AnswerService {
         if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
             tagService.updateQuestionTags(question.getId(), addedTags, removedTags);
 
+        //답변 update
         answer.update(request);
 
         return new AnswerResponse.AnswerId(answerId);
@@ -97,8 +97,8 @@ public class AnswerServiceImpl implements AnswerService {
         Question question = answer.getQuestion();
         checkPermission(loginMember, answer);
 
-        List<String> answerTags = Arrays.stream(answer.getTags().split(" "))
-                .filter(tag -> !tag.isEmpty()).toList();
+        //현재 답변의 태그들
+        List<String> answerTags = getCurrentAnswerTags(answer);
 
         //redis tag 삭제
         tagService.deleteTags(answerTags);
@@ -132,5 +132,12 @@ public class AnswerServiceImpl implements AnswerService {
         if (!member.getId().equals(answer.getMember().getId()))
             throw new RestApiException(AnswerErrorCode.ANSWER_UNAUTHORIZED);
     }
+
+    private List<String> getCurrentAnswerTags(Answer answer) {
+        return Arrays.stream(answer.getTags().split(" "))
+                .filter(tag -> !tag.isEmpty()).toList();
+    }
+
+
 
 }

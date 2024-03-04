@@ -6,9 +6,12 @@ import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.repository.QuestionRepository;
+import org.aspectj.lang.annotation.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 
@@ -22,13 +25,18 @@ public abstract class ServiceTestConfig {
     protected Member member;
     protected Question question;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
 
     @BeforeEach
     public void setUp() {
         member = createMember();
         question = createQuestion();
+        redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
-
+    @AfterEach
+    public void tearDown() {
+    }
     protected Member createMember() {
         return memberRepository.save(
                 Member.builder()
@@ -47,6 +55,8 @@ public abstract class ServiceTestConfig {
                         .build()
         );
     }
+
+
 
     protected AnswerRequest getAnswerRequest() {
         return AnswerRequest.builder()
