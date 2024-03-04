@@ -1,4 +1,4 @@
-package com.server.capple.domain.mapper;
+package com.server.capple.domain.member.mapper;
 
 import com.server.capple.domain.member.dto.response.MemberResponse;
 import org.springframework.stereotype.Component;

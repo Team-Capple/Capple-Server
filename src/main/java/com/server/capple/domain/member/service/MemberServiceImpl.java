@@ -1,6 +1,6 @@
 package com.server.capple.domain.member.service;
 
-import com.server.capple.domain.mapper.MemberMapper;
+import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.dto.response.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.repository.MemberRepository;
