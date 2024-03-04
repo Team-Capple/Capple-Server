@@ -8,9 +8,8 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum MemberErrorCode implements ErrorCodeInterface {
-
-    MEMBER_NOT_FOUND("MEMBER001", "Member가 존재하지 않습니다.",HttpStatus.NOT_FOUND);
+public enum AnswerErrorCode implements ErrorCodeInterface {
+    ANSWER_NOT_FOUND("ANSWER001", "답변을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     private final String code;
     private final String message;

@@ -8,12 +8,14 @@ import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.MemberErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -21,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Long memberId) {
-        Member member = findByMemberId(memberId);
+        Member member = findMember(memberId);
         return mapper.toMyPageMemberInfo(member.getNickname(), member.getEmail(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
     }
 
@@ -30,7 +32,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member findByMemberId(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOTFOUND));
+    public Member findMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 }
