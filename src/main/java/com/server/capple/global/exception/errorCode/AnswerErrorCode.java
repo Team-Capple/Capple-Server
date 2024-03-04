@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum AnswerErrorCode implements ErrorCodeInterface {
-    ANSWER_NOT_FOUND("ANSWER001", "답변을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+    ANSWER_NOT_FOUND("ANSWER001", "답변을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ANSWER_UNAUTHORIZED("ANSWER002", "답변에 대한 권한이 업습니다.", HttpStatus.FORBIDDEN);
 
     private final String code;
     private final String message;
