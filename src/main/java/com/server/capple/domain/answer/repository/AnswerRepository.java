@@ -10,9 +10,17 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    @Query("select a from Answer a where a.id = :answerId and a.deletedAt is null")
+    @Query("SELECT a FROM Answer a WHERE a.id = :answerId")
     Optional<Answer> findById(@Param("answerId") Long answerId);
 
-    @Query("SELECT a FROM Answer a where a.question.id = :questionId AND a.deletedAt IS NULL ORDER BY a.createdAt DESC")
-    Optional<List<Answer>> findByQuestion(@Param("questionId") Long questionId, Pageable pageable);
+    @Query("SELECT a FROM Answer a WHERE a.question.id = :questionId ORDER BY a.createdAt DESC")
+    Optional<List<Answer>> findByQuestion(
+            @Param("questionId") Long questionId,
+            Pageable pageable);
+
+    @Query("SELECT a FROM Answer a WHERE a.question.id = :questionId AND a.content LIKE %:keyword%")
+    Optional<List<Answer>> findByQuestionAndKeyword(
+            @Param("questionId") Long questionId,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 }

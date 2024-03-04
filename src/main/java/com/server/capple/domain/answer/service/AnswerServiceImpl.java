@@ -61,15 +61,25 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public AnswerList getAnswerList(Long questionId, int numberOfAnswer) {
-        Pageable pageable = PageRequest.of(0, numberOfAnswer);
+    public AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable) {
+//        Pageable pageable = PageRequest.of(0, numberOfAnswer);
 
-        return answerMapper.toAnswerList(
-                answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
-                -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
-                        .stream()
-                        .map(answerMapper::toAnswerInfo)
-                        .toList());
+        if (keyword == null) {
+            return answerMapper.toAnswerList(
+                    answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
+                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
+                            .stream()
+                            .map(answerMapper::toAnswerInfo)
+                            .toList());
+        } else {
+            return answerMapper.toAnswerList(
+                    answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
+                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
+                            .stream()
+                            .map(answerMapper::toAnswerInfo)
+                            .toList());
+        }
+
     }
 
 }
