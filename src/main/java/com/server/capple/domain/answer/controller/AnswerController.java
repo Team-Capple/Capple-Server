@@ -34,4 +34,19 @@ public class AnswerController {
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.updateAnswer(member, answerId, request));
     }
+
+    @Operation(summary = "답변 삭제 API", description = " 답변 삭제 API 입니다." +
+            "pathvariable 으로 answerId를 주세요.")
+    @DeleteMapping("/{answerId}")
+    public BaseResponse<AnswerResponse.AnswerId> deleteAnswer(Member member, @PathVariable(value = "answerId") Long answerId) {
+        return BaseResponse.onSuccess(answerService.deleteAnswer(member, answerId));
+    }
+
+    @Operation(summary = "답변 좋아요/취소 API", description = " 답변 좋아요/취소 API 입니다." +
+            "pathvariable 으로 answerId를 주세요.")
+    @PostMapping("/{answerId}/heart")
+    public BaseResponse<AnswerResponse.AnswerId> toggleAnswerHeart(Member member, @PathVariable(value = "answerId") Long answerId) {
+        return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
+    }
+
 }
