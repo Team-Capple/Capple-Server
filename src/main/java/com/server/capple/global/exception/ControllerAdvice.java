@@ -31,7 +31,7 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleRestApiException(
             RestApiException e) {
         ErrorCode errorCode = e.getErrorCode();
-        return handlerExceptionInternal(errorCode);
+        return handleExceptionInternal(errorCode);
     }
 
     /**
@@ -84,13 +84,6 @@ public class ControllerAdvice extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternalArgs(GlobalErrorCode.VALIDATION_ERROR.getErrorCode(), errors);
 
-    }
-
-    private ResponseEntity<BaseResponse<String>> handlerExceptionInternal(
-            ErrorCode errorCode) {
-        return ResponseEntity
-                .status(errorCode.getHttpStatus().value())
-                .body(BaseResponse.onFailure(errorCode.getCode(), errorCode.getMessage(), null));
     }
 
     private ResponseEntity<BaseResponse<String>> handleExceptionInternal(ErrorCode errorCode) {

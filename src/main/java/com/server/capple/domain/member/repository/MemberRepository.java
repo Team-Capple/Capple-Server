@@ -8,7 +8,5 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
-
-    @Query("select m from Member m where m.id = :memberId and m.deletedAt is null")
-    Optional<Member> findById(@Param("memberId") Long memberId);
+    Optional<Member> findById(Long memberId);
 }

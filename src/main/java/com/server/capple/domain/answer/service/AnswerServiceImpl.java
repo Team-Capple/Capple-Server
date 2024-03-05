@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
@@ -15,6 +16,7 @@ import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,7 @@ public class AnswerServiceImpl implements AnswerService {
         tagService.saveTags(request.getTags());
 
         //온에어 질문일 경우, redis 질문 별 태그 저장
-        if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
+        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
             tagService.saveQuestionTags(questionId, request.getTags());
 
         return new AnswerResponse.AnswerId(answer.getId());
@@ -82,7 +84,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         //온에어 시간이 지나면 순위에는 변동 X 온에어 시간일 경우에만 변동
         //redis 질문별 태그 update
-        if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
+        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
             tagService.updateQuestionTags(question.getId(), addedTags, removedTags);
 
         //답변 update
@@ -107,7 +109,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         //온에어 시간이 지나면 순위에는 변동 X 온에어 시간일 경우에만 변동
         //redis 질문별 tag 삭제
-        if (question.getQuestionStatus().equals(QuestionStatus.ONGOING))
+        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
             tagService.deleteQuestionTags(question.getId(), answerTags);
 
         answer.delete();
@@ -115,6 +117,8 @@ public class AnswerServiceImpl implements AnswerService {
         return new AnswerResponse.AnswerId(answerId);
     }
 
+
+    //답변 좋아요 / 취소
     @Override
     public AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
@@ -124,12 +128,27 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public Answer findAnswer(Long answerId) {
-        return answerRepository.findById(answerId).orElseThrow(
-                () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
-        );
+    public AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable) {
+
+        if (keyword == null) {
+            return answerMapper.toAnswerList(
+                    answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
+                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
+                            .stream()
+                            .map(answerMapper::toAnswerInfo)
+                            .toList());
+        } else {
+            return answerMapper.toAnswerList(
+                    answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
+                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
+                            .stream()
+                            .map(answerMapper::toAnswerInfo)
+                            .toList());
+        }
+
     }
 
+    //로그인된 유저와 작성자가 같은지 체크
     private void checkPermission(Member loginMember, Answer answer) {
         Member member = memberService.findMember(loginMember.getId());
 
@@ -140,5 +159,12 @@ public class AnswerServiceImpl implements AnswerService {
     private List<String> getCurrentAnswerTags(Answer answer) {
         return Arrays.stream(answer.getTags().split(" "))
                 .filter(tag -> !tag.isEmpty()).toList();
+    }
+
+    @Override
+    public Answer findAnswer(Long answerId) {
+        return answerRepository.findById(answerId).orElseThrow(
+                () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
+        );
     }
 }
