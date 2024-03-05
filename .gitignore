@@ -42,3 +42,4 @@ src/main/resources/*.yml
 ._.DS_Store
 **/.DS_Store
 **/._.DS_Store
+dump.rdb

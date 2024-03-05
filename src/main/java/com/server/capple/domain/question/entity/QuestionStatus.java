@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum QuestionStatus {
 
-    LAST("지난 질문"),
-    ONGOING("진행중인 질문");
+    LIVE("진행중인 질문"),
+    OLD("지난 질문"),
+    HOLD("보류중인 질문"),
+    PENDING("대기중인 질문");
     private final String toKorean;
 }
