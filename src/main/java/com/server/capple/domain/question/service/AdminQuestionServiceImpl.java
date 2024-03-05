@@ -27,8 +27,8 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     @Override
     @Transactional
     public QuestionId deleteQuestion(Long questionId) {
-        Question question = adminQuestionRepository.findById(questionId).orElseThrow(() -> new RestApiException(
-                QuestionErrorCode.QUESTION_NOT_FOUND));
+        Question question = adminQuestionRepository.findById(questionId).orElseThrow(()
+                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
         question.delete();
 
