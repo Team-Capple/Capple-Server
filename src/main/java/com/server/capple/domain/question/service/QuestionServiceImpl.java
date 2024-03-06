@@ -1,6 +1,6 @@
 package com.server.capple.domain.question.service;
 
-import com.server.capple.domain.question.dto.response.QuestionResponse.MainQuestion;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.mapper.QuestionMapper;
@@ -24,8 +24,8 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public MainQuestion getMainQuestion(QuestionStatus questionStatus) {
-        return questionMapper.toMainQuestion(questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
+    public QuestionInfo getMainQuestion() {
+        return questionMapper.toQuestionInfo(questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
     }
 }

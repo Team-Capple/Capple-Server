@@ -1,6 +1,6 @@
 package com.server.capple.domain.question.controller;
 
-import com.server.capple.domain.question.dto.response.QuestionResponse.MainQuestion;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.global.common.BaseResponse;
@@ -26,8 +26,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/main")
-    private BaseResponse<MainQuestion> getLiveQuestionSummary() {
-        return BaseResponse.onSuccess(questionService.getMainQuestion(QuestionStatus.LIVE));
+    private BaseResponse<QuestionInfo> getMainQuestion() {
+        return BaseResponse.onSuccess(questionService.getMainQuestion());
     }
 
 //    @Operation(summary = "모든 질문 조회 API", description = "모든 질문을 조회합니다.")
@@ -35,7 +35,9 @@ public class QuestionController {
 //            @ApiResponse(responseCode = "COMMON200", description = "성공"),
 //    })
 //    @GetMapping
-//    private BaseResponse.on
+//    private BaseResponse<QuestionInfos> getQuestions() {
+//        return BaseResponse.onSuccess(questionService.get);
+//    }
 
 
 //    @Operation(summary = "최근 지난 질문 조회 API", description = "최근 지난 질문을 조회합니다.")

@@ -2,7 +2,7 @@ package com.server.capple.domain.question.mapper;
 
 import com.server.capple.domain.question.dto.request.QuestionRequest.QuestionCreate;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionId;
-import com.server.capple.domain.question.dto.response.QuestionResponse.MainQuestion;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.entity.Question;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +22,8 @@ public class QuestionMapper {
                 .build();
     }
 
-    public MainQuestion toMainQuestion(Question question) {
-        return MainQuestion.builder()
+    public QuestionInfo toQuestionInfo(Question question) {
+        return QuestionInfo.builder()
                 .questionId(question.getId())
                 .questionStatus(question.getQuestionStatus())
                 .content(question.getContent())
