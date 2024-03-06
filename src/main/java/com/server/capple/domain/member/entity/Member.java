@@ -24,6 +24,14 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-
+    @Column(nullable = false)
     private String profileImage;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
 }
