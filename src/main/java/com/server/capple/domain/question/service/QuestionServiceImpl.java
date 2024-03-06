@@ -1,6 +1,7 @@
 package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.mapper.QuestionMapper;
@@ -8,6 +9,7 @@ import com.server.capple.domain.question.repository.QuestionRepository;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,4 +30,14 @@ public class QuestionServiceImpl implements QuestionService {
         return questionMapper.toQuestionInfo(questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
     }
+
+    @Override
+    public QuestionInfos getQuestions() {
+        return questionMapper.toQuestionInfos(questionRepository.findAll()
+                .stream()
+                .map(questionMapper::toQuestionInfo)
+                .toList());
+    }
+
+
 }
