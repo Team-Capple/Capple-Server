@@ -15,8 +15,8 @@ public class MemberMapper {
                 .build();
     }
 
-    public MemberResponse.editMemberInfo toEditMemberInfo(Long memberId, String nickname, String profileImage){
-        return MemberResponse.editMemberInfo.builder()
+    public MemberResponse.EditMemberInfo toEditMemberInfo(Long memberId, String nickname, String profileImage){
+        return MemberResponse.EditMemberInfo.builder()
                 .MemberId(memberId)
                 .nickname(nickname)
                 .profileImage(profileImage)

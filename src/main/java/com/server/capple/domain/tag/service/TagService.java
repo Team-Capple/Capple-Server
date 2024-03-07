@@ -9,10 +9,17 @@ public interface TagService {
 
     void saveTags(List<String> tags);
 
+    void deleteQuestionTags(Long questionId, List<String> tags);
+
+    void deleteTags(List<String> tags);
+
+    void updateQuestionTags(Long questionId, List<String> addedTags, List<String> removedTags);
+
+    void updateTags(List<String> addedTags, List<String> removedTags);
+
     TagResponse.TagInfos getTagsByQuestion(Long questionId);
 
     void findOrCreateTag(String tagName);
 
     TagResponse.TagInfos searchTags(String keyword);
-
 }

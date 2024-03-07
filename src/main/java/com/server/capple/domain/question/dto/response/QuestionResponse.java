@@ -1,13 +1,16 @@
 package com.server.capple.domain.question.dto.response;
 
 import com.server.capple.domain.question.entity.QuestionStatus;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 public class QuestionResponse {
 
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class MainQuestion {
         private Long questionId;
@@ -15,8 +18,8 @@ public class QuestionResponse {
         private String content;
     }
 
-    @Data
-    @Builder
+    @Getter
+    @AllArgsConstructor
     public static class QuestionId {
         private Long questionId;
     }

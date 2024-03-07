@@ -18,6 +18,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
 
+    @Override
     public Question findQuestion(Long questionId) {
         return questionRepository.findById(questionId).orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));

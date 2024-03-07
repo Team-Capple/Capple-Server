@@ -18,7 +18,7 @@ public class MemberResponse {
 
     @Getter
     @Builder
-    public static class editMemberInfo {
+    public static class EditMemberInfo {
         private Long MemberId;
         private String nickname;
         private String profileImage;

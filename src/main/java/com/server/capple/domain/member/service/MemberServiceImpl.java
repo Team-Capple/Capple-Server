@@ -47,7 +47,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponse.editMemberInfo editMemberInfo(Long memberId, MemberRequest.editMemberInfo request) {
+    public MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request) {
         Member member = findMember(memberId);
 
         // 이전 이미지 버킷에서 삭제

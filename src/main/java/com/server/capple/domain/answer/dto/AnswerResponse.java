@@ -1,10 +1,8 @@
 package com.server.capple.domain.answer.dto;
 
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+
+import lombok.*;
 
 public class AnswerResponse {
     @Getter
@@ -13,7 +11,8 @@ public class AnswerResponse {
         private Long answerId;
     }
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class AnswerInfo {
         private String profileImage;
@@ -22,9 +21,18 @@ public class AnswerResponse {
         private String tags;
     }
 
-    @Data
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     @Builder
     public static class AnswerList {
         private List<AnswerInfo> answerInfos;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class AnswerLike {
+        private Long answerId;
+        private Boolean isLiked;
     }
 }

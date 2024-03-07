@@ -17,11 +17,12 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
 
     private final AdminQuestionRepository adminQuestionRepository;
     private final QuestionMapper questionMapper;
+
     @Override
     public QuestionId createQuestion(QuestionCreate request) {
         Question question = adminQuestionRepository.save(questionMapper.toQuestion(request));
 
-        return questionMapper.toQuestionId(question);
+        return new QuestionId(question.getId());
     }
 
     @Override
@@ -32,6 +33,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
 
         question.delete();
 
-        return questionMapper.toQuestionId(question);
+        return new QuestionId(question.getId());
+
     }
 }
