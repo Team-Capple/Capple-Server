@@ -36,8 +36,8 @@ public class MemberController {
     @Operation(summary = "마이페이지 프로필 수정 API", description = " 프로필 수정 API 입니다." +
             " request body로 수정할 멤버 id, 닉네임, 업로드한 이미지 url을 주세요.")
     @PostMapping("/{memberId}")
-    public BaseResponse<MemberResponse.editMemberInfo> editMemberInfo(@PathVariable Long memberId,
-                                                                      @RequestBody @Valid MemberRequest.editMemberInfo request) {
+    public BaseResponse<MemberResponse.EditMemberInfo> editMemberInfo(@PathVariable Long memberId,
+                                                                      @RequestBody @Valid MemberRequest.EditMemberInfo request) {
         return BaseResponse.onSuccess(memberService.editMemberInfo(memberId, request));
     }
 }

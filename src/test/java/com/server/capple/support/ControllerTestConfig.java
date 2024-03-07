@@ -44,7 +44,7 @@ public abstract class ControllerTestConfig {
         return Question.builder()
                 .id(1L)
                 .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
-                .questionStatus(QuestionStatus.ONGOING)
+                .questionStatus(QuestionStatus.LIVE)
                 .build();
     }
 

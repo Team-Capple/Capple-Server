@@ -106,18 +106,18 @@ public class MemberControllerTest extends ControllerTestConfig {
         final String url = "/members/{memberId}";
         final Long memberId = 1L;
 
-        MemberRequest.editMemberInfo request = MemberRequest.editMemberInfo.builder()
+        MemberRequest.EditMemberInfo request = MemberRequest.EditMemberInfo.builder()
                 .profileImage("ari.png")
                 .nickname("아리")
                 .build();
 
-        MemberResponse.editMemberInfo response = MemberResponse.editMemberInfo.builder()
+        MemberResponse.EditMemberInfo response = MemberResponse.EditMemberInfo.builder()
                 .MemberId(memberId)
                 .nickname("아리")
                 .profileImage("ari.png")
                 .build();
 
-        given(memberService.editMemberInfo(any(Long.class), any(MemberRequest.editMemberInfo.class))).willReturn(response);
+        given(memberService.editMemberInfo(any(Long.class), any(MemberRequest.EditMemberInfo.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(post(url, memberId)

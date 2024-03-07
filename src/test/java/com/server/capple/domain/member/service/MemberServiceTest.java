@@ -36,13 +36,13 @@ public class MemberServiceTest extends ServiceTestConfig {
     @Transactional
     public void editProfileTest() {
         //given
-        MemberRequest.editMemberInfo request = MemberRequest.editMemberInfo.builder()
+        MemberRequest.EditMemberInfo request = MemberRequest.EditMemberInfo.builder()
                 .nickname("아리")
                 .profileImage("ari.png")
                 .build();
 
         //when
-        MemberResponse.editMemberInfo memberInfo = memberService.editMemberInfo(member.getId(), request);
+        MemberResponse.EditMemberInfo memberInfo = memberService.editMemberInfo(member.getId(), request);
 
         //then
         assertEquals(memberInfo.getNickname(), "아리");

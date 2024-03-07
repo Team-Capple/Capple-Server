@@ -9,6 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface MemberService {
     MemberResponse.MyPageMemberInfo getMemberInfo(Long memberId);
     Member findMember(Long memberId);
-    MemberResponse.editMemberInfo editMemberInfo(Long memberId, MemberRequest.editMemberInfo request);
+    MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request);
     MemberResponse.ProfileImage uploadImage(MultipartFile image);
 }
