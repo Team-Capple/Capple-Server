@@ -58,6 +58,7 @@ public class MemberServiceImpl implements MemberService {
         member.updateProfileImage(imageUrl);
 
         // 2. 닉네임 업데이트
+        if (memberRepository.countMemberByNickname(request.getNickname(), memberId) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
         member.updateNickname(request.getNickname());
 
         return mapper.toEditMemberInfo(member.getId(), member.getNickname(), member.getProfileImage());

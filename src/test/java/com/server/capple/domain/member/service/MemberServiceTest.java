@@ -2,7 +2,9 @@ package com.server.capple.domain.member.service;
 
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
+import com.server.capple.global.exception.RestApiException;
 import com.server.capple.support.ServiceTestConfig;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
