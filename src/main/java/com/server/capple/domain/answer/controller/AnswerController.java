@@ -69,4 +69,10 @@ public class AnswerController {
         return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
     }
 
+    @Operation(summary = "답변 좋아요/취소 API", description = " 답변 좋아요/취소 API 입니다." +
+            "pathvariable 으로 answerId를 주세요.")
+    @PostMapping("/{memberId}")
+    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@PathVariable Long memberId) {
+        return BaseResponse.onSuccess(answerService.getMemberAnswer(memberId));
+    }
 }

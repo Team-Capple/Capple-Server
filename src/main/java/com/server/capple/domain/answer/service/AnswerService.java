@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
@@ -20,4 +21,6 @@ public interface AnswerService {
     AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId);
 
     AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable);
+
+    MemberAnswerList getMemberAnswer(Long memberId);
 }

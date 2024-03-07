@@ -35,4 +35,22 @@ public class AnswerResponse {
         private Long answerId;
         private Boolean isLiked;
     }
+
+
+    @Getter
+    @Builder
+    public static class MemberAnswerInfo {
+        private Long questionId;
+        private String nickname;
+        private String profileImage;
+        private String content;
+        private String tags;
+        private int heartCount;
+        private String writeAt;
+    }
+
+    @AllArgsConstructor
+    public static class MemberAnswerList {
+        private List<MemberAnswerInfo> memberAnswerInfos;
+    }
 }

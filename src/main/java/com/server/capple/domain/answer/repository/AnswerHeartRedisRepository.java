@@ -32,4 +32,9 @@ public class AnswerHeartRedisRepository implements Serializable {
             return FALSE;
         }
     }
+
+    public int getAnswerHeartsCount(Long answerId) {
+        String key = ANSWER_HEART_KEY_PREFIX + answerId.toString();
+        return setOperations.members(key).size();
+    }
 }
