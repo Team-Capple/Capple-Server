@@ -33,10 +33,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionInfos getQuestions() {
-        return questionMapper.toQuestionInfos(questionRepository.findAll()
-                .stream()
-                .map(questionMapper::toQuestionInfo)
-                .toList());
+        return questionMapper.toQuestionInfos(questionRepository.findAllByOrderByCreatedAtDesc().orElseThrow(()
+                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND))
+                        .stream()
+                        .map(questionMapper::toQuestionInfo)
+                        .toList());
     }
 
 

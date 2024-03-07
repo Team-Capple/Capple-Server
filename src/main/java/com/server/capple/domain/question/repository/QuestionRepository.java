@@ -21,4 +21,5 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Optional<Question> findFirstByOrderByLivedAtDesc();
 
+    Optional<List<Question>> findAllByOrderByCreatedAtDesc();
 }
