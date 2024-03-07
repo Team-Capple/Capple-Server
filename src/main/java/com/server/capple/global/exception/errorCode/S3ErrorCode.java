@@ -8,11 +8,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum MemberErrorCode implements ErrorCodeInterface {
+public enum S3ErrorCode implements ErrorCodeInterface {
 
-    MEMBER_NOT_FOUND("MEMBER001", "Member가 존재하지 않습니다.",HttpStatus.NOT_FOUND),
-    EXIST_MEMBER_NICKNAME("MEMBER002", "이미 사용 중인 닉네임입니다.",HttpStatus.BAD_REQUEST),
-    ;
+    FAILED_UPLOAD_IMAGE("S3001", "S3 이미지 업로드에 실패했습니다.",HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

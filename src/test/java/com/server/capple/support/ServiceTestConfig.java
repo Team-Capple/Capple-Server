@@ -44,7 +44,7 @@ public abstract class ServiceTestConfig {
                 Member.builder()
                         .email("tnals2384@gmail.com")
                         .nickname("루시")
-                        .profileImage("lucy.jpg")
+                        .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
                         .build()
         );
     }
