@@ -1,9 +1,9 @@
 package com.server.capple.domain.question.dto.response;
 
 import com.server.capple.domain.question.entity.QuestionStatus;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 public class QuestionResponse {
@@ -12,7 +12,7 @@ public class QuestionResponse {
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class MainQuestion {
+    public static class QuestionSummary {
         private Long questionId;
         private QuestionStatus questionStatus;
         private String content;
@@ -20,10 +20,27 @@ public class QuestionResponse {
 
     @Getter
     @AllArgsConstructor
+    @Builder
+    public static class QuestionInfo {
+        private Long questionId;
+        private QuestionStatus questionStatus;
+        private String content;
+        private String tag;
+        private Long likeCount;
+        private Long commentCount;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
     public static class QuestionId {
         private Long questionId;
     }
 
-
-
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class QuestionInfos {
+        private List<QuestionInfo> questionInfos;
+    }
 }
