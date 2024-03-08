@@ -15,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -69,5 +71,20 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse.ProfileImage uploadImage(MultipartFile image) {
         return new MemberResponse.ProfileImage(s3ImageComponent.uploadImage(image));
     }
+
+    @Override
+    public MemberResponse.DeleteProfileImages deleteOrphanageImages() {
+        // 버킷에 저장된 모든 이미지 조회
+        List<String> bucketImages = s3ImageComponent.findAllImageUrls();
+
+        // profile image로 사용되지 않는 이미지 버킷에서 삭제
+        List<String> deleteImages = bucketImages.stream()
+                .filter(bucketImage -> !memberRepository.existMemberProfileImage(bucketImage))
+                .peek(s3ImageComponent::deleteImage)
+                .toList();
+
+        return new MemberResponse.DeleteProfileImages(deleteImages);
+    }
+
 
 }

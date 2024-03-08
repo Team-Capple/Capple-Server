@@ -2,7 +2,9 @@ package com.server.capple.global.utils;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.S3ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -65,5 +69,20 @@ public class S3ImageComponent {
      */
     public void deleteImage(String fileUrl) {
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileUrl.split("/", 4)[3]));
+    }
+
+    public List<String> findAllImageUrls(){
+        List<String> imageUrls = new ArrayList<>();
+
+        // 버킷 이미지 전체 조회
+        List<S3ObjectSummary> objectSummaries = amazonS3.listObjects(bucket).getObjectSummaries();
+
+        // imageUrl 추출
+        for (S3ObjectSummary objectSummary : objectSummaries) {
+            String imageUrl = amazonS3.getUrl(bucket, objectSummary.getKey()).toString();
+            imageUrls.add(imageUrl);
+        }
+
+        return imageUrls;
     }
 }

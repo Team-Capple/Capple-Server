@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 
 public class MemberResponse {
 
@@ -28,5 +30,11 @@ public class MemberResponse {
     @Getter
     public static class ProfileImage {
         private String imageUrl;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteProfileImages {
+        private List<String> DeleteImages;
     }
 }

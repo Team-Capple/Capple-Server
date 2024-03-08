@@ -40,4 +40,10 @@ public class MemberController {
                                                                       @RequestBody @Valid MemberRequest.EditMemberInfo request) {
         return BaseResponse.onSuccess(memberService.editMemberInfo(memberId, request));
     }
+
+    @Operation(summary = "미사용 이미지 삭제 API", description = " 미사용 이미지 API 입니다.")
+    @DeleteMapping("/image")
+    public BaseResponse<MemberResponse.DeleteProfileImages> deleteOrphanageImages() {
+        return BaseResponse.onSuccess(memberService.deleteOrphanageImages());
+    }
 }
