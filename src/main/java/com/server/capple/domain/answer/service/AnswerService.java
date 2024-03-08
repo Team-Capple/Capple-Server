@@ -23,4 +23,6 @@ public interface AnswerService {
     AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable);
 
     MemberAnswerList getMemberAnswer(Long memberId);
+
+    MemberAnswerList getMemberHeartAnswer(Long memberId);
 }

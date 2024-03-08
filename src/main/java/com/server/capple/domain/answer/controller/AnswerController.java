@@ -69,10 +69,17 @@ public class AnswerController {
         return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
     }
 
-    @Operation(summary = "답변 좋아요/취소 API", description = " 답변 좋아요/취소 API 입니다." +
-            "pathvariable 으로 answerId를 주세요.")
+    @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다." +
+            "pathvariable 으로 memeberId를 주세요.")
     @PostMapping("/{memberId}")
     public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@PathVariable Long memberId) {
         return BaseResponse.onSuccess(answerService.getMemberAnswer(memberId));
+    }
+
+    @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다." +
+            "pathvariable 으로 memeberId를 주세요.")
+    @PostMapping("/{memberId}/heart")
+    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberHeartAnswer(@PathVariable Long memberId) {
+        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(memberId));
     }
 }

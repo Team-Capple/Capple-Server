@@ -3,7 +3,6 @@ package com.server.capple.domain.answer.service;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
@@ -25,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -158,6 +156,16 @@ public class AnswerServiceImpl implements AnswerService {
         return answerMapper.toMemberAnswerList(
                 answers.stream()
                         .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId())))
+                        .toList()
+        );
+    }
+
+    @Override
+    public MemberAnswerList getMemberHeartAnswer(Long memberId) {
+        return answerMapper.toMemberAnswerList(
+                answerHeartRedisRepository.getMemberHeartsAnswer(memberId)
+                        .stream()
+                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer(Long.valueOf((answerId))), answerHeartRedisRepository.getAnswerHeartsCount(Long.valueOf(answerId))))
                         .toList()
         );
     }
