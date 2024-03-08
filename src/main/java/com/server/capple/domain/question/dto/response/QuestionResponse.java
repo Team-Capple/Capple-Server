@@ -29,6 +29,7 @@ public class QuestionResponse {
         private Long likeCount;
         private Long commentCount;
     }
+
     @Getter
     @AllArgsConstructor
     @Builder
@@ -42,6 +43,4 @@ public class QuestionResponse {
     public static class QuestionInfos {
         private List<QuestionInfo> questionInfos;
     }
-
-
 }
