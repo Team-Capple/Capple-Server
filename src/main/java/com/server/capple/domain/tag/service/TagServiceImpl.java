@@ -17,7 +17,6 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
-
     private final TagRedisRepository tagRedisRepository;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
@@ -34,10 +33,35 @@ public class TagServiceImpl implements TagService {
         tagRedisRepository.saveQuestionTags(questionId, tags);
     }
 
+    //질문 사용된 tags list 조회 (count 높은 순으로)
     @Override
     public TagResponse.TagInfos getTagsByQuestion(Long questionId) {
         Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId);
         return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
+    }
+
+    //answer 삭제시 tag 삭제, count decrease
+    @Override
+    public void deleteTags(List<String> tags) {
+        tagRedisRepository.deleteTags(tags);
+    }
+
+    //answer 삭제시 tag 삭제, count decrease
+    @Override
+    public void deleteQuestionTags(Long questionId, List<String> tags) {
+        tagRedisRepository.deleteQuestionTags(questionId, tags);
+    }
+
+    @Override
+    public void updateTags(List<String> addedTags, List<String> removedTags) {
+        saveTags(addedTags);
+        deleteTags(removedTags);
+    }
+
+    @Override
+    public void updateQuestionTags(Long questionId, List<String> addedTags, List<String> removedTags) {
+        saveQuestionTags(questionId, addedTags);
+        deleteQuestionTags(questionId, removedTags);
     }
 
 

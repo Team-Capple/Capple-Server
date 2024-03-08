@@ -10,8 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    @Query("SELECT a FROM Answer a WHERE a.id = :answerId")
-    Optional<Answer> findById(@Param("answerId") Long answerId);
+    Optional<Answer> findById(Long answerId);
 
     @Query("SELECT a FROM Answer a WHERE a.question.id = :questionId ORDER BY a.createdAt DESC")
     Optional<List<Answer>> findByQuestion(

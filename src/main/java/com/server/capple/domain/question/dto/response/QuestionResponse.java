@@ -2,13 +2,15 @@ package com.server.capple.domain.question.dto.response;
 
 import com.server.capple.domain.question.entity.QuestionStatus;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 
 public class QuestionResponse {
 
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class QuestionSummary {
         private Long questionId;
@@ -16,7 +18,8 @@ public class QuestionResponse {
         private String content;
     }
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class QuestionInfo {
         private Long questionId;
@@ -26,14 +29,15 @@ public class QuestionResponse {
         private Long likeCount;
         private Long commentCount;
     }
-
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class QuestionId {
         private Long questionId;
     }
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     @Builder
     public static class QuestionInfos {
         private List<QuestionInfo> questionInfos;

@@ -3,6 +3,8 @@ package com.server.capple.global.utils;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.S3ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,14 +26,19 @@ public class S3ImageComponent {
      * @param multipartFile 업로드 할 이미지 파일
      * @return 업로드된 파일의 접근 URL
      */
-    public String uploadImage(MultipartFile multipartFile) throws IOException {
+    public String uploadImage(MultipartFile multipartFile) {
         String fileName = createFileName(multipartFile.getOriginalFilename());
 
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(multipartFile.getSize());
         metadata.setContentType(multipartFile.getContentType());
 
-        amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
+        try {
+            amazonS3.putObject(bucket, fileName, multipartFile.getInputStream(), metadata);
+        } catch (IOException e) {
+            throw new RestApiException(S3ErrorCode.FAILED_UPLOAD_IMAGE);
+        }
+
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 

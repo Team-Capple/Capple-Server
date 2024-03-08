@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum MemberErrorCode implements ErrorCodeInterface {
-    MEMEBER_NOT_FOUND("MEMBER001", "사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+
+    MEMBER_NOT_FOUND("MEMBER001", "Member가 존재하지 않습니다.",HttpStatus.NOT_FOUND),
+    EXIST_MEMBER_NICKNAME("MEMBER002", "이미 사용 중인 닉네임입니다.",HttpStatus.BAD_REQUEST),
+    ;
+
     private final String code;
     private final String message;
     private final HttpStatus httpStatus;

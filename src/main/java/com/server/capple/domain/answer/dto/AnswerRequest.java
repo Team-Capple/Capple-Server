@@ -23,9 +23,4 @@ public class AnswerRequest {
     @Builder.Default
     private List<String> tags = new ArrayList<>();
 
-    @Data
-    @Builder
-    private static class AnswerGetList {
-        private String questionId;
-    }
 }

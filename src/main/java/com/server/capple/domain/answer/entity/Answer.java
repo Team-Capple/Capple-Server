@@ -1,5 +1,6 @@
 package com.server.capple.domain.answer.entity;
 
+import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.BaseEntity;
@@ -33,4 +34,8 @@ public class Answer extends BaseEntity {
 
     private String tags;
 
+    public void update(AnswerRequest request) {
+        this.content = request.getAnswer();
+        this.tags = String.join(" ", request.getTags()) + " ";
+    }
 }

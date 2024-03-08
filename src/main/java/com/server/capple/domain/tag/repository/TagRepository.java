@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface TagRepository extends JpaRepository<Tag, Long> {
     Optional<Tag> findByTagName(String tagName);
 
-    @Query("SELECT t FROM Tag t WHERE t.tagName LIKE %:keyword%")
+    @Query("select t from Tag t where t.tagName like %:keyword%")
     List<Tag> findTagsByKeyword(@Param("keyword") String keyword);
 }

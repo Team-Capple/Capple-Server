@@ -8,9 +8,9 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum AnswerErrorCode implements ErrorCodeInterface {
-    ANSWER_NOT_FOUND("ANSWER001", "답변을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    ANSWER_UNAUTHORIZED("ANSWER002", "답변에 대한 권한이 업습니다.", HttpStatus.FORBIDDEN);
+public enum S3ErrorCode implements ErrorCodeInterface {
+
+    FAILED_UPLOAD_IMAGE("S3001", "S3 이미지 업로드에 실패했습니다.",HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
