@@ -10,10 +10,21 @@ public class QuestionResponse {
 
     @Data
     @Builder
+    public static class QuestionSummary {
+        private Long questionId;
+        private QuestionStatus questionStatus;
+        private String content;
+    }
+
+    @Data
+    @Builder
     public static class QuestionInfo {
         private Long questionId;
         private QuestionStatus questionStatus;
         private String content;
+        private String tag;
+        private Long likeCount;
+        private Long commentCount;
     }
 
     @Data

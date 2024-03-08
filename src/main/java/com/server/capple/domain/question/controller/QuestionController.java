@@ -1,8 +1,7 @@
 package com.server.capple.domain.question.controller;
 
-import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
-import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +26,7 @@ public class QuestionController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/main")
-    private BaseResponse<QuestionInfo> getMainQuestion() {
+    private BaseResponse<QuestionSummary> getMainQuestion() {
         return BaseResponse.onSuccess(questionService.getMainQuestion());
     }
 
