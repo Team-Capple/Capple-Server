@@ -6,6 +6,8 @@ import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
+import com.server.capple.domain.member.mapper.TokensMapper;
 import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.MemberErrorCode;
@@ -32,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
     private final S3ImageComponent s3ImageComponent;
+    private final TokensMapper tokensMapper;
     private final AppleAuthService appleAuthService;
     private final JwtService jwtService;
 
@@ -88,5 +91,18 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+    }
+
+    @Override
+    @Transactional
+    public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage) {
+        String sub = jwtService.getSub(signUpToken);
+        Member member = memberMapper.createMember(sub, email, nickname, Role.ROLE_ACADEMIER, profileImage);
+        memberRepository.save(member);
+        Long memberId = member.getId();
+        String role = member.getRole().getName();
+        String accessToken = jwtService.createJwt(memberId, role, "access");
+        String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        return tokensMapper.toTokens(accessToken, refreshToken);
     }
 }

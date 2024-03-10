@@ -1,6 +1,8 @@
 package com.server.capple.domain.member.mapper;
 
 import com.server.capple.domain.member.dto.MemberResponse;
+import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,6 +30,16 @@ public class MemberMapper {
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .isMember(isMember)
+            .build();
+    }
+
+    public Member createMember(String sub, String email, String nickName, Role role, String profileImage) {
+        return Member.builder()
+            .sub(sub)
+            .email(email)
+            .nickname(nickName)
+            .role(role)
+            .profileImage(profileImage)
             .build();
     }
 }

@@ -49,4 +49,13 @@ public class MemberController {
     public BaseResponse<MemberResponse.SignInResponse> login(@RequestParam String code) {
         return BaseResponse.onSuccess(memberService.signIn(code));
     }
+
+    @Operation(summary = "회원가입 API", description = "회원가입 API 입니다." +
+        "로컬 로그인 또는 소셜 로그인으로 생성한 token을 이용해 회원가입을 진행합니다." +
+        "body에 로그인 실패시 반환 받은 signUpToken, 이메일, 닉네임, 프로필 이미지를 입력해주세요. 프로필 이미지는 필수가 아닙니다." +
+        "회원가입 성공시 accessToken과 refreshToken이 반환됩니다.")
+    @PostMapping("/sign-up")
+    public BaseResponse<MemberResponse.Tokens> signUp(@RequestBody MemberRequest.signUp request) {
+        return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getEmail(), request.getNickname(), request.getProfileImage()));
+    }
 }
