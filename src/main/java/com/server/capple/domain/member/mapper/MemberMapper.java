@@ -22,4 +22,12 @@ public class MemberMapper {
                 .profileImage(profileImage)
                 .build();
     };
+
+    public MemberResponse.SignInResponse toSignInResponse(String accessToken, String refreshToken, Boolean isMember) {
+        return MemberResponse.SignInResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .isMember(isMember)
+            .build();
+    }
 }

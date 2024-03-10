@@ -40,4 +40,13 @@ public class MemberController {
                                                                       @RequestBody @Valid MemberRequest.EditMemberInfo request) {
         return BaseResponse.onSuccess(memberService.editMemberInfo(memberId, request));
     }
+
+    @Operation(summary = "로그인 API", description = "로그인 API 입니다. " +
+        "쿼리 파라미터를 이용해 애플 인증서버에서 받아온 code를 입력해주세요." +
+        "기존에 존재하는 사용자라면 isMember가 true로 반환되며, accessToken과 refreshToken이 반환됩니다." +
+        "새로운 사용자라면 isMember가 false로 반환되며, refreshToken의 위치에 signUpToken이 반환됩니다.")
+    @GetMapping("/sign-in")
+    public BaseResponse<MemberResponse.SignInResponse> login(@RequestParam String code) {
+        return BaseResponse.onSuccess(memberService.signIn(code));
+    }
 }

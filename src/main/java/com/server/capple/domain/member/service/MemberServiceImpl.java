@@ -1,5 +1,7 @@
 package com.server.capple.domain.member.service;
 
+import com.server.capple.config.security.jwt.service.JwtService;
+import com.server.capple.config.security.oauth.apple.service.AppleAuthService;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.dto.MemberResponse;
@@ -8,6 +10,7 @@ import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.MemberErrorCode;
 import com.server.capple.global.utils.S3ImageComponent;
+import com.server.capple.config.security.oauth.apple.dto.AppleIdTokenPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +30,15 @@ public class MemberServiceImpl implements MemberService {
     private static final String DEFAULT_PROFILE_IMAGE = "https://capple-bucket.s3.ap-northeast-2.amazonaws.com/capple_default_image.png";
 
     private final MemberRepository memberRepository;
-    private final MemberMapper mapper;
+    private final MemberMapper memberMapper;
     private final S3ImageComponent s3ImageComponent;
+    private final AppleAuthService appleAuthService;
+    private final JwtService jwtService;
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Long memberId) {
         Member member = findMember(memberId);
-        return mapper.toMyPageMemberInfo(member.getNickname(), member.getEmail(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
+        return memberMapper.toMyPageMemberInfo(member.getNickname(), member.getEmail(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
     }
 
     private String changeJoinDateFormat(LocalDateTime createAt){
@@ -61,7 +66,7 @@ public class MemberServiceImpl implements MemberService {
         if (memberRepository.countMemberByNickname(request.getNickname(), memberId) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
         member.updateNickname(request.getNickname());
 
-        return mapper.toEditMemberInfo(member.getId(), member.getNickname(), member.getProfileImage());
+        return memberMapper.toEditMemberInfo(member.getId(), member.getNickname(), member.getProfileImage());
     }
 
     @Override
@@ -70,4 +75,18 @@ public class MemberServiceImpl implements MemberService {
         return new MemberResponse.ProfileImage(s3ImageComponent.uploadImage(image));
     }
 
+    @Override
+    public MemberResponse.SignInResponse signIn(String authorizationCode) {
+        AppleIdTokenPayload appleIdTokenPayload = appleAuthService.get(authorizationCode);
+        Optional<Member> optionalMember = memberRepository.findBySub(appleIdTokenPayload.getSub());
+        if (optionalMember.isEmpty()) {
+            String signUpToken = jwtService.createSignUpAccessJwt(appleIdTokenPayload.getSub());
+            return memberMapper.toSignInResponse(null, signUpToken, false);
+        }
+        Long memberId = optionalMember.get().getId();
+        String role = optionalMember.get().getRole().getName();
+        String accessToken = jwtService.createJwt(memberId, role, "access");
+        String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+    }
 }
