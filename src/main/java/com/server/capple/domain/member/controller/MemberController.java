@@ -58,4 +58,12 @@ public class MemberController {
     public BaseResponse<MemberResponse.Tokens> signUp(@RequestBody MemberRequest.signUp request) {
         return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getEmail(), request.getNickname(), request.getProfileImage()));
     }
+
+    @Operation(summary = "테스트용 로컬 로그인 API", description = "테스트용 로컬 로그인 API 입니다." +
+        "쿼리 파라미터를 이용해 테스트용 아이디를 입력해주세요." +
+        "refreshToken의 위치에 signUpToken이 반환됩니다.")
+    @GetMapping("/local-sign-in")
+    public BaseResponse<MemberResponse.SignInResponse> localLogin(@RequestParam String testId) {
+        return BaseResponse.onSuccess(memberService.localSignIn(testId));
+    }
 }

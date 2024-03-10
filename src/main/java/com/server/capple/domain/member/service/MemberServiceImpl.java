@@ -105,4 +105,18 @@ public class MemberServiceImpl implements MemberService {
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         return tokensMapper.toTokens(accessToken, refreshToken);
     }
+
+    @Override
+    public MemberResponse.SignInResponse localSignIn(String testId) {
+        Optional<Member> optionalMember = memberRepository.findBySub(testId);
+        if (optionalMember.isEmpty()) {
+            String signUpToken = jwtService.createSignUpAccessJwt(testId);
+            return memberMapper.toSignInResponse(null, signUpToken, false);
+        }
+        Long memberId = optionalMember.get().getId();
+        String role = optionalMember.get().getRole().getName();
+        String accessToken = jwtService.createJwt(memberId, role, "access");
+        String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+    }
 }
