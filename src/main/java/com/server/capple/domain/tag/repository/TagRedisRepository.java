@@ -60,4 +60,14 @@ public class TagRedisRepository implements Serializable {
         String question = questionId.toString();
         return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, 7);
     }
+
+    //밤 12시 정각이 될때마다 기존의 count를 50%로 줄임
+    public void decreaseTagCount() {
+        Set<ZSetOperations.TypedTuple<String>> tags = zSetOperations.rangeWithScores(TAGS_KEY, 0, -1);
+
+        tags.forEach(tag -> {
+                if(tag.getValue() != null && tag.getScore() != null)
+                    zSetOperations.add(TAGS_KEY, tag.getValue(), tag.getScore() * 0.5);
+        });
+    }
 }
