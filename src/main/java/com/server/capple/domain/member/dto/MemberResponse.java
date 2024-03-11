@@ -29,4 +29,19 @@ public class MemberResponse {
     public static class ProfileImage {
         private String imageUrl;
     }
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class Tokens {
+        private String accessToken;
+        private String refreshToken;
+    }
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class SignInResponse {
+        private String accessToken;
+        private String refreshToken;
+        private Boolean isMember;
+    }
 }

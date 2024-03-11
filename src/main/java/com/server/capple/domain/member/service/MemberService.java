@@ -11,4 +11,7 @@ public interface MemberService {
     Member findMember(Long memberId);
     MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request);
     MemberResponse.ProfileImage uploadImage(MultipartFile image);
+    MemberResponse.SignInResponse signIn(String authorizationCode);
+    MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage);
+    MemberResponse.SignInResponse localSignIn(String testId);
 }

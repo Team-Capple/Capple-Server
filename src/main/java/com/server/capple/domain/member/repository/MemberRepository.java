@@ -14,5 +14,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT COUNT(*) FROM Member m WHERE m.nickname = :nickname and m.id != :memberId and m.deletedAt is null")
     Long countMemberByNickname(@Param("nickname") String nickname, @Param("memberId") Long memberId);
 
-
+    Optional<Member> findBySub(String sub);
 }

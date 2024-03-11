@@ -1,5 +1,6 @@
 package com.server.capple.domain.answer.controller;
 
+import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.service.AnswerService;
@@ -26,7 +27,7 @@ public class AnswerController {
     @Operation(summary = "답변 생성 API", description = " 답변 생성 API 입니다." +
             "pathvariable 으로 questionId를 주세요.")
     @PostMapping("/question/{questionId}")
-    public BaseResponse<AnswerResponse.AnswerId> createAnswer(Member member, @PathVariable(value = "questionId") Long questionId,
+    public BaseResponse<AnswerResponse.AnswerId> createAnswer(@AuthMember Member member, @PathVariable(value = "questionId") Long questionId,
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.createAnswer(member, questionId, request));
     }
