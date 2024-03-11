@@ -18,4 +18,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "SELECT EXISTS(SELECT 1 FROM Member m WHERE m.profileImage = :image)")
     boolean existMemberProfileImage(@Param("image") String image);
 
+    Optional<Member> findBySub(String sub);
 }

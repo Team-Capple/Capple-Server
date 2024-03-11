@@ -1,5 +1,6 @@
 package com.server.capple.domain.answer.controller;
 
+import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.service.AnswerService;
@@ -26,7 +27,7 @@ public class AnswerController {
     @Operation(summary = "답변 생성 API", description = " 답변 생성 API 입니다." +
             "pathvariable 으로 questionId를 주세요.")
     @PostMapping("/question/{questionId}")
-    public BaseResponse<AnswerResponse.AnswerId> createAnswer(Member member, @PathVariable(value = "questionId") Long questionId,
+    public BaseResponse<AnswerResponse.AnswerId> createAnswer(@AuthMember Member member, @PathVariable(value = "questionId") Long questionId,
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.createAnswer(member, questionId, request));
     }
@@ -50,7 +51,7 @@ public class AnswerController {
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
             "pathvariable 으로 answerId를 주세요.")
     @PatchMapping("/{answerId}")
-    public BaseResponse<AnswerResponse.AnswerId> updateAnswer(Member member, @PathVariable(value = "answerId") Long answerId,
+    public BaseResponse<AnswerResponse.AnswerId> updateAnswer(@AuthMember Member member, @PathVariable(value = "answerId") Long answerId,
                                                               @RequestBody @Valid AnswerRequest request) {
         return BaseResponse.onSuccess(answerService.updateAnswer(member, answerId, request));
     }
@@ -58,14 +59,14 @@ public class AnswerController {
     @Operation(summary = "답변 삭제 API", description = " 답변 삭제 API 입니다." +
             "pathvariable 으로 answerId를 주세요.")
     @DeleteMapping("/{answerId}")
-    public BaseResponse<AnswerResponse.AnswerId> deleteAnswer(Member member, @PathVariable(value = "answerId") Long answerId) {
+    public BaseResponse<AnswerResponse.AnswerId> deleteAnswer(@AuthMember Member member, @PathVariable(value = "answerId") Long answerId) {
         return BaseResponse.onSuccess(answerService.deleteAnswer(member, answerId));
     }
 
     @Operation(summary = "답변 좋아요/취소 API", description = " 답변 좋아요/취소 API 입니다." +
             "pathvariable 으로 answerId를 주세요.")
     @PostMapping("/{answerId}/heart")
-    public BaseResponse<AnswerResponse.AnswerLike> toggleAnswerHeart(Member member, @PathVariable(value = "answerId") Long answerId) {
+    public BaseResponse<AnswerResponse.AnswerLike> toggleAnswerHeart(@AuthMember Member member, @PathVariable(value = "answerId") Long answerId) {
         return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
     }
 

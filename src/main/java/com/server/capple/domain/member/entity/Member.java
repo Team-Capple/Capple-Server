@@ -25,6 +25,12 @@ public class Member extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
+    private String sub;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     private String profileImage;
 
     public void updateNickname(String nickname) {

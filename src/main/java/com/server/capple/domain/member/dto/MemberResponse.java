@@ -37,4 +37,21 @@ public class MemberResponse {
     public static class DeleteProfileImages {
         private List<String> DeleteImages;
     }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class Tokens {
+        private String accessToken;
+        private String refreshToken;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class SignInResponse {
+        private String accessToken;
+        private String refreshToken;
+        private Boolean isMember;
+    }
 }
