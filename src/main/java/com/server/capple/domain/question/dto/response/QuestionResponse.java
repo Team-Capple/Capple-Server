@@ -1,6 +1,8 @@
 package com.server.capple.domain.question.dto.response;
 
 import com.server.capple.domain.question.entity.QuestionStatus;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +26,7 @@ public class QuestionResponse {
     public static class QuestionInfo {
         private Long questionId;
         private QuestionStatus questionStatus;
+        private LocalDateTime livedAt;
         private String content;
         private String tag;
         private Long likeCount;
