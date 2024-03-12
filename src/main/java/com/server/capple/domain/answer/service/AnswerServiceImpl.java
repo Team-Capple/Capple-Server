@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
@@ -147,6 +148,28 @@ public class AnswerServiceImpl implements AnswerService {
         }
 
     }
+
+    @Override
+    public MemberAnswerList getMemberAnswer(Long memberId) {
+        Member member = memberService.findMember(memberId);
+        List<Answer> answers = answerRepository.findByMember(member).orElse(null);
+        return answerMapper.toMemberAnswerList(
+                answers.stream()
+                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId())))
+                        .toList()
+        );
+    }
+
+    @Override
+    public MemberAnswerList getMemberHeartAnswer(Long memberId) {
+        return answerMapper.toMemberAnswerList(
+                answerHeartRedisRepository.getMemberHeartsAnswer(memberId)
+                        .stream()
+                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer(Long.valueOf((answerId))), answerHeartRedisRepository.getAnswerHeartsCount(Long.valueOf(answerId))))
+                        .toList()
+        );
+    }
+
 
     //로그인된 유저와 작성자가 같은지 체크
     private void checkPermission(Member loginMember, Answer answer) {

@@ -2,10 +2,14 @@ package com.server.capple.domain.answer.repository;
 
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -31,5 +35,25 @@ public class AnswerHeartRedisRepository implements Serializable {
             setOperations.remove(key, member);
             return FALSE;
         }
+    }
+
+    public int getAnswerHeartsCount(Long answerId) {
+        String key = ANSWER_HEART_KEY_PREFIX + answerId.toString();
+        return setOperations.members(key).size();
+    }
+
+    public Set<Integer> getMemberHeartsAnswer(Long memberId) {
+        String member = MEMBER_KEY_PREFIX + memberId.toString();
+        ScanOptions option = ScanOptions.scanOptions().match("*").build();
+
+        Cursor<String> cursor = setOperations.scan(member, option);
+        Set<Integer> memberHeartAnswerIds = new HashSet<>();
+
+        while(cursor.hasNext()){
+            String value = cursor.next();
+            Integer answerId = Integer.parseInt(value.replace(ANSWER_HEART_KEY_PREFIX, ""));
+            memberHeartAnswerIds.add(answerId);
+        }
+        return memberHeartAnswerIds;
     }
 }

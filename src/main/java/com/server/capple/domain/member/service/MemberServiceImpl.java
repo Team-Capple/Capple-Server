@@ -20,16 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
-
-    // 기본 프로필 이미지
-    // todo: 기본 프로필 디자인 작업 완료 시 변경
-    private static final String DEFAULT_PROFILE_IMAGE = "https://capple-bucket.s3.ap-northeast-2.amazonaws.com/capple_default_image.png";
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
@@ -58,12 +55,11 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request) {
         Member member = findMember(memberId);
 
-        // 이전 이미지 버킷에서 삭제
-        s3ImageComponent.deleteImage(member.getProfileImage());
-
         // 1. 이미지 업데이트
-        String imageUrl = Optional.ofNullable(request.getProfileImage()).orElse(DEFAULT_PROFILE_IMAGE);
-        member.updateProfileImage(imageUrl);
+        String profileImage = request.getProfileImage();
+        if (profileImage != null) {
+            member.updateProfileImage(profileImage);
+        }
 
         // 2. 닉네임 업데이트
         if (memberRepository.countMemberByNickname(request.getNickname(), memberId) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
@@ -79,6 +75,19 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public MemberResponse.DeleteProfileImages deleteOrphanageImages() {
+        // 버킷에 저장된 모든 이미지 조회
+        List<String> bucketImages = s3ImageComponent.findAllImageUrls();
+
+        // profile image로 사용되지 않는 이미지 버킷에서 삭제
+        List<String> deleteImages = bucketImages.stream()
+                .filter(bucketImage -> !memberRepository.existMemberProfileImage(bucketImage))
+                .peek(s3ImageComponent::deleteImage)
+                .toList();
+
+        return new MemberResponse.DeleteProfileImages(deleteImages);
+    }
+
     public MemberResponse.SignInResponse signIn(String authorizationCode) {
         AppleIdTokenPayload appleIdTokenPayload = appleAuthService.get(authorizationCode);
         Optional<Member> optionalMember = memberRepository.findBySub(appleIdTokenPayload.getSub());
