@@ -33,7 +33,7 @@ public class QuestionMapper {
                 .build();
     }
 
-    public QuestionInfo toQuestionInfo(Question question, String tags) {
+    public QuestionInfo toQuestionInfo(Question question, String tags, boolean isAnswered) {
         return QuestionInfo.builder()
                 .questionId(question.getId())
                 .questionStatus(question.getQuestionStatus())
@@ -41,8 +41,9 @@ public class QuestionMapper {
                 .content(question.getContent())
                 .tag(tags)
                 // Count는 추후 수정 예정(필드 수정해야함...)
-                .likeCount(100L)
-                .commentCount(0L)
+//                .likeCount(100L)
+//                .commentCount(0L)
+                .isAnswered(isAnswered)
                 .build();
     }
 

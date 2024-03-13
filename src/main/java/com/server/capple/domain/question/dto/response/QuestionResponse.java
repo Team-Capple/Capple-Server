@@ -29,8 +29,10 @@ public class QuestionResponse {
         private LocalDateTime livedAt;
         private String content;
         private String tag;
-        private Long likeCount;
-        private Long commentCount;
+        // 추후 추가 예정
+//        private Long likeCount;
+//        private Long commentCount;
+        private boolean isAnswered;
     }
 
     @Getter
