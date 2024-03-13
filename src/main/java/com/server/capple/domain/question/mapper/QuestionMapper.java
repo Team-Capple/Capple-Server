@@ -40,7 +40,7 @@ public class QuestionMapper {
                 .livedAt(question.getLivedAt())
                 .content(question.getContent())
                 .tag(tags)
-                // Count는 추후 수정 예정(필드 수정해야함...)
+                // todo Count는 추후 수정 예정(필드 수정해야함...)
 //                .likeCount(100L)
 //                .commentCount(0L)
                 .isAnswered(isAnswered)
