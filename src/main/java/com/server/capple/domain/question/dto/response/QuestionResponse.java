@@ -18,6 +18,7 @@ public class QuestionResponse {
         private Long questionId;
         private QuestionStatus questionStatus;
         private String content;
+        private boolean isAnswered;
     }
 
     @Getter

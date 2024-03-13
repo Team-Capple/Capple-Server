@@ -25,11 +25,12 @@ public class QuestionMapper {
                 .build();
     }
 
-    public QuestionSummary toQuestionSummary(Question question) {
+    public QuestionSummary toQuestionSummary(Question question, boolean isAnswered) {
         return QuestionSummary.builder()
                 .questionId(question.getId())
                 .questionStatus(question.getQuestionStatus())
                 .content(question.getContent())
+                .isAnswered(isAnswered)
                 .build();
     }
 

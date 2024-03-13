@@ -7,7 +7,7 @@ import com.server.capple.domain.question.entity.Question;
 
 public interface QuestionService {
     Question findQuestion(Long questionId);
-    QuestionSummary getMainQuestion();
+    QuestionSummary getMainQuestion(Member member);
 
     QuestionInfos getQuestions(Member member);
 }
