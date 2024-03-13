@@ -1,5 +1,9 @@
 package com.server.capple.domain.question.service;
 
+import com.server.capple.config.security.AuthMember;
+import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answer.repository.AnswerRepository;
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
 import com.server.capple.domain.question.entity.Question;
@@ -22,6 +26,7 @@ import java.util.Set;
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final TagRedisRepository tagRedisRepository;
+    private final AnswerRepository answerRepository;
 
     private final QuestionMapper questionMapper;
 
@@ -38,11 +43,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionInfos getQuestions() {
+    public QuestionInfos getQuestions(Member member) {
         return questionMapper.toQuestionInfos(questionRepository.findAllByOrderByCreatedAtDesc().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND))
                         .stream()
-                        .map(question -> questionMapper.toQuestionInfo(question, String.join(" ", tagRedisRepository.getTagsByQuestion(question.getId()))))
+                        .map(question -> questionMapper.toQuestionInfo(question, String.join(" ", tagRedisRepository.getTagsByQuestion(question.getId())), answerRepository.existsByQuestionAndMember(question, member)))
                         .toList());
     }
 }

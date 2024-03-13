@@ -1,5 +1,7 @@
 package com.server.capple.domain.question.controller;
 
+import com.server.capple.config.security.AuthMember;
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
 import com.server.capple.domain.question.service.QuestionService;
@@ -35,8 +37,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping
-    private BaseResponse<QuestionInfos> getQuestions() {
-        return BaseResponse.onSuccess(questionService.getQuestions());
+    private BaseResponse<QuestionInfos> getQuestions(@AuthMember Member member) {
+        return BaseResponse.onSuccess(questionService.getQuestions(member));
     }
 
 
