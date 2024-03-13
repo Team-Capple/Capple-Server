@@ -28,8 +28,8 @@ public class QuestionController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/main")
-    private BaseResponse<QuestionSummary> getMainQuestion() {
-        return BaseResponse.onSuccess(questionService.getMainQuestion());
+    private BaseResponse<QuestionSummary> getMainQuestion(@AuthMember Member member) {
+        return BaseResponse.onSuccess(questionService.getMainQuestion(member));
     }
 
     @Operation(summary = "모든 질문 조회 API", description = "모든 질문을 조회합니다.")

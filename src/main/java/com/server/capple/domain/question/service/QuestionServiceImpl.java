@@ -4,6 +4,7 @@ import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.question.dto.response.QuestionResponse;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
 import com.server.capple.domain.question.entity.Question;
@@ -37,9 +38,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionSummary getMainQuestion() {
-        return questionMapper.toQuestionSummary(questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
-                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND)));
+    public QuestionSummary getMainQuestion(Member member) {
+        Question mainQuestion = questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
+                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
+
+        boolean isAnswered = answerRepository.existsByQuestionAndMember(mainQuestion, member);
+
+        return questionMapper.toQuestionSummary(mainQuestion, isAnswered);
     }
 
     @Override
