@@ -23,7 +23,7 @@ public class MemberServiceTest extends ServiceTestConfig {
     @Transactional
     public void getMyPageMemberInfo() {
         //given & when
-        MemberResponse.MyPageMemberInfo memberInfo = memberService.getMemberInfo(member.getId());
+        MemberResponse.MyPageMemberInfo memberInfo = memberService.getMemberInfo(member);
 
         //then
         assertEquals(memberInfo.getNickname(), member.getNickname());
@@ -42,7 +42,7 @@ public class MemberServiceTest extends ServiceTestConfig {
                 .build();
 
         //when
-        MemberResponse.EditMemberInfo memberInfo = memberService.editMemberInfo(member.getId(), request);
+        MemberResponse.EditMemberInfo memberInfo = memberService.editMemberInfo(member, request);
 
         //then
         assertEquals(memberInfo.getNickname(), "아리");

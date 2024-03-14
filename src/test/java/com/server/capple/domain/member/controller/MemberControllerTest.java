@@ -52,7 +52,7 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .joinDate(joinDate)
                 .build();
 
-        given(memberService.getMemberInfo(any(Long.class))).willReturn(response);
+        given(memberService.getMemberInfo(any(Member.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url, memberId).accept(MediaType.APPLICATION_JSON));
@@ -68,7 +68,7 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.result.profileImage").value("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png"))
                 .andExpect(jsonPath("$.result.joinDate").value(joinDate));
 
-        verify(memberService).getMemberInfo(memberId);
+        verify(memberService).getMemberInfo(member);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .profileImage("ari.png")
                 .build();
 
-        given(memberService.editMemberInfo(any(Long.class), any(MemberRequest.EditMemberInfo.class))).willReturn(response);
+        given(memberService.editMemberInfo(any(Member.class), any(MemberRequest.EditMemberInfo.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(post(url, memberId)

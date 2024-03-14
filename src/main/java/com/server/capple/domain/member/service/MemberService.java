@@ -7,9 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface MemberService {
-    MemberResponse.MyPageMemberInfo getMemberInfo(Long memberId);
+    MemberResponse.MyPageMemberInfo getMemberInfo(Member member);
     Member findMember(Long memberId);
-    MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request);
+    MemberResponse.EditMemberInfo editMemberInfo(Member member, MemberRequest.EditMemberInfo request);
     MemberResponse.ProfileImage uploadImage(MultipartFile image);
     MemberResponse.DeleteProfileImages deleteOrphanageImages();
     MemberResponse.SignInResponse signIn(String authorizationCode);
