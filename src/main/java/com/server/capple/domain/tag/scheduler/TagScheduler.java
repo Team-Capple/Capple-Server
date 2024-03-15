@@ -12,9 +12,8 @@ import org.springframework.stereotype.Component;
 public class TagScheduler {
     private final TagRedisRepository tagRedisRepository;
 
-    @Scheduled(cron = "0 0 0 * * *") //매일 밤 12시에 실행
+    @Scheduled(cron = "0 4 0 * * *") //매일 새벽 4시에 실행
     public void decreaseTagCount() {
         tagRedisRepository.decreaseTagCount();
-        System.out.println("success");
     }
 }

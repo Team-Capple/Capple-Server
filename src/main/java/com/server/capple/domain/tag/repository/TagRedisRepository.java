@@ -1,6 +1,8 @@
 package com.server.capple.domain.tag.repository;
 
 
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.TagErrorCode;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -49,10 +51,14 @@ public class TagRedisRepository implements Serializable {
 
     private void decreaseTagCount(String key, String tag) {
         Double count = zSetOperations.score(key, tag);
+
+        if(count == null)
+            throw new RestApiException(TagErrorCode.TAG_NOT_FOUND);
+
         if (count == 1.0)
             zSetOperations.remove(key, tag);
         else
-            zSetOperations.incrementScore(key, tag, 1.0);
+            zSetOperations.incrementScore(key, tag, -1.0);
     }
 
     //해당 question 답변에 많이 쓰인 태그 7개 조회
@@ -61,13 +67,24 @@ public class TagRedisRepository implements Serializable {
         return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, 7);
     }
 
+    //현재 인기 태그 3개 조회
+    public Set<String> getPopularTags() {
+        return zSetOperations.reverseRange(TAGS_KEY, 0, 3);
+    }
+
     //밤 12시 정각이 될때마다 기존의 count를 50%로 줄임
     public void decreaseTagCount() {
         Set<ZSetOperations.TypedTuple<String>> tags = zSetOperations.rangeWithScores(TAGS_KEY, 0, -1);
 
-        tags.forEach(tag -> {
-                if(tag.getValue() != null && tag.getScore() != null)
-                    zSetOperations.add(TAGS_KEY, tag.getValue(), tag.getScore() * 0.5);
-        });
+        if (tags != null) {
+            tags.forEach(tag -> {
+                zSetOperations.add(TAGS_KEY, tag.getValue(), tag.getScore() * 0.5);
+
+                //count 감소 후 score가 1.0보다 작으면 tags에서 삭제
+                if (tag.getScore() < 1.0)
+                    zSetOperations.remove(TAGS_KEY, tag.getValue());
+
+            });
+        }
     }
 }
