@@ -54,4 +54,11 @@ public class MemberResponse {
         private String refreshToken;
         private Boolean isMember;
     }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class AuthEmail {
+        private Boolean isChecked;
+    }
 }

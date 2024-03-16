@@ -74,4 +74,10 @@ public class MemberController {
     public BaseResponse<MemberResponse.SignInResponse> localLogin(@RequestParam String testId) {
         return BaseResponse.onSuccess(memberService.localSignIn(testId));
     }
+
+    @Operation(summary = "대학 메일 인증 API", description = "대학 메일 인증 API 입니다. 포스텍 이메일을 입력해주세요.")
+    @PostMapping("/auth-email")
+    public BaseResponse<MemberResponse.AuthEmail> authEmail(@RequestBody MemberRequest.AuthEmail request) {
+        return BaseResponse.onSuccess(memberService.authEmail(request));
+    }
 }

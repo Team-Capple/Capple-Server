@@ -34,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     private final TokensMapper tokensMapper;
     private final AppleAuthService appleAuthService;
     private final JwtService jwtService;
+//    private final WebClient
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
@@ -121,5 +122,11 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+    }
+
+    @Override
+    public MemberResponse.AuthEmail authEmail(MemberRequest.AuthEmail request) {
+
+        return null;
     }
 }

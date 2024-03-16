@@ -32,4 +32,12 @@ public class MemberRequest {
         private String profileImage;
     }
 
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    public static class AuthEmail {
+        private String email;
+    }
+
 }
