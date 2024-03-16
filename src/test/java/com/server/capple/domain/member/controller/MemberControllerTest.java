@@ -47,7 +47,6 @@ public class MemberControllerTest extends ControllerTestConfig {
         Member member = createMember();
         MemberResponse.MyPageMemberInfo response = MemberResponse.MyPageMemberInfo.builder()
                 .nickname(member.getNickname())
-                .email(member.getEmail())
                 .profileImage(member.getProfileImage())
                 .joinDate(joinDate)
                 .build();
@@ -64,7 +63,6 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.nickname").value("루시"))
-                .andExpect(jsonPath("$.result.email").value("tnals2384@gmail.com"))
                 .andExpect(jsonPath("$.result.profileImage").value("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png"))
                 .andExpect(jsonPath("$.result.joinDate").value(joinDate));
 

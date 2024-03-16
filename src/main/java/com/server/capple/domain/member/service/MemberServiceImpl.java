@@ -37,7 +37,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
-        return memberMapper.toMyPageMemberInfo(member.getNickname(), member.getEmail(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
+        return memberMapper.toMyPageMemberInfo(member.getNickname(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
     }
 
     private String changeJoinDateFormat(LocalDateTime createAt){
@@ -98,9 +98,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage) {
+    public MemberResponse.Tokens signUp(String signUpToken, String nickname, String profileImage) {
         String sub = jwtService.getSub(signUpToken);
-        Member member = memberMapper.createMember(sub, email, nickname, Role.ROLE_ACADEMIER, profileImage);
+        Member member = memberMapper.createMember(sub, nickname, Role.ROLE_ACADEMIER, profileImage);
         memberRepository.save(member);
         Long memberId = member.getId();
         String role = member.getRole().getName();

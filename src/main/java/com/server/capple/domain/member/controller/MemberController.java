@@ -64,7 +64,7 @@ public class MemberController {
             "회원가입 성공시 accessToken과 refreshToken이 반환됩니다.")
     @PostMapping("/sign-up")
     public BaseResponse<MemberResponse.Tokens> signUp(@RequestBody MemberRequest.signUp request) {
-        return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getEmail(), request.getNickname(), request.getProfileImage()));
+        return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getNickname(), request.getProfileImage()));
     }
 
     @Operation(summary = "테스트용 로컬 로그인 API", description = "테스트용 로컬 로그인 API 입니다." +

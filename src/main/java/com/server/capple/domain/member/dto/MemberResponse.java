@@ -13,7 +13,6 @@ public class MemberResponse {
     @Builder
     public static class MyPageMemberInfo {
         private String nickname;
-        private String email;
         private String profileImage;
         private String joinDate;
     }

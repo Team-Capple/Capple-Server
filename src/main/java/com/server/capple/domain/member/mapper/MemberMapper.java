@@ -8,10 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MemberMapper {
 
-    public MemberResponse.MyPageMemberInfo toMyPageMemberInfo(String nickname, String email, String profileImage, String joinDate){
+    public MemberResponse.MyPageMemberInfo toMyPageMemberInfo(String nickname, String profileImage, String joinDate){
         return MemberResponse.MyPageMemberInfo.builder()
                 .nickname(nickname)
-                .email(email)
                 .profileImage(profileImage)
                 .joinDate(joinDate)
                 .build();
@@ -33,10 +32,9 @@ public class MemberMapper {
             .build();
     }
 
-    public Member createMember(String sub, String email, String nickName, Role role, String profileImage) {
+    public Member createMember(String sub, String nickName, Role role, String profileImage) {
         return Member.builder()
             .sub(sub)
-            .email(email)
             .nickname(nickName)
             .role(role)
             .profileImage(profileImage)

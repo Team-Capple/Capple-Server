@@ -22,9 +22,6 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
     private String sub;
 
     @Column(nullable = false)
