@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,7 +78,7 @@ public class MemberController {
 
     @Operation(summary = "대학 메일 인증 API", description = "대학 메일 인증 API 입니다. 포스텍 이메일을 입력해주세요.")
     @PostMapping("/auth-email")
-    public BaseResponse<MemberResponse.AuthEmail> authEmail(@RequestBody MemberRequest.AuthEmail request) {
+    public BaseResponse<Mono<MemberResponse.AuthEmail>> authEmail(@RequestBody MemberRequest.AuthEmail request) {
         return BaseResponse.onSuccess(memberService.authEmail(request));
     }
 }

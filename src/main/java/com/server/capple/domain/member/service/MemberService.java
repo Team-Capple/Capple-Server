@@ -4,6 +4,7 @@ import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
 
 public interface MemberService {
@@ -16,5 +17,5 @@ public interface MemberService {
     MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage);
     MemberResponse.SignInResponse localSignIn(String testId);
 
-    MemberResponse.AuthEmail authEmail(MemberRequest.AuthEmail email);
+    Mono<MemberResponse.AuthEmail> authEmail(MemberRequest.AuthEmail email);
 }

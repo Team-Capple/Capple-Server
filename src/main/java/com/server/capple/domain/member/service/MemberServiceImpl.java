@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,7 +36,7 @@ public class MemberServiceImpl implements MemberService {
     private final TokensMapper tokensMapper;
     private final AppleAuthService appleAuthService;
     private final JwtService jwtService;
-//    private final WebClient
+    private final WebClient webClient;
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
@@ -125,7 +127,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberResponse.AuthEmail authEmail(MemberRequest.AuthEmail request) {
+    public Mono<MemberResponse.AuthEmail> authEmail(MemberRequest.AuthEmail request) {
 
         return null;
     }
