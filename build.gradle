@@ -53,6 +53,8 @@ dependencies {
 	implementation 'org.bouncycastle:bcpkix-jdk15on:1.56'
 //	대학 이메일 인증
 	implementation 'com.github.in-seo:univcert:master-SNAPSHOT'
+//	WebClient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 }
 
 dependencyManagement {
