@@ -122,4 +122,13 @@ public class MemberServiceImpl implements MemberService {
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
     }
+
+    @Override
+    @Transactional
+    public MemberResponse.MemberId deleteMember(Member member) {
+        Member deleteMember = memberRepository.findById(member.getId()).orElseThrow(
+                () -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
+        deleteMember.delete();
+        return memberMapper.toMemberId(member);
+    }
 }

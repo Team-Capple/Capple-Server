@@ -15,4 +15,6 @@ public interface MemberService {
     MemberResponse.SignInResponse signIn(String authorizationCode);
     MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage);
     MemberResponse.SignInResponse localSignIn(String testId);
+
+    MemberResponse.MemberId deleteMember (Member member);
 }
