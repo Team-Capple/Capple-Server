@@ -150,8 +150,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public MemberAnswerList getMemberAnswer(Long memberId) {
-        Member member = memberService.findMember(memberId);
+    public MemberAnswerList getMemberAnswer(Member member) {
         List<Answer> answers = answerRepository.findByMember(member).orElse(null);
         return answerMapper.toMemberAnswerList(
                 answers.stream()
@@ -161,9 +160,9 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public MemberAnswerList getMemberHeartAnswer(Long memberId) {
+    public MemberAnswerList getMemberHeartAnswer(Member member) {
         return answerMapper.toMemberAnswerList(
-                answerHeartRedisRepository.getMemberHeartsAnswer(memberId)
+                answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
                         .stream()
                         .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer(Long.valueOf((answerId))), answerHeartRedisRepository.getAnswerHeartsCount(Long.valueOf(answerId))))
                         .toList()

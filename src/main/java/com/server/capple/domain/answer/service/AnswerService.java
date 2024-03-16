@@ -22,7 +22,7 @@ public interface AnswerService {
 
     AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable);
 
-    MemberAnswerList getMemberAnswer(Long memberId);
+    MemberAnswerList getMemberAnswer(Member member);
 
-    MemberAnswerList getMemberHeartAnswer(Long memberId);
+    MemberAnswerList getMemberHeartAnswer(Member member);
 }

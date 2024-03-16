@@ -1,7 +1,9 @@
 package com.server.capple.domain.member.controller;
 
+import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +23,9 @@ public class MemberController {
 
     @Operation(summary = "마이페이지 프로필 조회 API", description = " 프로필 조회 API 입니다." +
             " path variable로 조회할 memberId를 주세요.")
-    @GetMapping("/{memberId}")
-    public BaseResponse<MemberResponse.MyPageMemberInfo> getMemberInfo(@PathVariable Long memberId) {
-        return BaseResponse.onSuccess(memberService.getMemberInfo(memberId));
+    @GetMapping("/mypage")
+    public BaseResponse<MemberResponse.MyPageMemberInfo> getMemberInfo(@AuthMember Member member) {
+        return BaseResponse.onSuccess(memberService.getMemberInfo(member));
     }
 
     @Operation(summary = "마이페이지 프로필 이미지 업로드 API", description = " 프로필 이미지 업로드 API 입니다." +
@@ -35,10 +37,10 @@ public class MemberController {
 
     @Operation(summary = "마이페이지 프로필 수정 API", description = " 프로필 수정 API 입니다." +
             " request body로 수정할 멤버 id, 닉네임, 업로드한 이미지 url을 주세요.")
-    @PostMapping("/{memberId}")
-    public BaseResponse<MemberResponse.EditMemberInfo> editMemberInfo(@PathVariable Long memberId,
+    @PostMapping("/mypage")
+    public BaseResponse<MemberResponse.EditMemberInfo> editMemberInfo(@AuthMember Member member,
                                                                       @RequestBody @Valid MemberRequest.EditMemberInfo request) {
-        return BaseResponse.onSuccess(memberService.editMemberInfo(memberId, request));
+        return BaseResponse.onSuccess(memberService.editMemberInfo(member, request));
     }
 
     @Operation(summary = "미사용 이미지 삭제 API", description = " 미사용 이미지 API 입니다.")
