@@ -18,7 +18,7 @@ public class QuestionResponse {
         private Long questionId;
         private QuestionStatus questionStatus;
         private String content;
-        private boolean isAnswered;
+        private Boolean isAnswered;
     }
 
     @Getter
@@ -33,7 +33,7 @@ public class QuestionResponse {
         // 추후 추가 예정
 //        private Long likeCount;
 //        private Long commentCount;
-        private boolean isAnswered;
+        private Boolean isAnswered;
     }
 
     @Getter
