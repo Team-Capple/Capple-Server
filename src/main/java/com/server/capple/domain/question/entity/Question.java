@@ -33,10 +33,16 @@ public class Question extends BaseEntity {
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
     private List<Answer> answers = new ArrayList<>();
+
     private LocalDateTime livedAt;
 
+
+    //question Status를 바꾸는 함수
     public void setQuestionStatus(QuestionStatus questionStatus) {
         this.questionStatus = questionStatus;
+
+        if(questionStatus.equals(QuestionStatus.LIVE))
+            this.livedAt = LocalDateTime.now();
     }
 
 }
