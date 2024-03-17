@@ -3,11 +3,11 @@ package com.server.capple.domain.question.entity;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,5 +34,9 @@ public class Question extends BaseEntity {
     @Builder.Default
     private List<Answer> answers = new ArrayList<>();
     private LocalDateTime livedAt;
+
+    public void setQuestionStatus(QuestionStatus questionStatus) {
+        this.questionStatus = questionStatus;
+    }
 
 }

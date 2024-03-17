@@ -3,6 +3,7 @@ package com.server.capple.domain.question.service;
 import com.server.capple.domain.question.dto.request.QuestionRequest.QuestionCreate;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionId;
 import com.server.capple.domain.question.entity.Question;
+import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.mapper.QuestionMapper;
 import com.server.capple.domain.question.repository.AdminQuestionRepository;
 import com.server.capple.global.exception.RestApiException;
@@ -35,5 +36,23 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
 
         return new QuestionId(question.getId());
 
+    }
+
+    public QuestionId setLiveQuestion() {
+        Question newQuestion = adminQuestionRepository.findByQuestionStatus(QuestionStatus.PENDING)
+                .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_PENDING_NOT_FOUND));
+
+        newQuestion.setQuestionStatus(QuestionStatus.LIVE);
+
+        return new QuestionId(newQuestion.getId());
+
+    }
+
+    public QuestionId closeLiveQuestion() {
+        Question question = adminQuestionRepository.findByQuestionStatus(QuestionStatus.LIVE)
+                .orElseThrow( () -> new RestApiException(QuestionErrorCode.QUESTION_LIVE_NOT_FOUND));
+        question.setQuestionStatus(QuestionStatus.OLD);
+
+        return new QuestionId(question.getId());
     }
 }

@@ -9,4 +9,7 @@ public interface AdminQuestionService {
 
     QuestionId deleteQuestion(Long questionId);
 
+    QuestionId setLiveQuestion();
+    QuestionId closeLiveQuestion();
+
 }
