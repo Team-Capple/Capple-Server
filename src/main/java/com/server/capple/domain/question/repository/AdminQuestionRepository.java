@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AdminQuestionRepository extends JpaRepository<Question, Long> {
-    Optional<Question> findByQuestionStatus(QuestionStatus questionStatus);
+    Optional<Question> findFirstByQuestionStatus(QuestionStatus questionStatus);
 }
