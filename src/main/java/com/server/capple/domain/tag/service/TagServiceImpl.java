@@ -1,5 +1,6 @@
 package com.server.capple.domain.tag.service;
 
+import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.domain.tag.dto.TagResponse;
 import com.server.capple.domain.tag.entity.Tag;
 import com.server.capple.domain.tag.mapper.TagMapper;
@@ -20,6 +21,7 @@ public class TagServiceImpl implements TagService {
     private final TagRedisRepository tagRedisRepository;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
+    private final QuestionService questionService;
 
     //전체 tag 저장, count update
     @Override
@@ -30,13 +32,26 @@ public class TagServiceImpl implements TagService {
     //질문 별 tag 저장, count update
     @Override
     public void saveQuestionTags(Long questionId, List<String> tags) {
+        //question id가 유효한지 검증을 위해
+        questionService.findQuestion(questionId);
         tagRedisRepository.saveQuestionTags(questionId, tags);
     }
 
     //질문 사용된 tags list 조회 (count 높은 순으로)
     @Override
     public TagResponse.TagInfos getTagsByQuestion(Long questionId) {
+        //question id가 유효한지 검증을 위해
+        questionService.findQuestion(questionId);
+
         Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId);
+        return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
+    }
+
+
+    //인기 태그 조회
+    @Override
+    public TagResponse.TagInfos getPopularTags() {
+        Set<String> typedTuples = tagRedisRepository.getPopularTags();
         return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
     }
 

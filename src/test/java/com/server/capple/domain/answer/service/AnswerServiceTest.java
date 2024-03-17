@@ -31,9 +31,9 @@ public class AnswerServiceTest extends ServiceTestConfig {
         AnswerRequest request = getAnswerRequest();
 
         //when
-        Long answerId = answerService.createAnswer(member, question.getId(), request).getAnswerId();
+        Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
         Answer answer = answerService.findAnswer(answerId);
-        List<String> tags = tagService.getTagsByQuestion(question.getId()).getTags();
+        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId()).getTags();
 
         //then
         assertEquals("나는 와플을 좋아하는 사람이 좋아", answer.getContent());
@@ -50,7 +50,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
     public void updateAnswerTest() {
         //given
         AnswerRequest request = getAnswerRequest();
-        Long answerId = answerService.createAnswer(member, question.getId(), request).getAnswerId();
+        Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
 
         AnswerRequest updateRequest = AnswerRequest.builder()
                 .answer("나는 동그랗고 와플 좋아하는 사람이 좋아")
@@ -64,7 +64,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
         //then
         assertEquals("나는 동그랗고 와플 좋아하는 사람이 좋아", answer.getContent());
         assertEquals("#동그라미 #와플 #동글 ", answer.getTags());
-        List<String> tags = tagService.getTagsByQuestion(question.getId()).getTags();
+        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId()).getTags();
 
         assertEquals(3, tags.size());
         assertTrue(tags.contains("#와플"));
@@ -79,14 +79,14 @@ public class AnswerServiceTest extends ServiceTestConfig {
     public void deleteAnswerTest() {
         //given
         AnswerRequest request = getAnswerRequest();
-        Long answerId = answerService.createAnswer(member, question.getId(), request).getAnswerId();
+        Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
 
         //when
         answerService.deleteAnswer(member, answerId);
         Answer answer = answerService.findAnswer(answerId);
 
         //then
-        List<String> tags = tagService.getTagsByQuestion(question.getId()).getTags();
+        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId()).getTags();
 
         assertEquals(0, tags.size());
         assertNotNull(answer.getDeletedAt());

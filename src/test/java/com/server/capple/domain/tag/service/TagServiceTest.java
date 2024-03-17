@@ -28,7 +28,7 @@ public class TagServiceTest extends ServiceTestConfig {
         //given
         String keyword = "와플";
         AnswerRequest request = getAnswerRequest();
-        answerService.createAnswer(member, question.getId(), request);
+        answerService.createAnswer(member, liveQuestion.getId(), request);
 
         //when
         TagResponse.TagInfos tags = tagService.searchTags(keyword);
@@ -48,9 +48,9 @@ public class TagServiceTest extends ServiceTestConfig {
                 .build();
 
         //when
-        answerService.createAnswer(member, question.getId(), request);
-        answerService.createAnswer(member, question.getId(), request2);
-        TagResponse.TagInfos tags = tagService.getTagsByQuestion(question.getId());
+        answerService.createAnswer(member, liveQuestion.getId(), request);
+        answerService.createAnswer(member, liveQuestion.getId(), request2);
+        TagResponse.TagInfos tags = tagService.getTagsByQuestion(liveQuestion.getId());
 
         //then
         assertEquals("#와플", tags.getTags().get(0));

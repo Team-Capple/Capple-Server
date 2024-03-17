@@ -29,4 +29,11 @@ public class TagController {
         return BaseResponse.onSuccess(tagService.getTagsByQuestion(questionId));
     }
 
+
+    @Operation(summary = "사람들이 많이 쓴 키워드 조회 API", description = "질문에 상관없이 인기 키워드를 조회합니다.")
+    @GetMapping()
+    public BaseResponse<TagResponse.TagInfos> getPopularTags() {
+        return BaseResponse.onSuccess(tagService.getPopularTags());
+    }
+
 }

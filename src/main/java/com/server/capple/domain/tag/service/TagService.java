@@ -18,7 +18,7 @@ public interface TagService {
     void updateTags(List<String> addedTags, List<String> removedTags);
 
     TagResponse.TagInfos getTagsByQuestion(Long questionId);
-
+    TagResponse.TagInfos getPopularTags();
     void findOrCreateTag(String tagName);
 
     TagResponse.TagInfos searchTags(String keyword);

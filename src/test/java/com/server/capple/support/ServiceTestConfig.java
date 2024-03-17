@@ -4,6 +4,7 @@ import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
@@ -25,7 +26,8 @@ public abstract class ServiceTestConfig {
     protected AnswerRepository answerRepository;
 
     protected Member member;
-    protected Question question;
+    protected Question liveQuestion;
+    protected Question pendingQuestion;
     protected Answer answer;
 
     @Autowired
@@ -34,7 +36,8 @@ public abstract class ServiceTestConfig {
     @BeforeEach
     public void setUp() {
         member = createMember();
-        question = createQuestion();
+        liveQuestion = createLiveQuestion();
+        pendingQuestion =createPendingQuestion();
         answer = createAnswer();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
@@ -45,11 +48,13 @@ public abstract class ServiceTestConfig {
                         .email("tnals2384@gmail.com")
                         .nickname("루시")
                         .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
+                        .role(Role.ROLE_ACADEMIER)
+                        .sub("2384973284")
                         .build()
         );
     }
 
-    protected Question createQuestion() {
+    protected Question createLiveQuestion() {
         return questionRepository.save(
                 Question.builder()
                         .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
@@ -58,11 +63,20 @@ public abstract class ServiceTestConfig {
         );
     }
 
+    protected Question createPendingQuestion() {
+        return questionRepository.save(
+                Question.builder()
+                        .content("가장 좋아하는 음식은 무엇인가요?")
+                        .questionStatus(QuestionStatus.PENDING)
+                        .build()
+        );
+    }
+
     protected Answer createAnswer() {
         return answerRepository.save(Answer.builder()
                 .content("나는 무자비한 사람이 좋아")
                 .tags("#무자비 #와플 ")
-                .question(question)
+                .question(liveQuestion)
                 .member(member)
                 .build()
         );
