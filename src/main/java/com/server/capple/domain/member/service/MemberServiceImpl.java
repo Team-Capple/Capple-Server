@@ -36,8 +36,7 @@ public class MemberServiceImpl implements MemberService {
     private final JwtService jwtService;
 
     @Override
-    public MemberResponse.MyPageMemberInfo getMemberInfo(Long memberId) {
-        Member member = findMember(memberId);
+    public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
         return memberMapper.toMyPageMemberInfo(member.getNickname(), member.getEmail(), member.getProfileImage(), changeJoinDateFormat(member.getCreatedAt()));
     }
 
@@ -52,17 +51,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponse.EditMemberInfo editMemberInfo(Long memberId, MemberRequest.EditMemberInfo request) {
-        Member member = findMember(memberId);
-
+    public MemberResponse.EditMemberInfo editMemberInfo(Member member, MemberRequest.EditMemberInfo request) {
         // 1. 이미지 업데이트
-        String profileImage = request.getProfileImage();
-        if (profileImage != null) {
-            member.updateProfileImage(profileImage);
-        }
+        member.updateProfileImage(request.getProfileImage());
 
         // 2. 닉네임 업데이트
-        if (memberRepository.countMemberByNickname(request.getNickname(), memberId) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
+        if (memberRepository.countMemberByNickname(request.getNickname(), member.getId()) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
         member.updateNickname(request.getNickname());
 
         return memberMapper.toEditMemberInfo(member.getId(), member.getNickname(), member.getProfileImage());

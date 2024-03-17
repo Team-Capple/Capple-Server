@@ -70,17 +70,15 @@ public class AnswerController {
         return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
     }
 
-    @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다." +
-            "pathvariable 으로 memeberId를 주세요.")
-    @GetMapping("/{memberId}")
-    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@PathVariable(value = "memberId") Long memberId) {
-        return BaseResponse.onSuccess(answerService.getMemberAnswer(memberId));
+    @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다.")
+    @GetMapping
+    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@AuthMember Member member) {
+        return BaseResponse.onSuccess(answerService.getMemberAnswer(member));
     }
 
-    @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다." +
-            "pathvariable 으로 memeberId를 주세요.")
-    @GetMapping("/{memberId}/heart")
-    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberHeartAnswer(@PathVariable(value = "memberId") Long memberId) {
-        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(memberId));
+    @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.")
+    @GetMapping("/heart")
+    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberHeartAnswer(@AuthMember Member member) {
+        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member));
     }
 }
