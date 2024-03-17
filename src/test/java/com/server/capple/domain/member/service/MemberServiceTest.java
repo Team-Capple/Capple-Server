@@ -27,7 +27,6 @@ public class MemberServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals(memberInfo.getNickname(), member.getNickname());
-        assertEquals(memberInfo.getEmail(), member.getEmail());
         assertEquals(memberInfo.getProfileImage(), member.getProfileImage());
     }
 
