@@ -72,7 +72,7 @@ public class AnswerController {
 
     @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다." +
             "pathvariable 으로 memeberId를 주세요.")
-    @GetMapping("/{memberId}/")
+    @GetMapping("/{memberId}")
     public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@PathVariable(value = "memberId") Long memberId) {
         return BaseResponse.onSuccess(answerService.getMemberAnswer(memberId));
     }
