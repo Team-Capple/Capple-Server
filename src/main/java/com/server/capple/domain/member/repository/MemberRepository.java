@@ -10,13 +10,15 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findById(Long memberId);
+    @Query(value = "SELECT m FROM Member m WHERE m.id = :memberId and m.deletedAt is null")
+    Optional<Member> findById(@Param("memberId") Long memberId);
 
     @Query("SELECT COUNT(*) FROM Member m WHERE m.nickname = :nickname and m.id != :memberId and m.deletedAt is null")
     Long countMemberByNickname(@Param("nickname") String nickname, @Param("memberId") Long memberId);
 
-    @Query(value = "SELECT EXISTS(SELECT 1 FROM Member m WHERE m.profileImage = :image)")
+    @Query(value = "SELECT EXISTS(SELECT 1 FROM Member m WHERE m.profileImage = :image and m.deletedAt is null)")
     boolean existMemberProfileImage(@Param("image") String image);
 
-    Optional<Member> findBySub(String sub);
+    @Query(value = "SELECT m FROM Member m WHERE m.sub = :sub and m.deletedAt is null")
+    Optional<Member> findBySub(@Param("sub") String sub);
 }

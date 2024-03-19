@@ -128,7 +128,7 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse.MemberId resignMember(Member member) {
         Member resignedMember = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
-        resignedMember.delete();
+        resignedMember.resignMember();
         return memberMapper.toMemberId(member);
     }
 }

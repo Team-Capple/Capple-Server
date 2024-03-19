@@ -10,7 +10,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@SQLRestriction("deleted_at is null")
+//@SQLRestriction("deleted_at is null")
 public class Member extends BaseEntity {
 
     @Id
@@ -36,5 +36,10 @@ public class Member extends BaseEntity {
 
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
+    }
+
+    public void resignMember() {
+        this.nickname = "알 수 없음";
+        delete();
     }
 }
