@@ -40,4 +40,10 @@ public class MemberMapper {
             .profileImage(profileImage)
             .build();
     }
+
+    public MemberResponse.MemberId toMemberId(Member member) {
+        return MemberResponse.MemberId.builder()
+                .memberId(member.getId())
+                .build();
+    }
 }

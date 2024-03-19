@@ -74,4 +74,10 @@ public class MemberController {
     public BaseResponse<MemberResponse.SignInResponse> localLogin(@RequestParam String testId) {
         return BaseResponse.onSuccess(memberService.localSignIn(testId));
     }
+
+    @Operation(summary = "회원탈퇴 API", description = "회원탈퇴 API 입니다.")
+    @GetMapping("/deleteMember")
+    public BaseResponse<MemberResponse.MemberId> resignMember(@AuthMember Member member) {
+        return BaseResponse.onSuccess(memberService.resignMember(member));
+    }
 }
