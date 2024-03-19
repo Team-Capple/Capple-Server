@@ -52,14 +52,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public MemberResponse.EditMemberInfo editMemberInfo(Member member, MemberRequest.EditMemberInfo request) {
+        Member editedMember = findMember(member.getId());
+
         // 1. 이미지 업데이트
-        member.updateProfileImage(request.getProfileImage());
+        editedMember.updateProfileImage(request.getProfileImage());
 
         // 2. 닉네임 업데이트
-        if (memberRepository.countMemberByNickname(request.getNickname(), member.getId()) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
-        member.updateNickname(request.getNickname());
+        if (memberRepository.countMemberByNickname(request.getNickname(), editedMember.getId()) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
+        editedMember.updateNickname(request.getNickname());
 
-        return memberMapper.toEditMemberInfo(member.getId(), member.getNickname(), member.getProfileImage());
+        return memberMapper.toEditMemberInfo(editedMember.getId(), editedMember.getNickname(), editedMember.getProfileImage());
     }
 
     @Override
