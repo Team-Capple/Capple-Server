@@ -97,4 +97,12 @@ public class MemberController {
     public BaseResponse<Boolean> checkNickname(@RequestParam String nickname) {
         return BaseResponse.onSuccess(memberService.checkNickname(nickname));
     }
+
+    @Operation(summary = "이메일 중복 체크", description = "이메일 중복 체크 API 입니다." +
+        "쿼리 파라미터를 이용해 이메일을 입력해주세요." +
+        "중복 이메일일 경우 true, 중복되지 않은 이메일일 경우 false가 반환됩니다.")
+    @GetMapping("/email/check")
+    public BaseResponse<Boolean> checkEmail(@RequestParam String email) {
+        return BaseResponse.onSuccess(memberService.checkEmail(email));
+    }
 }

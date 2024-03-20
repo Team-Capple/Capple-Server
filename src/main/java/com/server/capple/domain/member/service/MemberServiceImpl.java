@@ -148,4 +148,9 @@ public class MemberServiceImpl implements MemberService {
     public Boolean checkNickname(String nickname) {
         return memberRepository.existsMemberByNickname(nickname);
     }
+
+    @Override
+    public Boolean checkEmail(String email) {
+        return memberRepository.existsMemberByEmail(email);
+    }
 }

@@ -19,4 +19,5 @@ public interface MemberService {
     MemberResponse.Tokens changeRole(Long memberId, Role role);
     MemberResponse.MemberId resignMember (Member member);
     Boolean checkNickname(String nickname);
+    Boolean checkEmail(String email);
 }
