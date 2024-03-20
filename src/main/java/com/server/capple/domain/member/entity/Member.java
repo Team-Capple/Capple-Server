@@ -40,6 +40,7 @@ public class Member extends BaseEntity {
     public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+    public void updateRole(Role role) {this.role = role;}
 
     public void resignMember() {
         this.nickname = "알 수 없음";

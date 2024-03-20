@@ -4,6 +4,7 @@ import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,5 +80,13 @@ public class MemberController {
     @GetMapping("/resign")
     public BaseResponse<MemberResponse.MemberId> resignMember(@AuthMember Member member) {
         return BaseResponse.onSuccess(memberService.resignMember(member));
+    }
+
+    @Operation(summary = "사용자 자격 변경", description = "사용자 자격 변경 API 입니다." +
+        "쿼리 파라미터를 이용해 변경할 role을 입력해주세요." +
+        "Role은 \"ROLE_ACADEMIER\", \"ROLE_ADMIN\" 중 하나로 입력해주세요.")
+    @GetMapping("/role/change")
+    public BaseResponse<MemberResponse.Tokens> changeRole(@AuthMember Member member, Role role) {
+        return BaseResponse.onSuccess(memberService.changeRole(member.getId(), role));
     }
 }
