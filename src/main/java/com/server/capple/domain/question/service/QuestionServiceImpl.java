@@ -39,7 +39,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionSummary getMainQuestion(Member member) {
-        Question mainQuestion = questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
+        Question mainQuestion = questionRepository.findByQuestionStatusIsLiveAndOldOrderByLivedAt().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
         boolean isAnswered = answerRepository.existsByQuestionAndMember(mainQuestion, member);
