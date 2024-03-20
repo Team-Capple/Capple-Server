@@ -32,10 +32,11 @@ public class MemberMapper {
             .build();
     }
 
-    public Member createMember(String sub, String nickName, Role role, String profileImage) {
+    public Member createMember(String sub, String email, String nickName, Role role, String profileImage) {
         return Member.builder()
             .sub(sub)
             .nickname(nickName)
+            .email(email)
             .role(role)
             .profileImage(profileImage)
             .build();
