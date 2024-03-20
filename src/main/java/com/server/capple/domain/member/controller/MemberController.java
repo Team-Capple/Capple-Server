@@ -89,4 +89,12 @@ public class MemberController {
     public BaseResponse<MemberResponse.Tokens> changeRole(@AuthMember Member member, Role role) {
         return BaseResponse.onSuccess(memberService.changeRole(member.getId(), role));
     }
+
+    @Operation(summary = "닉네임 중복 체크", description = "닉네임 중복 체크 API 입니다." +
+        "쿼리 파라미터를 이용해 닉네임을 입력해주세요." +
+        "중복 닉네임일 경우 true, 중복되지 않은 닉네임일 경우 false가 반환됩니다.")
+    @GetMapping("/nickname/check")
+    public BaseResponse<Boolean> checkNickname(@RequestParam String nickname) {
+        return BaseResponse.onSuccess(memberService.checkNickname(nickname));
+    }
 }

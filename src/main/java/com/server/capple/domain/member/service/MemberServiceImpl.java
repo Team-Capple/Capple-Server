@@ -143,4 +143,9 @@ public class MemberServiceImpl implements MemberService {
         resignedMember.resignMember();
         return memberMapper.toMemberId(member);
     }
+
+    @Override
+    public Boolean checkNickname(String nickname) {
+        return memberRepository.existsMemberByNickname(nickname);
+    }
 }

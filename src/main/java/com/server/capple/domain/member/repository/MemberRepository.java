@@ -21,4 +21,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query(value = "SELECT m FROM Member m WHERE m.sub = :sub and m.deletedAt is null")
     Optional<Member> findBySub(@Param("sub") String sub);
+
+    boolean existsMemberByNickname(String nickname);
 }
