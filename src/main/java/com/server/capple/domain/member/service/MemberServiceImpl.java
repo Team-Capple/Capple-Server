@@ -153,4 +153,8 @@ public class MemberServiceImpl implements MemberService {
     public Boolean checkEmail(String email) {
         return memberRepository.existsMemberByEmail(email);
     }
+
+    private String convertEmailToJwt(String email) {
+        return jwtService.createJwtFromEmail(email);
+    }
 }

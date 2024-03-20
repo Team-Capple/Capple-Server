@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 
 public interface JwtService {
     String createJwt(Long memberId, String role, String tokenType);
+    String createJwtFromEmail(String email);
     String createSignUpAccessJwt(String sub);
     Authentication getAuthentication(String token);
     String getSub(String token);

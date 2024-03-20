@@ -52,6 +52,15 @@ public class JwtServiceImpl implements JwtService{
             .compact();
     }
 
+    @Override
+    public String createJwtFromEmail(String email) {
+        SecretKey emailSecretKey = new SecretKeySpec((jwtProperties.getJwt_secret()+email).getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS512.key().build().getAlgorithm());
+        return Jwts.builder()
+            .setAudience("capple")
+            .signWith(SignatureAlgorithm.HS512, emailSecretKey)
+            .compact();
+    }
+
     public String createSignUpAccessJwt(String sub) {
         Long expiredTime = jwtProperties.getRefresh_expired_time();
         return Jwts.builder()
