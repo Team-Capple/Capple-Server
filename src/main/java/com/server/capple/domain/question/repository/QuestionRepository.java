@@ -1,6 +1,7 @@
 package com.server.capple.domain.question.repository;
 
 import com.server.capple.domain.question.entity.Question;
+import com.server.capple.domain.question.entity.QuestionStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -12,14 +13,17 @@ import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
-    @Query("select q from Question q where q.id = :questionId and q.deletedAt is null")
+    @Query("SELECT q FROM Question q WHERE q.id = :questionId")
     Optional<Question> findById(@Param("questionId") Long questionId);
 
     // QuestionStatus에 따라 livedAt에 가장 최신인 Question을 가져오는 쿼리
-    @Query("SELECT q FROM Question q WHERE q.questionStatus = :questionStatus AND q.deletedAt IS NULL ORDER BY q.livedAt DESC LIMIT 1")
+    @Query("SELECT q FROM Question q WHERE q.questionStatus = :questionStatus ORDER BY q.livedAt DESC LIMIT 1")
     Optional<Question> findByQuestionOrderByLivedAt();
 
     Optional<Question> findFirstByOrderByLivedAtDesc();
 
     Optional<List<Question>> findAllByOrderByCreatedAtDesc();
+
+    @Query("SELECT q FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE' ORDER BY q.livedAt")
+    Optional<List<Question>> findAllByQuestionStatusIsLiveAndOldByOrderByCreatedAtDesc();
 }
