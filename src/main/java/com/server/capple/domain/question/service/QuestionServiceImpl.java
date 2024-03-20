@@ -39,7 +39,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionSummary getMainQuestion(Member member) {
-        Question mainQuestion = questionRepository.findFirstByOrderByLivedAtDesc().orElseThrow(()
+        Question mainQuestion = questionRepository.findByQuestionStatusIsLiveAndOldOrderByLivedAt().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
         boolean isAnswered = answerRepository.existsByQuestionAndMember(mainQuestion, member);
@@ -49,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionInfos getQuestions(Member member) {
-        return questionMapper.toQuestionInfos(questionRepository.findAllByOrderByCreatedAtDesc().orElseThrow(()
+        return questionMapper.toQuestionInfos(questionRepository.findAllByQuestionStatusIsLiveAndOldByOrderByCreatedAtDesc().orElseThrow(()
                 -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND))
                         .stream()
                         .map(question -> questionMapper.toQuestionInfo(question, String.join(" ", tagRedisRepository.getTagsByQuestion(question.getId())), answerRepository.existsByQuestionAndMember(question, member)))
