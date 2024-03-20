@@ -27,6 +27,7 @@ public class MemberRequest {
     @Getter
     public static class signUp {
         private String signUpToken;
+        private String email;
         private String nickname;
         private String profileImage;
     }
