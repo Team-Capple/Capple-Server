@@ -127,10 +127,34 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
+    public MemberResponse.Tokens changeRole(Long memberId, Role role) {
+        Member member = findMember(memberId);
+        member.updateRole(role);
+        String accessToken = jwtService.createJwt(memberId, role.getName(), "access");
+        String refreshToken = jwtService.createJwt(memberId, role.getName(), "refresh");
+        return tokensMapper.toTokens(accessToken, refreshToken);
+    }
+
+    @Override
+    @Transactional
     public MemberResponse.MemberId resignMember(Member member) {
         Member resignedMember = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         resignedMember.resignMember();
         return memberMapper.toMemberId(member);
+    }
+
+    @Override
+    public Boolean checkNickname(String nickname) {
+        return memberRepository.existsMemberByNickname(nickname);
+    }
+
+    @Override
+    public Boolean checkEmail(String email) {
+        return memberRepository.existsMemberByEmail(email);
+    }
+
+    private String convertEmailToJwt(String email) {
+        return jwtService.createJwtFromEmail(email);
     }
 }

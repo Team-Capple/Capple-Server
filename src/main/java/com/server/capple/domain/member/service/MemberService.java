@@ -3,6 +3,7 @@ package com.server.capple.domain.member.service;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -15,5 +16,8 @@ public interface MemberService {
     MemberResponse.SignInResponse signIn(String authorizationCode);
     MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage);
     MemberResponse.SignInResponse localSignIn(String testId);
+    MemberResponse.Tokens changeRole(Long memberId, Role role);
     MemberResponse.MemberId resignMember (Member member);
+    Boolean checkNickname(String nickname);
+    Boolean checkEmail(String email);
 }

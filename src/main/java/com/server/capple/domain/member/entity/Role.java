@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum Role {
-    ROLE_VISITOR("ROLE_VISITOR")
-    ,ROLE_ADMIN("ROLE_ADMIN")
-    ,ROLE_ACADEMIER("ROLE_ACADEMIER")
-    ,ROLE_DEVELOPER("ROLE_DEVELOPER")
+    ROLE_VISITOR("VISITOR")
+    ,ROLE_ADMIN("ADMIN")
+    ,ROLE_ACADEMIER("ACADEMIER")
+    ,ROLE_DEVELOPER("DEVELOPER")
     ;
     private final String name;
     Role(String name) {

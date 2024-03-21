@@ -2,9 +2,11 @@ package com.server.capple.config.security;
 
 import com.server.capple.config.security.jwt.filter.JwtFilter;
 import com.server.capple.config.security.jwt.service.JwtService;
+import com.server.capple.domain.member.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,14 +47,14 @@ public class SecurityConfig {
 //    경로별 인가 //TODO Role 분리 필요
         http
             .authorizeHttpRequests((auth) -> auth
-//                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api-docs/**").permitAll()
-//                .requestMatchers("/member/sign-in","/member/sign-up", "/member/local-sign-in", "/token/**").permitAll()
-//                .requestMatchers("/answers/question/**").hasAnyRole(ROLE_VISITOR.getName(), ROLE_DEVELOPER.getName(), ROLE_ADMIN.getName())
-//                .requestMatchers("**").hasRole(ROLE_DEVELOPER.name())
-//                .requestMatchers("/member/sign-up", "/member/local-sign-up").hasAnyRole(ROLE_VISITOR.name(),ROLE_ADMIN.name())
-//                .requestMatchers("/admin/**").hasRole(ROLE_ADMIN.name())
-                .anyRequest().permitAll());
-//                .anyRequest().authenticated());
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api-docs/**").permitAll()
+                .requestMatchers("/members/sign-in","/members/sign-up", "/members/local-sign-in", "/token/**", "/members/check-nickname", "/members/generate-email-jwt").permitAll()
+                .requestMatchers("/admin/**").hasRole(Role.ROLE_ADMIN.getName())
+                .requestMatchers("/answers","/answers/**").authenticated()
+                .requestMatchers("/members","/members/**").authenticated()
+                .requestMatchers("/tags","/tags/**").authenticated()
+                .requestMatchers("/questions","/questions/**").authenticated()
+                .anyRequest().denyAll());
         http
             .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 //    세션 설정
