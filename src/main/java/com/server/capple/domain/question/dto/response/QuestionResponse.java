@@ -1,5 +1,6 @@
 package com.server.capple.domain.question.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.capple.domain.question.entity.QuestionStatus;
 
 import java.time.LocalDateTime;
@@ -9,7 +10,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 public class QuestionResponse {
-
 
     @Getter
     @AllArgsConstructor
@@ -27,6 +27,8 @@ public class QuestionResponse {
     public static class QuestionInfo {
         private Long questionId;
         private QuestionStatus questionStatus;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime livedAt;
         private String content;
         private String tag;
