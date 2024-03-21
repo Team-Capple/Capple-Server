@@ -24,6 +24,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     Optional<List<Question>> findAllByOrderByCreatedAtDesc();
 
-    @Query("SELECT q FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE' ORDER BY q.livedAt")
+    @Query("SELECT q FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE' ORDER BY q.livedAt DESC")
     Optional<List<Question>> findAllByQuestionStatusIsLiveAndOldByOrderByCreatedAtDesc();
 }
