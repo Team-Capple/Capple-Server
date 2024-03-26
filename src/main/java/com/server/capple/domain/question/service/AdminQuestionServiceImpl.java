@@ -40,7 +40,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
 
     @Transactional
     public QuestionId setLiveQuestion() {
-        Question newQuestion = adminQuestionRepository.findFirstByQuestionStatus(QuestionStatus.PENDING)
+        Question newQuestion = adminQuestionRepository.findFirstByQuestionStatusOrderByIdAsc(QuestionStatus.PENDING)
                 .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_PENDING_NOT_FOUND));
 
         newQuestion.setQuestionStatus(QuestionStatus.LIVE);
@@ -51,7 +51,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
 
     @Transactional
     public QuestionId closeLiveQuestion() {
-        Question question = adminQuestionRepository.findFirstByQuestionStatus(QuestionStatus.LIVE)
+        Question question = adminQuestionRepository.findFirstByQuestionStatusOrderByIdAsc(QuestionStatus.LIVE)
                 .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_LIVE_NOT_FOUND));
         question.setQuestionStatus(QuestionStatus.OLD);
 
