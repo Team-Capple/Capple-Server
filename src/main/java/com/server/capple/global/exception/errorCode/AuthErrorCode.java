@@ -15,6 +15,7 @@ public enum AuthErrorCode implements ErrorCodeInterface {
     ,WRONG_TOKEN_SIGNITURE("AUTH004", "토큰의 서명이 잘못됐습니다.", HttpStatus.UNAUTHORIZED)
     ,EMPTY_TOKEN("AUTH005", "토큰이 비어있습니다.", HttpStatus.UNAUTHORIZED)
     ,INVALID_TOKEN_TYPE("AUTH006", "유효하지 않은 토큰 타입입니다.", HttpStatus.UNAUTHORIZED)
+    ,EXPIRED_SIGNUP_TOKEN("AUTH007", "만료된 회원가입 토큰입니다.", HttpStatus.UNAUTHORIZED)
     ,
     ;
     private final String code;

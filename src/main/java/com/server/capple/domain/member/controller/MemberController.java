@@ -8,6 +8,9 @@ import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -104,5 +107,22 @@ public class MemberController {
     @GetMapping("/email/check")
     public BaseResponse<Boolean> checkEmail(@RequestParam String email) {
         return BaseResponse.onSuccess(memberService.checkEmail(email));
+    }
+
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "메일 발송 성공"),
+        @ApiResponse(responseCode = "400", description = "메일 발송 실패")
+    })
+    @Operation(summary = "회원가입 인증메일 발송 API", description = "회원가입 인증메일 발송 API 입니다.<br>" +
+        "쿼리 파라미터를 이용해 이메일을 입력해주세요.<br>" +
+        "인증코드가 발송됩니다.")
+    @GetMapping("/email/certification")
+    public BaseResponse<Boolean> sendCertMail(
+        @Parameter(description = "회원가입 인증 토큰")
+        @RequestParam String signUpToken,
+        @Parameter(description = "인증 메일을 받을 이메일 주소")
+        @RequestParam String email
+    ) {
+        return BaseResponse.onSuccess(memberService.sendCertMail(signUpToken, email));
     }
 }

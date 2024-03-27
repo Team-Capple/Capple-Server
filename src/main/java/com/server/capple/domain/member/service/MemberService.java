@@ -20,4 +20,5 @@ public interface MemberService {
     MemberResponse.MemberId resignMember (Member member);
     Boolean checkNickname(String nickname);
     Boolean checkEmail(String email);
+    Boolean sendCertMail(String signUpToken, String email);
 }
