@@ -102,7 +102,8 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage) {
         String sub = jwtService.getSub(signUpToken);
-        Member member = memberMapper.createMember(sub, email, nickname, Role.ROLE_ACADEMIER, profileImage);
+        String encryptedEmail = convertEmailToJwt(email);
+        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, profileImage);
         memberRepository.save(member);
         Long memberId = member.getId();
         String role = member.getRole().getName();
@@ -151,7 +152,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Boolean checkEmail(String email) {
-        return memberRepository.existsMemberByEmail(email);
+        String encryptedEmail = convertEmailToJwt(email);
+        return memberRepository.existsMemberByEmail(encryptedEmail);
     }
 
     private String convertEmailToJwt(String email) {
