@@ -125,4 +125,23 @@ public class MemberController {
     ) {
         return BaseResponse.onSuccess(memberService.sendCertMail(signUpToken, email));
     }
+
+    @Operation(summary = "회원가입 인증코드 인증 API", description = "회원가입 인증코드 인증API 입니다.<br>" +
+        "쿼리 파라미터를 이용해 이메일과 인증코드를 입력해주세요.<br>" +
+        "인증코드가 일치할 경우 true, 일치하지 않을 경우 false가 반환됩니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "메일 인증 성공"),
+        @ApiResponse(responseCode = "400", description = "메일 인증 실패")
+    })
+    @GetMapping("/email/certification/check")
+    public BaseResponse<Boolean> checkCertCode(
+        @Parameter(description = "회원가입 인증 토큰")
+        @RequestParam String signUpToken,
+        @Parameter(description = "인증 메일을 받은 이메일 주소")
+        @RequestParam String email,
+        @Parameter(description = "인증 코드")
+        @RequestParam String certCode
+    ) {
+        return BaseResponse.onSuccess(memberService.checkCertCode(signUpToken, email, certCode));
+    }
 }

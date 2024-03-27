@@ -186,4 +186,16 @@ public class MemberServiceImpl implements MemberService {
         // 이메일 발송
         return mailService.snedMailAddressCerticationMail(email);
     }
+
+    @Override
+    public Boolean checkCertCode(String signUpToken, String email, String certCode) {
+        // 토큰 만료 체크
+        if (jwtService.isExpired(signUpToken)) {
+            throw new RestApiException(AuthErrorCode.EXPIRED_SIGNUP_TOKEN);
+        }
+        // 이메일 암호화
+        String emailJwt = convertEmailToJwt(email);
+        // 이메일 인증코드 체크
+        return mailService.checkEmailCertificationCode(emailJwt, certCode);
+    }
 }

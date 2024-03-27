@@ -21,4 +21,5 @@ public interface MemberService {
     Boolean checkNickname(String nickname);
     Boolean checkEmail(String email);
     Boolean sendCertMail(String signUpToken, String email);
+    Boolean checkCertCode(String signUpToken, String email, String certCode);
 }

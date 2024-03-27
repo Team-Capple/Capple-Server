@@ -3,6 +3,8 @@ package com.server.capple.domain.mail.service;
 import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.mail.repository.MailRedisRepository;
 import com.server.capple.domain.mail.vo.MailDomain;
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.MailErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +26,18 @@ public class MailServiceImpl implements MailService {
     public Boolean checkMailDomain(String emailAddress) {
         String domainAddress = emailAddress.split("@")[1];
         return MailDomain.isExistDomain(domainAddress);
+    }
+
+    @Override
+    public Boolean checkEmailCertificationCode(String emailJwt, String certificationCode) {
+        String savedCertificationCode = mailRedisRepository.findByEmail(emailJwt);
+        if (savedCertificationCode == null) {
+            throw new RestApiException(MailErrorCode.CERTIFICATION_CODE_EXPIRED);
+        }
+        if (!certificationCode.equals(savedCertificationCode)) {
+            throw new RestApiException(MailErrorCode.CERTIFICATION_CODE_NOT_MATCH);
+        }
+        mailRedisRepository.deleteByEmail(emailJwt);
+        return true;
     }
 }

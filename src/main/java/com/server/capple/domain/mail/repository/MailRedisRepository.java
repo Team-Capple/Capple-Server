@@ -25,4 +25,14 @@ public class MailRedisRepository implements Serializable {
         valueOperations.set(key, certCode, timeoutDuration);
         return true;
     }
+
+    public String findByEmail(String email) {
+        String key = EMAIL_CERT_CODE_KEY + email;
+        return valueOperations.get(key);
+    }
+
+    public Boolean deleteByEmail(String email) {
+        String key = EMAIL_CERT_CODE_KEY + email;
+        return valueOperations.getAndDelete(key) != null;
+    }
 }

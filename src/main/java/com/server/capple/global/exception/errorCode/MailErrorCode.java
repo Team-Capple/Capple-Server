@@ -13,6 +13,8 @@ public enum MailErrorCode implements ErrorCodeInterface {
     INVALID_EMAIL_FORM("MAIL002", "이메일 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
     NOT_SUPPORTED_EMAIL_DOMAIN("MAIL003", "지원하지 않는 이메일 도메인입니다.", HttpStatus.BAD_REQUEST),
     DUPLICATE_EMAIL("MAIL004", "이미 가입된 이메일입니다.", HttpStatus.BAD_REQUEST),
+    CERTIFICATION_CODE_EXPIRED("MAIL005", "인증 코드가 만료되었습니다.", HttpStatus.BAD_REQUEST),
+    CERTIFICATION_CODE_NOT_MATCH("MAIL006", "인증 코드가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     ;
     private final String code;
     private final String message;
