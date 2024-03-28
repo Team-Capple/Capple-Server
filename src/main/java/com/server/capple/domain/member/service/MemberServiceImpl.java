@@ -1,18 +1,22 @@
 package com.server.capple.domain.member.service;
 
 import com.server.capple.config.security.jwt.service.JwtService;
+import com.server.capple.config.security.oauth.apple.dto.AppleIdTokenPayload;
 import com.server.capple.config.security.oauth.apple.service.AppleAuthService;
+import com.server.capple.domain.mail.service.MailService;
+import com.server.capple.domain.mail.service.MailUtil;
 import com.server.capple.domain.member.dto.MemberRequest;
-import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
+import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.mapper.TokensMapper;
 import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.AuthErrorCode;
+import com.server.capple.global.exception.errorCode.MailErrorCode;
 import com.server.capple.global.exception.errorCode.MemberErrorCode;
 import com.server.capple.global.utils.S3ImageComponent;
-import com.server.capple.config.security.oauth.apple.dto.AppleIdTokenPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
     private final TokensMapper tokensMapper;
     private final AppleAuthService appleAuthService;
     private final JwtService jwtService;
+    private final MailService mailService;
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
@@ -156,5 +161,41 @@ public class MemberServiceImpl implements MemberService {
 
     private String convertEmailToJwt(String email) {
         return jwtService.createJwtFromEmail(email);
+    }
+
+    @Override
+    public Boolean sendCertMail(String signUpToken, String email) {
+        // 토큰 만료 체크
+        if (jwtService.isExpired(signUpToken)) {
+            throw new RestApiException(AuthErrorCode.EXPIRED_SIGNUP_TOKEN);
+        }
+        // 이메일 형식 체크
+        if (!MailUtil.emailAddressFormVerification(email)) {
+            throw new RestApiException(MailErrorCode.INVALID_EMAIL_FORM);
+        }
+        // 지원 도메인 체크
+        if (!mailService.checkMailDomain(email)) {
+            throw new RestApiException(MailErrorCode.NOT_SUPPORTED_EMAIL_DOMAIN);
+        }
+        // 이메일 암호화
+        String emailJwt = convertEmailToJwt(email);
+        // 이메일 중복 체크
+        if (memberRepository.existsMemberByEmail(emailJwt)) {
+            throw new RestApiException(MailErrorCode.DUPLICATE_EMAIL);
+        }
+        // 이메일 발송
+        return mailService.snedMailAddressCerticationMail(email);
+    }
+
+    @Override
+    public Boolean checkCertCode(String signUpToken, String email, String certCode) {
+        // 토큰 만료 체크
+        if (jwtService.isExpired(signUpToken)) {
+            throw new RestApiException(AuthErrorCode.EXPIRED_SIGNUP_TOKEN);
+        }
+        // 이메일 암호화
+        String emailJwt = convertEmailToJwt(email);
+        // 이메일 인증코드 체크
+        return mailService.checkEmailCertificationCode(emailJwt, certCode);
     }
 }
