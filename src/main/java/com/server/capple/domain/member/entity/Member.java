@@ -44,6 +44,8 @@ public class Member extends BaseEntity {
 
     public void resignMember() {
         this.nickname = "알 수 없음";
+        this.email = "Resign Member";
+        this.sub = "Resign Member";
         delete();
     }
 }
