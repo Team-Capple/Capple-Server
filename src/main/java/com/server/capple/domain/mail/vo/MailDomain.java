@@ -4,7 +4,8 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum MailDomain {
-    POSTECH("postech.ac.kr"),
+    POSTECH_APPLE_DEVELOPER_ACADEMY("pos.idserve.net"),
+//    POSTECH("postech.ac.kr"),
     ;
 
     private final String domain;
