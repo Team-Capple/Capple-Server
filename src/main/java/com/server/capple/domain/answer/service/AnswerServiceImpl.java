@@ -129,21 +129,21 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public AnswerList getAnswerList(Long questionId, String keyword, Pageable pageable) {
+    public AnswerList getAnswerList(Long memberId, Long questionId, String keyword, Pageable pageable) {
 
         if (keyword == null) {
             return answerMapper.toAnswerList(
                     answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answerMapper::toAnswerInfo)
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId))
                             .toList());
         } else {
             return answerMapper.toAnswerList(
                     answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answerMapper::toAnswerInfo)
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId))
                             .toList());
         }
 

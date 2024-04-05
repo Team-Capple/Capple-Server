@@ -41,11 +41,12 @@ public class AnswerController {
     })
     @GetMapping("/question/{questionId}")
     public BaseResponse<AnswerResponse.AnswerList> getAnswerList(
+            @AuthMember Member member,
             @PathVariable(value = "questionId") Long questionId,
             @RequestParam(name = "keyword", required = false) String keyword,
             @PageableDefault
             @Parameter(hidden = true) Pageable pageable) {
-        return BaseResponse.onSuccess(answerService.getAnswerList(questionId, keyword, pageable));
+        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, keyword, pageable));
     }
 
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
