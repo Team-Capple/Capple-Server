@@ -49,6 +49,7 @@ public class AnswerResponse {
         private String writeAt;
     }
 
+    @Getter
     @AllArgsConstructor
     public static class MemberAnswerList {
         private List<MemberAnswerInfo> memberAnswerInfos;
