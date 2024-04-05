@@ -7,4 +7,6 @@ import com.server.capple.domain.report.dto.request.ReportRequest;
 public interface ReportService {
     ReportResponse.ReportId createReport(Member member, ReportRequest.ReportCreate request);
 
+    ReportResponse.ReportInfos getReports(Member member);
+
 }

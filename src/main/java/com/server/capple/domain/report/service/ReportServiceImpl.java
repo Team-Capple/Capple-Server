@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,6 +29,7 @@ public class ReportServiceImpl implements ReportService {
     private final AnswerService answerService;
 
     @Override
+    @Transactional
     public ReportResponse.ReportId createReport(Member loginMember, ReportRequest.ReportCreate request) {
 
         Member member = memberService.findMember(loginMember.getId());
@@ -41,5 +44,16 @@ public class ReportServiceImpl implements ReportService {
         Report report = reportRepository.save(reportMapper.toReport(member, question, answer, request));
 
         return new ReportResponse.ReportId(report.getId());
+    }
+
+    @Override
+    public ReportResponse.ReportInfos getReports(Member loginMember) {
+        Member member = memberService.findMember(loginMember.getId());
+
+        List<Report> reports = reportRepository.findAll();
+        return reportMapper.toReportInfos(reports
+                .stream()
+                .map(reportMapper::toReportInfo)
+                .toList());
     }
 }

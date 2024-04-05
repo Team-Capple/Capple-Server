@@ -12,10 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "신고 API", description = "신고 관련 API")
 @RestController
@@ -34,5 +31,12 @@ public class ReportController {
         return BaseResponse.onSuccess(reportService.createReport(member, request));
     }
 
-
+    @Operation(summary = "신고함 조회 API", description = "신고함을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping
+    private BaseResponse<ReportResponse.ReportInfos> getReports(@AuthMember Member member) {
+        return BaseResponse.onSuccess(reportService.getReports(member));
+    }
 }
