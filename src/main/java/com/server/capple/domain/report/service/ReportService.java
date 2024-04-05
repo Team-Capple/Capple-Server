@@ -11,4 +11,5 @@ public interface ReportService {
 
     ReportResponse.ReportId updateReport(Member member, Long reportId, ReportRequest.ReportUpdate request);
 
+    ReportResponse.ReportId resignReport(Member member, Long reportId);
 }

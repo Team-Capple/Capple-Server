@@ -70,4 +70,19 @@ public class ReportServiceImpl implements ReportService {
 
         return new ReportResponse.ReportId(report.getId());
     }
+
+    @Override
+    @Transactional
+    public ReportResponse.ReportId resignReport(Member loginMember, Long reportId) {
+        Member member = memberService.findMember(loginMember.getId());
+
+        Report report = reportRepository.findById(reportId).orElseThrow(()
+                -> new RestApiException(ReportErrorCode.REPORT_NOT_FOUND));
+
+        if (report.getMember().getId() == loginMember.getId()) {
+            report.delete();
+        }
+
+        return new ReportResponse.ReportId(report.getId());
+    }
 }
