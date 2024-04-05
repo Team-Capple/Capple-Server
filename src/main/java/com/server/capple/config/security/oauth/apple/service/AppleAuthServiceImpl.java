@@ -3,12 +3,18 @@ package com.server.capple.config.security.oauth.apple.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.capple.config.security.oauth.apple.client.AppleAuthClient;
+import com.server.capple.config.security.oauth.apple.dto.AppleIdTokenPayload;
 import com.server.capple.config.security.oauth.apple.dto.response.AppleSocialTokenResponse;
 import com.server.capple.config.security.oauth.apple.mapper.IdTokensRequestMapper;
-import com.server.capple.config.security.oauth.apple.dto.AppleIdTokenPayload;
 import com.server.capple.config.security.oauth.apple.vo.AppleProperties;
-import io.jsonwebtoken.*;
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.AppleOauthError;
+import com.server.capple.global.exception.errorCode.GlobalErrorCode;
+import feign.FeignException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.stereotype.Service;
@@ -19,16 +25,38 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppleAuthServiceImpl implements AppleAuthService {
     private final AppleAuthClient appleAuthClient;
     private final AppleProperties appleProperties;
     private final IdTokensRequestMapper idTokensRequestMapper;
+
     public AppleIdTokenPayload get(String authorizationCode) {
-        AppleSocialTokenResponse response = appleAuthClient.generateAndValidateToken(idTokensRequestMapper.toIdTokenRequestByCode(appleProperties.getClient_id(), generateClientSecret(), authorizationCode, appleProperties.getGrant_type(), appleProperties.getRedirect_uri()));
-        String idToken = response.getIdToken();
-        return decodePayload(idToken, AppleIdTokenPayload.class);
+        try {
+            AppleSocialTokenResponse response = appleAuthClient.generateAndValidateToken(idTokensRequestMapper.toIdTokenRequestByCode(appleProperties.getClient_id(), generateClientSecret(), authorizationCode, appleProperties.getGrant_type(), appleProperties.getRedirect_uri()));
+            String idToken = response.getIdToken();
+            return decodePayload(idToken, AppleIdTokenPayload.class);
+        } catch (FeignException e) {
+            switch (e.status()) {
+                case 400:
+                    log.error("Apple Auth Client Error: {}", e.getMessage());
+                    throw new RestApiException(AppleOauthError.BAD_REQUEST);
+                case 403:
+                    log.error("Apple Auth Client Error: {}", e.getMessage());
+                    throw new RestApiException(AppleOauthError.FORBIDDEN);
+                case 404:
+                    log.error("Apple Auth Client Error: {}", e.getMessage());
+                    throw new RestApiException(AppleOauthError.NOT_FOUND);
+                case 500:
+                    log.error("Apple Auth Client Error: {}", e.getMessage());
+                    throw new RestApiException(AppleOauthError.INTERNAL_SERVER_ERROR);
+                default:
+                    log.error("Apple Auth Client Error: {}", e.getMessage());
+                    throw new RestApiException(GlobalErrorCode.SERVER_ERROR);
+            }
+        }
     }
 
     private String generateClientSecret() {

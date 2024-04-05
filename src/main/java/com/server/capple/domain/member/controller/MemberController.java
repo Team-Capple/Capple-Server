@@ -7,8 +7,12 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.global.common.BaseResponse;
+import com.server.capple.global.exception.errorCode.AppleOauthError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,6 +62,28 @@ public class MemberController {
             "기존에 존재하는 사용자라면 isMember가 true로 반환되며, accessToken과 refreshToken이 반환됩니다." +
             "새로운 사용자라면 isMember가 false로 반환되며, refreshToken의 위치에 signUpToken이 반환됩니다.")
     @GetMapping("/sign-in")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "회원 검증 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = MemberResponse.SignInResponse.class))),
+        @ApiResponse(responseCode = "400", description = "로그인 데이터/형식 오류", content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "403", description = "인증서버 접근 권한 오류", content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "404", description = "서버 내 인증서버 클라이언트 오류", content = @Content(mediaType = "application/json")),
+        @ApiResponse(responseCode = "500", description = "애플 인증서버 내부 오류", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AppleOauthError.class), examples = {
+            @ExampleObject(name = "OAUTH005", value = """
+                {
+                  "timeStamp": "2024-04-05T07:55:47.289412",
+                  "code": "OAUTH005",
+                  "message": "애플 인증서버 내부 오류입니다."
+                }
+                """, description = "애플 인증서버측의 오류입니다. 다시 시도해주세요."),
+            @ExampleObject(name = "GLOBAL005", value = """
+                {
+                  "timeStamp": "2024-04-05T07:55:47.289412",
+                    "code": "GLOBAL005",
+                    "message": "서버 에러, 관리자에게 문의해주세요."
+                }
+                """, description = "서버측의 애플 서버 접근 클라언트 관련 문제로 서버 관리자에게 문의해주세요."),
+        })),
+    })
     public BaseResponse<MemberResponse.SignInResponse> login(@RequestParam String code) {
         return BaseResponse.onSuccess(memberService.signIn(code));
     }
