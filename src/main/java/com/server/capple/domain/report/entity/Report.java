@@ -3,6 +3,7 @@ package com.server.capple.domain.report.entity;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
+import com.server.capple.domain.report.dto.request.ReportRequest;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,4 +44,8 @@ public class Report extends BaseEntity {
 //
 //    @Column(nullable = false)
 //    private String content;
+
+    public void update(ReportRequest.ReportUpdate request) {
+        this.reportType = request.getReportType();
+    }
 }

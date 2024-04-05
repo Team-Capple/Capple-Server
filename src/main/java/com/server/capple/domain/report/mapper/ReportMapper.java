@@ -22,12 +22,14 @@ public class ReportMapper {
                 .build();
     }
 
-    public ReportResponse.ReportInfo toReportInfo(Report report) {
+    public ReportResponse.ReportInfo toReportInfo(Member member, Report report) {
         return ReportResponse.ReportInfo.builder()
+                .reportId(report.getId())
                 .writer(report.getMember().getId())
                 .questionId(report.getQuestion() == null ? null : report.getQuestion().getId())
                 .answerId(report.getAnswer() == null ? null : report.getAnswer().getId())
                 .reportType(report.getReportType())
+                .isMine(member.getId() == report.getId())
                 .build();
     }
 

@@ -9,4 +9,6 @@ public interface ReportService {
 
     ReportResponse.ReportInfos getReports(Member member);
 
+    ReportResponse.ReportId updateReport(Member member, Long reportId, ReportRequest.ReportUpdate request);
+
 }

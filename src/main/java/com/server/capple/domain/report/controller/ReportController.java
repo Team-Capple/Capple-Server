@@ -11,7 +11,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Fetch;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "신고 API", description = "신고 관련 API")
@@ -27,7 +29,8 @@ public class ReportController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping
-    private BaseResponse<ReportResponse.ReportId> createReport(@AuthMember Member member, @RequestBody ReportRequest.ReportCreate request) {
+    private BaseResponse<ReportResponse.ReportId> createReport(@AuthMember Member member,
+                                                               @RequestBody ReportRequest.ReportCreate request) {
         return BaseResponse.onSuccess(reportService.createReport(member, request));
     }
 
@@ -38,5 +41,28 @@ public class ReportController {
     @GetMapping
     private BaseResponse<ReportResponse.ReportInfos> getReports(@AuthMember Member member) {
         return BaseResponse.onSuccess(reportService.getReports(member));
+    }
+
+    @Operation(summary = "신고함 수정 API", description = "신고함을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @PostMapping("/{reportId}")
+    private BaseResponse<ReportResponse.ReportId> updateReport(@AuthMember Member member,
+                                                               @PathVariable(value = "reportId") Long reportId,
+                                                               @RequestBody @Valid ReportRequest.ReportUpdate request) {
+
+        return BaseResponse.onSuccess(reportService.updateReport(member, reportId, request));
+    }
+
+    @Operation(summary = "신고함 삭제 API", description = "신고를 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @DeleteMapping("/{reportId}")
+    private BaseResponse<ReportResponse.ReportId> resignReport(@AuthMember Member member,
+                                                               @PathVariable(value = "reportId") Long reportId) {
+
+        return BaseResponse.onSuccess(reportService.resignReport(member, reportId));
     }
 }

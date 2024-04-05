@@ -15,4 +15,12 @@ public class ReportRequest {
 //        private String title;
 //        private String content;
     }
+    @Data
+    public static class ReportUpdate {
+        private ReportType reportType;
+
+//        TODO 추후 추가 예정
+//        private String title;
+//        private String content;
+    }
 }

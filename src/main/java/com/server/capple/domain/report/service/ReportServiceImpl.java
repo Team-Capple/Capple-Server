@@ -11,6 +11,8 @@ import com.server.capple.domain.report.dto.request.ReportRequest;
 import com.server.capple.domain.report.entity.Report;
 import com.server.capple.domain.report.mapper.ReportMapper;
 import com.server.capple.domain.report.repository.ReportRepository;
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.ReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +55,19 @@ public class ReportServiceImpl implements ReportService {
         List<Report> reports = reportRepository.findAll();
         return reportMapper.toReportInfos(reports
                 .stream()
-                .map(reportMapper::toReportInfo)
+                .map(report -> reportMapper.toReportInfo(member, report))
                 .toList());
+    }
+
+    @Override
+    @Transactional
+    public ReportResponse.ReportId updateReport(Member loginMember, Long reportId, ReportRequest.ReportUpdate request) {
+        Member member = memberService.findMember(loginMember.getId());
+
+        Report report = reportRepository.findById(reportId).orElseThrow(()
+        -> new RestApiException(ReportErrorCode.REPORT_NOT_FOUND));
+        report.update(request);
+
+        return new ReportResponse.ReportId(report.getId());
     }
 }
