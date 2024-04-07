@@ -19,6 +19,7 @@ public class AnswerResponse {
         private String nickname;
         private String content;
         private String tags;
+        private Boolean isMyAnswer;
     }
 
     @Getter
