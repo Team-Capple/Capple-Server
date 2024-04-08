@@ -166,6 +166,11 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public Boolean registerEmailWhitelist(String email, Long whitelistDurationMinutes) {
+        return mailService.saveMailWhitelist(email, whitelistDurationMinutes);
+    }
+
+    @Override
     public Boolean sendCertMail(String signUpToken, String email) {
         // 토큰 만료 체크
         if (jwtService.isExpired(signUpToken)) {
