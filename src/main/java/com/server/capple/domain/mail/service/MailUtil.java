@@ -6,5 +6,5 @@ public interface MailUtil {
         return emailAddress.matches(emailRegex);
     }
 
-    String snedMailAddressCerticationMail(String receiver);
+    String sendMailAddressCertificationMail(String receiver, Boolean isWhiteList);
 }

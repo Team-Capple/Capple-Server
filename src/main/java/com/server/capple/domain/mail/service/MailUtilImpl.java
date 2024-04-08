@@ -5,6 +5,7 @@ import com.server.capple.global.exception.errorCode.MailErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -16,10 +17,13 @@ import org.thymeleaf.context.Context;
 public class MailUtilImpl implements MailUtil {
     private final JavaMailSender javaMailSender;
     private final TemplateEngine templateEngine;
+    @Value("${mail.white-list-cert-code}")
+    private String whiteListCertCode;
 
     @Override
-    public String snedMailAddressCerticationMail(String receiver) {
+    public String sendMailAddressCertificationMail(String receiver, Boolean isWhiteList) {
         String certCode = generateCertCode();
+        if(isWhiteList) certCode = whiteListCertCode;
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
