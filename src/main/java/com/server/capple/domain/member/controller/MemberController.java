@@ -170,4 +170,21 @@ public class MemberController {
     ) {
         return BaseResponse.onSuccess(memberService.checkCertCode(signUpToken, email, certCode));
     }
+
+    @Operation(summary = "메일 인증 화이트 리스트 등록 API", description = "메일 인증 화이트 리스트 등록 API 입니다.<br>" +
+        "쿼리 파라미터를 이용해 화이트 리스트에 등록할 이메일 주소와 등록 기간(분)을 입역해주세요.<br>" +
+        "등록에 성공할 경우 true가 반환됩니다.<br>" +
+        "관리자 권한을 가진 토큰을 이용해야 해당 API를 사용할 수 있습니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "화이트 리스트 등록 성공"),
+        @ApiResponse(responseCode = "403", description = "화이트 리스트 등록 실패, 관리자 권한 필요."),
+    })
+    @GetMapping("/email/whitelist/register")
+    public BaseResponse<Boolean> registerEmailWhitelist(
+        @Parameter(description = "화이트 리스트 등록할 이메일")
+        @RequestParam String mail,
+        @Parameter(description = "화이트 리스트 등록 기간 (분)")
+        @RequestParam Long whitelistDurationMinutes) {
+        return BaseResponse.onSuccess(memberService.registerEmailWhitelist(mail, whitelistDurationMinutes));
+    }
 }
