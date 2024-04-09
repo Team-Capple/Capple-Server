@@ -18,22 +18,26 @@ public class MailServiceImpl implements MailService {
     private final JwtService jwtService;
 
     @Override
-    public Boolean snedMailAddressCerticationMail(String email) {
-        String certCode = mailUtil.snedMailAddressCerticationMail(email);
+    public Boolean sendMailAddressCertificationMail(String email, Boolean isWhiteList) {
+        String certCode = mailUtil.sendMailAddressCertificationMail(email, isWhiteList);
         String emailJwt = jwtService.createJwtFromEmail(email);
         return mailRedisRepository.save(emailJwt, certCode);
     }
 
     @Override
     public Boolean saveMailWhitelist(String email, Long whitelistDurationMinutes) {
-        return mailWhitelistRedisRepository.save(email, whitelistDurationMinutes);
+        String emailJwt = jwtService.createJwtFromEmail(email);
+        return mailWhitelistRedisRepository.save(emailJwt, whitelistDurationMinutes);
+    }
+
+    @Override
+    public Boolean checkWhiteList(String emailAddress) {
+        String emailJwt = jwtService.createJwtFromEmail(emailAddress);
+        return mailWhitelistRedisRepository.existsByEmail(emailJwt);
     }
 
     @Override
     public Boolean checkMailDomain(String emailAddress) {
-        if (mailWhitelistRedisRepository.existsByEmail(emailAddress)) {
-            return true;
-        }
         String domainAddress = emailAddress.split("@")[1];
         return MailDomain.isExistDomain(domainAddress);
     }

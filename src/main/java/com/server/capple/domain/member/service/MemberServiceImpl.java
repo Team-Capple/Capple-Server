@@ -180,8 +180,9 @@ public class MemberServiceImpl implements MemberService {
         if (!MailUtil.emailAddressFormVerification(email)) {
             throw new RestApiException(MailErrorCode.INVALID_EMAIL_FORM);
         }
+        Boolean isWhiteList = mailService.checkWhiteList(email);
         // 지원 도메인 체크
-        if (!mailService.checkMailDomain(email)) {
+        if (!isWhiteList && !mailService.checkMailDomain(email)) {
             throw new RestApiException(MailErrorCode.NOT_SUPPORTED_EMAIL_DOMAIN);
         }
         // 이메일 암호화
@@ -191,7 +192,7 @@ public class MemberServiceImpl implements MemberService {
             throw new RestApiException(MailErrorCode.DUPLICATE_EMAIL);
         }
         // 이메일 발송
-        return mailService.snedMailAddressCerticationMail(email);
+        return mailService.sendMailAddressCertificationMail(email, isWhiteList);
     }
 
     @Override
