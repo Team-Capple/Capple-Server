@@ -20,6 +20,7 @@ public class AnswerResponse {
         private String content;
         private String tags;
         private Boolean isMyAnswer;
+        private Boolean isReported;
     }
 
     @Getter

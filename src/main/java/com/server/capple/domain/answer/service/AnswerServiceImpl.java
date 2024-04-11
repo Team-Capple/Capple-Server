@@ -13,6 +13,7 @@ import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.service.QuestionService;
+import com.server.capple.domain.report.repository.ReportRepository;
 import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
@@ -30,6 +31,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class AnswerServiceImpl implements AnswerService {
     private final AnswerRepository answerRepository;
+    private final ReportRepository reportRepository;
     private final QuestionService questionService;
     private final AnswerMapper answerMapper;
     private final MemberService memberService;
@@ -136,14 +138,14 @@ public class AnswerServiceImpl implements AnswerService {
                     answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
                             .toList());
         } else {
             return answerMapper.toAnswerList(
                     answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
                             .toList());
         }
 
