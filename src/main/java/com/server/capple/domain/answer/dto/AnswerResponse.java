@@ -15,6 +15,7 @@ public class AnswerResponse {
     @AllArgsConstructor
     @Builder
     public static class AnswerInfo {
+        private Long answerId;
         private String profileImage;
         private String nickname;
         private String content;
@@ -43,6 +44,7 @@ public class AnswerResponse {
     @Builder
     public static class MemberAnswerInfo {
         private Long questionId;
+        private Long answerId;
         private String nickname;
         private String profileImage;
         private String content;
