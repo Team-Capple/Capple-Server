@@ -32,6 +32,7 @@ public class AnswerMapper {
 
     public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported) {
         return AnswerInfo.builder()
+                .answerId(answer.getId())
                 .profileImage(answer.getMember().getProfileImage())
                 .nickname(answer.getMember().getNickname())
                 .content(answer.getContent())
@@ -44,6 +45,7 @@ public class AnswerMapper {
     public MemberAnswerInfo toMemberAnswerInfo(Answer answer, int heartCount) {
         return MemberAnswerInfo.builder()
                 .questionId(answer.getQuestion().getId())
+                .answerId(answer.getId())
                 .nickname(answer.getMember().getNickname())
                 .profileImage(answer.getMember().getProfileImage())
                 .content(answer.getContent())
