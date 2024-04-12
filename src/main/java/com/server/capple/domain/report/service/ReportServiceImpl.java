@@ -12,6 +12,7 @@ import com.server.capple.domain.report.entity.Report;
 import com.server.capple.domain.report.mapper.ReportMapper;
 import com.server.capple.domain.report.repository.ReportRepository;
 import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import com.server.capple.global.exception.errorCode.ReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,12 @@ public class ReportServiceImpl implements ReportService {
     private final MemberService memberService;
     private final QuestionService questionService;
     private final AnswerService answerService;
+
+    @Override
+    public Report findReport(Long reportId) {
+        return reportRepository.findById(reportId).orElseThrow(()
+                -> new RestApiException(ReportErrorCode.REPORT_NOT_FOUND));
+    }
 
     @Override
     @Transactional

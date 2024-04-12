@@ -30,13 +30,14 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(Answer answer, Long memberId) {
+    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported) {
         return AnswerInfo.builder()
                 .profileImage(answer.getMember().getProfileImage())
                 .nickname(answer.getMember().getNickname())
                 .content(answer.getContent())
                 .tags(answer.getTags())
                 .isMyAnswer(answer.getMember().getId() == memberId)
+                .isReported(isReported)
                 .build();
     }
 
