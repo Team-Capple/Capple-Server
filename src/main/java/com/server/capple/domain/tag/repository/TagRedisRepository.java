@@ -72,18 +72,13 @@ public class TagRedisRepository implements Serializable {
         return zSetOperations.reverseRange(TAGS_KEY, 0, 3);
     }
 
-    //밤 12시 정각이 될때마다 기존의 count를 50%로 줄임
+    //기존의 count를 50%로 줄임 (스케줄러 사용)
     public void decreaseTagCount() {
         Set<ZSetOperations.TypedTuple<String>> tags = zSetOperations.rangeWithScores(TAGS_KEY, 0, -1);
 
         if (tags != null) {
             tags.forEach(tag -> {
                 zSetOperations.add(TAGS_KEY, tag.getValue(), tag.getScore() * 0.5);
-
-                //count 감소 후 score가 1.0보다 작으면 tags에서 삭제
-                if (tag.getScore() < 1.0)
-                    zSetOperations.remove(TAGS_KEY, tag.getValue());
-
             });
         }
     }
