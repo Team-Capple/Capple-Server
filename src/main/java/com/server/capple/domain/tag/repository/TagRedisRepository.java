@@ -5,12 +5,14 @@ import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.TagErrorCode;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,6 +22,7 @@ public class TagRedisRepository implements Serializable {
 
     @Resource(name = "redisTemplate")
     private ZSetOperations<String, String> zSetOperations;
+    private final RedisTemplate<String,String> redisTemplate;
 
     //지금 뜨는 키워드 조회를 위한 tag 저장, tagCount update
     public void saveTags(List<String> tags) {
@@ -43,8 +46,12 @@ public class TagRedisRepository implements Serializable {
 
     private void increaseTagCount(String key, String tag) {
         Double count = zSetOperations.score(key, tag);
-        if (count == null)
+        if (count == null) {
             zSetOperations.add(key, tag, 1.0);
+            //live 질문은 7시간동안만 열려있음
+            if(key.startsWith(QUESTION_TAGS_KEY_PREFIX))
+                redisTemplate.expire(key,7, TimeUnit.HOURS);
+        }
         else
             zSetOperations.incrementScore(key, tag, 1.0);
     }

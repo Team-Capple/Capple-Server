@@ -24,6 +24,7 @@ public class QuestionScheduler {
     public void closeLiveQuestion() {
         //question을 닫고, rdb에 popular tags 저장
         adminQuestionService.savePopularTags(adminQuestionService.closeLiveQuestion().getQuestionId());
+
         log.info("live question이 닫혔습니다.");
 
     }
