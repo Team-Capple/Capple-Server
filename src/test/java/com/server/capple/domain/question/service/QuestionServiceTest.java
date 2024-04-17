@@ -72,6 +72,7 @@ public class QuestionServiceTest extends ServiceTestConfig {
         //when
         adminQuestionService.savePopularTags(liveQuestion.getId());
         List<String> popularTags = Arrays.stream(liveQuestion.getPopularTags().split(" ")).toList();
+
         //then
         assertEquals(popularTags.get(0), "#바나나와플");
         assertEquals(popularTags.size(), 3);

@@ -21,7 +21,6 @@ public class TagServiceImpl implements TagService {
     private final TagRedisRepository tagRedisRepository;
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
-    private final QuestionService questionService;
 
     //전체 tag 저장, count update
     @Override
@@ -32,17 +31,12 @@ public class TagServiceImpl implements TagService {
     //질문 별 tag 저장, count update
     @Override
     public void saveQuestionTags(Long questionId, List<String> tags) {
-        //question id가 유효한지 검증을 위해
-        questionService.findQuestion(questionId);
         tagRedisRepository.saveQuestionTags(questionId, tags);
     }
 
     //질문 사용된 tags list 조회 (count 높은 순으로)
     @Override
     public TagResponse.TagInfos getTagsByQuestion(Long questionId, int size) {
-        //question id가 유효한지 검증을 위해
-        questionService.findQuestion(questionId);
-
         Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId, size);
         return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
     }
@@ -78,7 +72,6 @@ public class TagServiceImpl implements TagService {
         saveQuestionTags(questionId, addedTags);
         deleteQuestionTags(questionId, removedTags);
     }
-
 
     @Override
     @Transactional
