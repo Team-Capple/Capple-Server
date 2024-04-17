@@ -37,7 +37,7 @@ public abstract class ServiceTestConfig {
     public void setUp() {
         member = createMember();
         liveQuestion = createLiveQuestion();
-        pendingQuestion =createPendingQuestion();
+        pendingQuestion = createPendingQuestion();
         answer = createAnswer();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
@@ -46,6 +46,7 @@ public abstract class ServiceTestConfig {
         return memberRepository.save(
                 Member.builder()
                         .nickname("루시")
+                        .email("ksm@naver.com")
                         .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
                         .role(Role.ROLE_ACADEMIER)
                         .sub("2384973284")

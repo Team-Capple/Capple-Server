@@ -12,4 +12,6 @@ public interface AdminQuestionService {
     QuestionId setLiveQuestion();
     QuestionId closeLiveQuestion();
 
+    void savePopularTags(Long questionId);
+
 }

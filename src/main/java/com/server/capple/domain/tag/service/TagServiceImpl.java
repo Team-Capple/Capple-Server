@@ -39,11 +39,11 @@ public class TagServiceImpl implements TagService {
 
     //질문 사용된 tags list 조회 (count 높은 순으로)
     @Override
-    public TagResponse.TagInfos getTagsByQuestion(Long questionId) {
+    public TagResponse.TagInfos getTagsByQuestion(Long questionId, int size) {
         //question id가 유효한지 검증을 위해
         questionService.findQuestion(questionId);
 
-        Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId);
+        Set<String> typedTuples = tagRedisRepository.getTagsByQuestion(questionId, size);
         return new TagResponse.TagInfos(new ArrayList<>(typedTuples));
     }
 

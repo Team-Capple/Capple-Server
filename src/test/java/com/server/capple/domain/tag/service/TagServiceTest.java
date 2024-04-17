@@ -50,7 +50,7 @@ public class TagServiceTest extends ServiceTestConfig {
         //when
         answerService.createAnswer(member, liveQuestion.getId(), request);
         answerService.createAnswer(member, liveQuestion.getId(), request2);
-        TagResponse.TagInfos tags = tagService.getTagsByQuestion(liveQuestion.getId());
+        TagResponse.TagInfos tags = tagService.getTagsByQuestion(liveQuestion.getId(), 7);
 
         //then
         assertEquals("#와플", tags.getTags().get(0));

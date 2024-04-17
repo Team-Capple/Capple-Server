@@ -1,5 +1,6 @@
 package com.server.capple.domain.tag.controller;
 
+import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.tag.dto.TagResponse;
 import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.support.ControllerTestConfig;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -27,9 +29,12 @@ public class TagControllerTest extends ControllerTestConfig {
 
     @MockBean
     private TagService tagService;
+    @MockBean
+    private MemberService memberService;
 
     @Test
     @DisplayName("Tag 검색 테스트")
+    @WithMockUser(username = "user")
     public void searchTagsTest() throws Exception {
         //given
         final String url = "/tags/search";
@@ -50,11 +55,13 @@ public class TagControllerTest extends ControllerTestConfig {
 
     @Test
     @DisplayName("이 질문 답변에 사람들이 많이 쓴 키워드 조회 테스트")
+    @WithMockUser(username = "user")
     public void getPopularTagsTest() throws Exception {
         //given
         final String url = "/tags/{questionId}";
         TagResponse.TagInfos response = TagResponse.TagInfos.builder().tags(List.of("#와플", "#바나나")).build();
-        doReturn(response).when(tagService).getTagsByQuestion(any(Long.class));
+        doReturn(member).when(memberService).findMember(any(Long.class));
+        doReturn(response).when(tagService).getTagsByQuestion(any(Long.class), any(Integer.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url, question.getId())

@@ -52,7 +52,7 @@ public class TagRedisRepository implements Serializable {
     private void decreaseTagCount(String key, String tag) {
         Double count = zSetOperations.score(key, tag);
 
-        if(count == null)
+        if (count == null)
             throw new RestApiException(TagErrorCode.TAG_NOT_FOUND);
 
         if (count == 1.0)
@@ -61,15 +61,15 @@ public class TagRedisRepository implements Serializable {
             zSetOperations.incrementScore(key, tag, -1.0);
     }
 
-    //해당 question 답변에 많이 쓰인 태그 7개 조회
-    public Set<String> getTagsByQuestion(Long questionId) {
+    //해당 question 답변에 많이 쓰인 태그 size에 따라 조회
+    public Set<String> getTagsByQuestion(Long questionId, int size) {
         String question = questionId.toString();
-        return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, 7);
+        return zSetOperations.reverseRange(QUESTION_TAGS_KEY_PREFIX + question, 0, size - 1);
     }
 
     //현재 인기 태그 3개 조회
     public Set<String> getPopularTags() {
-        return zSetOperations.reverseRange(TAGS_KEY, 0, 3);
+        return zSetOperations.reverseRange(TAGS_KEY, 0, 2);
     }
 
     //기존의 count를 50%로 줄임 (스케줄러 사용)
