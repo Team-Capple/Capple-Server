@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -28,6 +29,7 @@ public abstract class ServiceTestConfig {
     protected Member member;
     protected Question liveQuestion;
     protected Question pendingQuestion;
+    protected Question oldQuestion;
     protected Answer answer;
 
     @Autowired
@@ -38,6 +40,7 @@ public abstract class ServiceTestConfig {
         member = createMember();
         liveQuestion = createLiveQuestion();
         pendingQuestion = createPendingQuestion();
+        oldQuestion = createOldQuestion();
         answer = createAnswer();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
@@ -59,6 +62,18 @@ public abstract class ServiceTestConfig {
                 Question.builder()
                         .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
                         .questionStatus(QuestionStatus.LIVE)
+                        .livedAt(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    protected Question createOldQuestion() {
+        return questionRepository.save(
+                Question.builder()
+                        .content("오늘 뭐 먹을 거에요?")
+                        .questionStatus(QuestionStatus.OLD)
+                        .livedAt(LocalDateTime.of(2024,04,01, 00,00,00))
+                        .popularTags("#쌀국수 #와플 #아메리카노")
                         .build()
         );
     }

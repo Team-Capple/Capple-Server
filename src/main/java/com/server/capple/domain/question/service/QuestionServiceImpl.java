@@ -2,6 +2,8 @@ package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.question.dao.QuestionInfoInterface;
+import com.server.capple.domain.question.dto.response.QuestionResponse;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.entity.Question;
@@ -16,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static com.server.capple.domain.question.dto.response.QuestionResponse.*;
 import static com.server.capple.domain.question.entity.QuestionStatus.*;
 
 @Service
@@ -45,16 +50,18 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionInfos getQuestions(Member member) {
-        return questionMapper.toQuestionInfos(questionRepository.findAllByQuestionStatusIsLiveAndOldByOrderByCreatedAtDesc().orElseThrow(()
-                        -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND))
+        List<QuestionInfoInterface> questions = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member);
+
+        return questionMapper.toQuestionInfos(questions
                 .stream()
-                .map(question -> {
+                .map(questionInfo -> {
+                    Question question = questionInfo.getQuestion();
+
                     String tags = question.getQuestionStatus().equals(LIVE) ?
                             String.join(" ", tagService.getTagsByQuestion(question.getId(),3).getTags()) :
                             question.getPopularTags().trim();
 
-                    return questionMapper.toQuestionInfo(question, tags,
-                        answerRepository.existsByQuestionAndMember(question, member));
+                    return questionMapper.toQuestionInfo(question, tags, questionInfo.getIsAnsweredByMember());
                 }).toList());
     }
 }

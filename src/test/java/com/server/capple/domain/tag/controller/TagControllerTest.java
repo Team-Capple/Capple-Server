@@ -60,7 +60,7 @@ public class TagControllerTest extends ControllerTestConfig {
         //given
         final String url = "/tags/{questionId}";
         TagResponse.TagInfos response = TagResponse.TagInfos.builder().tags(List.of("#와플", "#바나나")).build();
-        doReturn(member).when(memberService).findMember(any(Long.class));
+
         doReturn(response).when(tagService).getTagsByQuestion(any(Long.class), any(Integer.class));
 
         //when
