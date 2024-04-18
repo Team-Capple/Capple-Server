@@ -43,7 +43,9 @@ public class TagControllerTest extends ControllerTestConfig {
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url).param("keyword", "키워드")
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + jwt)
+        );
 
         //then
         resultActions.andExpect(status().isOk())
@@ -65,7 +67,9 @@ public class TagControllerTest extends ControllerTestConfig {
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url, question.getId())
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + jwt)
+        );
 
         //then
         resultActions.andExpect(status().isOk())
