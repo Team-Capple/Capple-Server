@@ -18,11 +18,11 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
         ports:
-        - ${{ secrets.TEST_POSTGRES_OUTER_PORT }}:${{ secrets.TEST_POSTGRES_INNER_PORT }}
+        - 35432:5432
       redis:
         image: redis:latest
         ports:
-        - ${{ secrets.TEST_REDIS_OUTER_PORT }}:${{ secrets.TEST_REDIS_INNER_PORT }}
+        - 36379:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v3
