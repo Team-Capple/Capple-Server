@@ -1,8 +1,11 @@
-name: Build Test
+name: Build
 
 on:
   push:
-    branches-ignore: ["develop"]
+    tags:
+      - '*'
+    branches:
+      - '*'
 
 jobs:
   build:
@@ -10,8 +13,16 @@ jobs:
     services:
       postgres:
         image: postgres:latest
+        env:
+          POSTGRES_USER: ${{secrets.TEST_POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{secrets.TEST_POSTGRES_PASSWORD}}
+          POSTGRES_DB: ${{secrets.TEST_POSTGRES_DB}}
         ports:
-        - 54345:5432
+        - ${{secrets.TEST_POSTGRES_OUTER_PORT}}:${{secrets.TEST_POSTGRES_INNER_PORT}}
+      redis:
+        image: redis:latest
+        ports:
+        - ${{secrets.TEST_REDIS_OUTER_PORT}}:${{secrets.TEST_REDIS_INNER_PORT}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,6 +35,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+
       - name: Git Submodule Update
         run: |
           git submodule update --remote --recursive
@@ -36,8 +48,19 @@ jobs:
         uses: gradle/gradle-build-action@v2
         
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        id: buildWithGradle
+        run: ./gradlew clean build
         shell: bash
+
+      - name: Upload Report Artifact When Build Failed
+        if: ${{ failure() && steps.buildWithGradle.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-artifact
+          path: ./build/reports
+          compression-level: 9
+          retention-days: 1
+          overwrite: true
         
       - name: Move *.jar File
         run: |
@@ -50,6 +73,3 @@ jobs:
           name: jar-file
           path: |
             ./content/*.jar
-
-    
-    
