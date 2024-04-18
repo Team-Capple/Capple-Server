@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{secrets.TOKEN_GITHUB}}
+          token: ${{ secrets.TOKEN_GITHUB }}
           submodules: recursive
 
       - name: Git Submodule Update

@@ -14,20 +14,20 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: ${{secrets.TEST_POSTGRES_USER}}
-          POSTGRES_PASSWORD: ${{secrets.TEST_POSTGRES_PASSWORD}}
-          POSTGRES_DB: ${{secrets.TEST_POSTGRES_DB}}
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
         ports:
-        - ${{secrets.TEST_POSTGRES_OUTER_PORT}}:${{secrets.TEST_POSTGRES_INNER_PORT}}
+        - ${{ secrets.TEST_POSTGRES_OUTER_PORT }}:${{ secrets.TEST_POSTGRES_INNER_PORT }}
       redis:
         image: redis:latest
         ports:
-        - ${{secrets.TEST_REDIS_OUTER_PORT}}:${{secrets.TEST_REDIS_INNER_PORT}}
+        - ${{ secrets.TEST_REDIS_OUTER_PORT }}:${{ secrets.TEST_REDIS_INNER_PORT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{secrets.TOKEN_GITHUB}}
+          token: ${{ secrets.TOKEN_GITHUB }}
           submodules: recursive
 
       - name: Setup Java JDK
