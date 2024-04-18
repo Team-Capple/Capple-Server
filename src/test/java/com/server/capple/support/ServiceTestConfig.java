@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
@@ -28,6 +29,7 @@ public abstract class ServiceTestConfig {
     protected Member member;
     protected Question liveQuestion;
     protected Question pendingQuestion;
+    protected Question oldQuestion;
     protected Answer answer;
 
     @Autowired
@@ -37,7 +39,8 @@ public abstract class ServiceTestConfig {
     public void setUp() {
         member = createMember();
         liveQuestion = createLiveQuestion();
-        pendingQuestion =createPendingQuestion();
+        pendingQuestion = createPendingQuestion();
+        oldQuestion = createOldQuestion();
         answer = createAnswer();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
@@ -46,6 +49,7 @@ public abstract class ServiceTestConfig {
         return memberRepository.save(
                 Member.builder()
                         .nickname("루시")
+                        .email("ksm@naver.com")
                         .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
                         .role(Role.ROLE_ACADEMIER)
                         .sub("2384973284")
@@ -58,6 +62,18 @@ public abstract class ServiceTestConfig {
                 Question.builder()
                         .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
                         .questionStatus(QuestionStatus.LIVE)
+                        .livedAt(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    protected Question createOldQuestion() {
+        return questionRepository.save(
+                Question.builder()
+                        .content("오늘 뭐 먹을 거에요?")
+                        .questionStatus(QuestionStatus.OLD)
+                        .livedAt(LocalDateTime.of(2024,04,01, 00,00,00))
+                        .popularTags("#쌀국수 #와플 #아메리카노")
                         .build()
         );
     }

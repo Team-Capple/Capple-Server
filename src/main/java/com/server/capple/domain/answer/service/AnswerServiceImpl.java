@@ -65,7 +65,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public AnswerResponse.AnswerId updateAnswer(Member loginMember, Long answerId, AnswerRequest request) {
         Answer answer = findAnswer(answerId);
-        Question question = answer.getQuestion();
+        Question question = questionService.findQuestion(answer.getQuestion().getId());
         checkPermission(loginMember, answer);
 
         //rdb에 태그 update
