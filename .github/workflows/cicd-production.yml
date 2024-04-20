@@ -38,7 +38,7 @@ jobs:
 
       - name: Set Spring Image Environment Variable
         run: |
-          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ env.VERSION }}" >> ${GITHUB_ENV}
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ github.sha }}" >> ${GITHUB_ENV}
 
       - name: Write Version
         run: |
