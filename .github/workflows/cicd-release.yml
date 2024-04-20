@@ -108,13 +108,13 @@ jobs:
           echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-release:${{ env.VERSION }}" >> ${GITHUB_ENV}
 
       - name: Pull Image
-        run: docker pull ${{ env.SPRING_IMAGE }}
+        run: docker run -d --name container-capple ${{ env.SPRING_IMAGE }}
 
       - name: Export Jar
-        run: docker cp ${{ env.SPRING_IMAGE }}:/app/*.jar .
+        run: docker capple.jar cp container-capple:/app/*.jar .
 
       - name: Rename Jar
-        run: mv *.jar capple-${{ env.VERSION }}.jar
+        run: mv capple.jar capple-${{ env.VERSION }}.jar
 
       - name: Upload Jar
         uses: actions/upload-artifact@v3
