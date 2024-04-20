@@ -1,8 +1,12 @@
-name: Build Test
+name: Build
 
 on:
   push:
-    branches-ignore: ["develop"]
+    tags-ignore:
+      - 'v**'
+    branches-ignore:
+      - 'release-**'
+      - 'master'
 
 jobs:
   build:
@@ -10,13 +14,21 @@ jobs:
     services:
       postgres:
         image: postgres:latest
+        env:
+          POSTGRES_USER: ${{ secrets.TEST_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.TEST_POSTGRES_DB }}
         ports:
-        - 54345:5432
+        - 35432:5432
+      redis:
+        image: redis:latest
+        ports:
+        - 36379:6379
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          token: ${{secrets.TOKEN_GITHUB}}
+          token: ${{ secrets.TOKEN_GITHUB }}
           submodules: recursive
 
       - name: Setup Java JDK
@@ -24,6 +36,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 17
+
       - name: Git Submodule Update
         run: |
           git submodule update --remote --recursive
@@ -36,8 +49,19 @@ jobs:
         uses: gradle/gradle-build-action@v2
         
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        id: buildWithGradle
+        run: ./gradlew clean build
         shell: bash
+
+      - name: Upload Report Artifact When Build Failed
+        if: ${{ failure() && steps.buildWithGradle.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: report-artifact
+          path: ./build/reports
+          compression-level: 9
+          retention-days: 1
+          overwrite: true
         
       - name: Move *.jar File
         run: |
@@ -45,11 +69,11 @@ jobs:
           mv ./build/libs/*.jar ./content/
 
       - name: Extract .jar File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar-file
           path: |
             ./content/*.jar
-
-    
-    
+          compression-level: 9
+          retention-days: 1
+          overwrite: true

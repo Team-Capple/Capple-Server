@@ -1,20 +1,29 @@
 package com.server.capple.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.server.capple.config.security.auth.CustomUserDetails;
+import com.server.capple.config.security.auth.service.JpaUserDetailService;
+import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.Mockito.when;
+
 @SpringBootTest
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
 public abstract class ControllerTestConfig {
     @Autowired
@@ -22,6 +31,11 @@ public abstract class ControllerTestConfig {
     @Autowired
     protected ObjectMapper objectMapper;
     protected Member member;
+    protected String jwt;
+    @Autowired
+    JwtService jwtService;
+    @MockBean
+    JpaUserDetailService jpaUserDetailService;
     protected Question question;
     protected Answer answer;
 
@@ -30,14 +44,24 @@ public abstract class ControllerTestConfig {
         member = createMember();
         question = createQuestion();
         answer = createAnswer();
+        jwt = createJwt(member);
+        when(jpaUserDetailService.loadUserByUsername(member.getId().toString())).thenReturn(new CustomUserDetails(member));
     }
 
     protected Member createMember() {
         return Member.builder()
+                .id(1L)
+                .role(Role.ROLE_ACADEMIER)
+                .sub("2384973284")
                 .email("tnals2384@gmail.com")
                 .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
+                .email("ksm@naver.com")
                 .nickname("루시")
                 .build();
+    }
+
+    protected String createJwt(Member member) {
+        return jwtService.createJwt(member.getId(), member.getRole().getName(), "access");
     }
 
     protected Question createQuestion() {

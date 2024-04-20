@@ -36,13 +36,19 @@ public class Question extends BaseEntity {
 
     private LocalDateTime livedAt;
 
+    private String popularTags;
+
 
     //question Status를 바꾸는 함수
     public void setQuestionStatus(QuestionStatus questionStatus) {
         this.questionStatus = questionStatus;
 
-        if(questionStatus.equals(QuestionStatus.LIVE))
+        if (questionStatus.equals(QuestionStatus.LIVE))
             this.livedAt = LocalDateTime.now();
+    }
+
+    public void setPopularTags(String popularTags) {
+        this.popularTags = popularTags;
     }
 
 }

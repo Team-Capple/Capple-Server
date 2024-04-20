@@ -1,0 +1,130 @@
+name: Release Deploy
+
+on:
+  push:
+    branches:
+      - 'release-**'
+
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+  GITHUB_ACTOR: ${{ github.actor }}
+
+jobs:
+  releaseDeploy:
+    name: Deploy to Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          submodules: recursive
+
+      - name: Git Submodule Update
+        run: |
+          git submodule update --remote --recursive
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_ACTOR }}
+          password: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: lowercase the image tag & repository
+        run: |
+          echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
+      - name: Get Version
+        run: |
+          echo "VERSION=$( echo ${{ github.ref_name }} | cut -c 9- )" >> ${GITHUB_ENV}
+
+      - name: Set Spring Image Environment Variable
+        run: |
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-release:${{ env.VERSION }}" >> ${GITHUB_ENV}
+
+      - name: Write Version
+        run: |
+          echo "server-version: ${{ env.VERSION }}" >> config/application.yml
+
+      - name: Build Image
+        run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
+
+      - name: Push
+        run: docker push ${{ env.SPRING_IMAGE }}
+
+      - name: Write Docker Image Tag Information to .env File
+        run: |
+          echo -e "\nSPRING_IMAGE=${{ env.SPRING_IMAGE }}" >> config/env/release.env
+
+      - name: Copy docker-compose.yml
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.RELEASE_SSH_HOST }}
+          port: ${{ secrets.RELEASE_SSH_PORT }}
+          username: ${{ secrets.RELEASE_SSH_USERNAME }}
+          key: ${{ secrets.RELEASE_SSH_PRIVATE_KEY }}
+          source: "docker-compose.release.yml, config/env/release.env"
+          target: /home/ec2-user
+
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RELEASE_SSH_HOST }}
+          port: ${{ secrets.RELEASE_SSH_PORT }}
+          username: ${{ secrets.RELEASE_SSH_USERNAME }}
+          key: ${{ secrets.RELEASE_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ec2-user 
+            sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
+            sudo docker container stop spring
+            sudo docker container rm spring
+            sudo docker image rm ${{ env.SPRING_IMAGE }}
+            sudo docker-compose --env-file=config/env/release.env -f docker-compose.release.yml -p backend up -d
+            sudo docker image prune -af
+
+  releaseExport:
+    name: Export Release Jar
+    runs-on: ubuntu-latest
+    needs: releaseDeploy
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_ACTOR }}
+          password: ${{ secrets.TOKEN_GITHUB }}
+
+      - name: lowercase the image tag & repository
+        run: |
+          echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
+
+      - name: Get Version
+        run: |
+          echo "VERSION=$( echo ${{ github.ref_name }} | cut -c 9- )" >> ${GITHUB_ENV}
+
+      - name: Set Spring Image Environment Variable
+        run: |
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-release:${{ env.VERSION }}" >> ${GITHUB_ENV}
+
+      - name: Run Container
+        run: docker run -d --name container-capple ${{ env.SPRING_IMAGE }}
+
+      - name: Extract .jar File From Container
+        run: docker cp container-capple:/app/app.jar .
+
+      - name: Stop Container
+        run: docker rm -f container-capple
+
+      - name: Rename Jar
+        run: mv app.jar capple-${{ env.VERSION }}.jar
+
+      - name: Extract .jar File
+        uses: actions/upload-artifact@v4
+        with:
+          name: capple-${{ env.VERSION }}
+          path: ./*.jar
+          compression-level: 9
+          retention-days: 1
+          overwrite: true
