@@ -111,13 +111,13 @@ jobs:
         run: docker run -d --name container-capple ${{ env.SPRING_IMAGE }}
 
       - name: Export Jar
-        run: docker cp capple.jar container-capple:/app/*.jar .
+        run: docker cp container-capple:/app/*.jar .
 
       - name: Stop Container
         run: docker rm -f container-capple
 
       - name: Rename Jar
-        run: mv capple.jar capple-${{ env.VERSION }}.jar
+        run: mv *.jar capple-${{ env.VERSION }}.jar
 
       - name: Upload Jar
         uses: actions/upload-artifact@v3
