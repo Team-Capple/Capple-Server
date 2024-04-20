@@ -1,10 +1,6 @@
 name: Production Deploy
 
 on:
-  workflow_run:
-    workflows: ["Build"]
-    types:
-      - completed
   push:
     tags:
       - 'v**'
