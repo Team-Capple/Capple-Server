@@ -107,11 +107,14 @@ jobs:
         run: |
           echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-release:${{ env.VERSION }}" >> ${GITHUB_ENV}
 
-      - name: Pull Image
+      - name: Run Container
         run: docker run -d --name container-capple ${{ env.SPRING_IMAGE }}
 
       - name: Export Jar
-        run: docker capple.jar cp container-capple:/app/*.jar .
+        run: docker cp capple.jar container-capple:/app/*.jar .
+
+      - name: Stop Container
+        run: docker rm -f container-capple
 
       - name: Rename Jar
         run: mv capple.jar capple-${{ env.VERSION }}.jar
