@@ -9,6 +9,7 @@ COPY gradle ./gradle
 COPY src ./src
 COPY config ./config
 
+RUN chmod +x gradlew
 RUN ./gradlew bootJar
 
 FROM eclipse-temurin:17-jre-jammy
