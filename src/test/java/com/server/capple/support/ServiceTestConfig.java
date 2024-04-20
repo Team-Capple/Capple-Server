@@ -13,11 +13,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public abstract class ServiceTestConfig {
     @Autowired
     protected MemberRepository memberRepository;
@@ -52,6 +54,7 @@ public abstract class ServiceTestConfig {
                         .email("ksm@naver.com")
                         .profileImage("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png")
                         .role(Role.ROLE_ACADEMIER)
+                        .email("tnals2384@gmail.com")
                         .sub("2384973284")
                         .build()
         );
