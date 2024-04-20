@@ -42,7 +42,7 @@ jobs:
 
       - name: Write Version
         run: |
-          echo "\nserver-version: Prod" >> config/application.yml
+          echo "server-version: Prod" >> config/application.yml
 
       - name: Build Image
         run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
