@@ -69,8 +69,11 @@ jobs:
           mv ./build/libs/*.jar ./content/
 
       - name: Extract .jar File
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar-file
           path: |
             ./content/*.jar
+          compression-level: 9
+          retention-days: 1
+          overwrite: true
