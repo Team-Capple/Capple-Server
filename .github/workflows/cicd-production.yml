@@ -1,10 +1,6 @@
 name: Production Deploy
 
 on:
-  workflow_run:
-    workflows: ["Build"]
-    types:
-      - completed
   push:
     tags:
       - 'v**'
@@ -42,11 +38,11 @@ jobs:
 
       - name: Set Spring Image Environment Variable
         run: |
-          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ env.VERSION }}" >> ${GITHUB_ENV}
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ github.sha }}" >> ${GITHUB_ENV}
 
       - name: Write Version
         run: |
-          echo "\nserver-version: Prod" >> config/application.yml
+          echo "server-version: Prod" >> config/application.yml
 
       - name: Build Image
         run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
@@ -80,5 +76,6 @@ jobs:
             sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
             sudo docker container stop spring
             sudo docker container rm spring
+            sudo docker image rm ${{ env.SPRING_IMAGE }}
             sudo docker-compose --env-file=config/env/prod.env -f docker-compose.prod.yml -p backend up -d
             sudo docker image prune -af

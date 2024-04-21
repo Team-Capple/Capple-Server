@@ -1,10 +1,6 @@
 name: Release Deploy
 
 on:
-  workflow_run:
-    workflows: ["Build"]
-    types:
-      - completed
   push:
     branches:
       - 'release-**'
@@ -50,7 +46,7 @@ jobs:
 
       - name: Write Version
         run: |
-          echo "\nserver-version: ${{ env.VERSION }}" >> config/application.yml
+          echo "server-version: ${{ env.VERSION }}" >> config/application.yml
 
       - name: Build Image
         run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
@@ -84,7 +80,8 @@ jobs:
             sudo docker login ${{ env.REGISTRY }} -u ${{ env.GITHUB_ACTOR }} -p ${{ secrets.TOKEN_GITHUB }}
             sudo docker container stop spring
             sudo docker container rm spring
-            sudo docker-compose --env-file=config/env/release.env -f docker-compose.release.yml -p backend-${{ env.VERSION }} up -d
+            sudo docker image rm ${{ env.SPRING_IMAGE }}
+            sudo docker-compose --env-file=config/env/release.env -f docker-compose.release.yml -p backend up -d
             sudo docker image prune -af
 
   releaseExport:
@@ -111,17 +108,20 @@ jobs:
         run: |
           echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-release:${{ env.VERSION }}" >> ${GITHUB_ENV}
 
-      - name: Pull Image
-        run: docker pull ${{ env.SPRING_IMAGE }}
+      - name: Run Container
+        run: docker run -d --name container-capple ${{ env.SPRING_IMAGE }}
 
-      - name: Export Jar
-        run: docker cp ${{ env.SPRING_IMAGE }}:/app/*.jar .
+      - name: Extract .jar File From Container
+        run: docker cp container-capple:/app/app.jar .
+
+      - name: Stop Container
+        run: docker rm -f container-capple
 
       - name: Rename Jar
-        run: mv *.jar capple-${{ env.VERSION }}.jar
+        run: mv app.jar capple-${{ env.VERSION }}.jar
 
-      - name: Upload Jar
-        uses: actions/upload-artifact@v3
+      - name: Extract .jar File
+        uses: actions/upload-artifact@v4
         with:
           name: capple-${{ env.VERSION }}
           path: ./*.jar
