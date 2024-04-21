@@ -29,8 +29,6 @@ public class TagControllerTest extends ControllerTestConfig {
 
     @MockBean
     private TagService tagService;
-    @MockBean
-    private MemberService memberService;
 
     @Test
     @DisplayName("Tag 검색 테스트")
@@ -38,7 +36,7 @@ public class TagControllerTest extends ControllerTestConfig {
     public void searchTagsTest() throws Exception {
         //given
         final String url = "/tags/search";
-        TagResponse.TagInfos response = TagResponse.TagInfos.builder().tags(List.of("#와플", "#바나나")).build();
+        TagResponse.TagInfos response = new TagResponse.TagInfos(List.of("#와플", "#바나나"));
         doReturn(response).when(tagService).searchTags(any());
 
         //when
@@ -61,7 +59,7 @@ public class TagControllerTest extends ControllerTestConfig {
     public void getPopularTagsTest() throws Exception {
         //given
         final String url = "/tags/{questionId}";
-        TagResponse.TagInfos response = TagResponse.TagInfos.builder().tags(List.of("#와플", "#바나나")).build();
+        TagResponse.TagInfos response = new TagResponse.TagInfos(List.of("#와플", "#바나나"));
 
         doReturn(response).when(tagService).getTagsByQuestion(any(Long.class), any(Integer.class));
 
