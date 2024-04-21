@@ -10,7 +10,6 @@ import java.util.List;
 
 public class TagResponse {
 
-    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
