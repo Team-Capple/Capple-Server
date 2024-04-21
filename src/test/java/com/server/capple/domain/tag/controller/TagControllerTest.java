@@ -29,8 +29,6 @@ public class TagControllerTest extends ControllerTestConfig {
 
     @MockBean
     private TagService tagService;
-    @MockBean
-    private MemberService memberService;
 
     @Test
     @DisplayName("Tag 검색 테스트")
