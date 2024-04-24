@@ -60,7 +60,11 @@ public class MemberServiceImpl implements MemberService {
         Member editedMember = findMember(member.getId());
 
         // 1. 이미지 업데이트
-        editedMember.updateProfileImage(request.getProfileImage());
+//        editedMember.updateProfileImage(request.getProfileImage());
+
+        // 임시 이미지 업데이트
+        // TODO : 추후 위 코드로 수정 예정
+        editedMember.updateProfileImage("");
 
         // 2. 닉네임 업데이트
         if (memberRepository.countMemberByNickname(request.getNickname(), editedMember.getId()) > 0) throw new RestApiException(MemberErrorCode.EXIST_MEMBER_NICKNAME);
@@ -108,7 +112,9 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage) {
         String sub = jwtService.getSub(signUpToken);
         String encryptedEmail = convertEmailToJwt(email);
-        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, profileImage);
+
+        // TODO : 추후 profileImage 파라미터 수정 예정
+        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, "");
         memberRepository.save(member);
         Long memberId = member.getId();
         String role = member.getRole().getName();
