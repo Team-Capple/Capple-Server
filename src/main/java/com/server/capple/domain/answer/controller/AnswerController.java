@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,8 @@ public class AnswerController {
             @RequestParam(name = "keyword", required = false) String keyword,
             @PageableDefault
             @Parameter(hidden = true) Pageable pageable) {
-        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, keyword, pageable));
+        Pageable tempPageable = PageRequest.of(pageable.getPageNumber(), 250);
+        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, keyword, tempPageable));
     }
 
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
