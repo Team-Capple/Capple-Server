@@ -80,7 +80,7 @@ public class QuestionServiceTest extends ServiceTestConfig {
     }
 
     @Test
-    @DisplayName("save popular tags 테스트")
+    @DisplayName("get questions 테스트")
     @Transactional
     public void getQuestionsTest() {
         //given & when
