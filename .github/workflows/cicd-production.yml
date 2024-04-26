@@ -36,13 +36,16 @@ jobs:
         run: |
           echo "REPOSITORY=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')" >> ${GITHUB_ENV}
 
+      - name: Get Version
+        run: echo "VERSION=$(git tag --points-at)" >> ${GITHUB_ENV}
+
       - name: Set Spring Image Environment Variable
         run: |
-          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ github.sha }}" >> ${GITHUB_ENV}
+          echo "SPRING_IMAGE=${{ env.REGISTRY }}/${{ env.REPOSITORY }}-prod:${{ env.VERSION }}" >> ${GITHUB_ENV}
 
       - name: Write Version
         run: |
-          echo "server-version: Prod" >> config/application.yml
+          echo -e "\nserver-version: ${{ env.VERSION }}" >> config/application-prod.yml
 
       - name: Build Image
         run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
