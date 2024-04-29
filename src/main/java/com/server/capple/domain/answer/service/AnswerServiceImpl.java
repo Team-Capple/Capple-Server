@@ -151,6 +151,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     }
 
+    // 유저가 작성한 답변 조회
     @Override
     public MemberAnswerList getMemberAnswer(Member member) {
         List<Answer> answers = answerRepository.findByMember(member).orElse(null);
@@ -161,12 +162,13 @@ public class AnswerServiceImpl implements AnswerService {
         );
     }
 
+    // 유저가 좋아한 답변 조회
     @Override
     public MemberAnswerList getMemberHeartAnswer(Member member) {
         return answerMapper.toMemberAnswerList(
                 answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
                         .stream()
-                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer(Long.valueOf((answerId))), answerHeartRedisRepository.getAnswerHeartsCount(Long.valueOf(answerId))))
+                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId)))
                         .toList()
         );
     }

@@ -1,9 +1,7 @@
 package com.server.capple.domain.answer.repository;
 
-import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Repository;
 
@@ -20,12 +18,12 @@ public class AnswerHeartRedisRepository implements Serializable {
     public static final String ANSWER_HEART_KEY_PREFIX = "answerHeart-";
     public static final String MEMBER_KEY_PREFIX = "member-";
 
-    @Resource(name = "redisTemplate")
-    private SetOperations<String, String> setOperations;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public Boolean toggleAnswerHeart(Long memberId, Long answerId) {
         String key = ANSWER_HEART_KEY_PREFIX + answerId.toString();
         String member = MEMBER_KEY_PREFIX + memberId.toString();
+        SetOperations<String, String> setOperations = redisTemplate.opsForSet();
 
         //해당 key에 member가 존재하지 않으면 추가, 존재하면 삭제
         if (FALSE.equals(setOperations.isMember(key, member))) {
@@ -39,21 +37,21 @@ public class AnswerHeartRedisRepository implements Serializable {
 
     public int getAnswerHeartsCount(Long answerId) {
         String key = ANSWER_HEART_KEY_PREFIX + answerId.toString();
-        return setOperations.members(key).size();
+        Set<String> members = redisTemplate.opsForSet().members(key);
+        return members != null ? members.size() : 0;
     }
 
-    public Set<Integer> getMemberHeartsAnswer(Long memberId) {
+    public Set<Long> getMemberHeartsAnswer(Long memberId) {
         String member = MEMBER_KEY_PREFIX + memberId.toString();
-        ScanOptions option = ScanOptions.scanOptions().match("*").build();
+        Set<String> keys = redisTemplate.keys(ANSWER_HEART_KEY_PREFIX + "*"); // 모든 키 조회
+        Set<Long> answerIds = new HashSet<>();
 
-        Cursor<String> cursor = setOperations.scan(member, option);
-        Set<Integer> memberHeartAnswerIds = new HashSet<>();
-
-        while(cursor.hasNext()){
-            String value = cursor.next();
-            Integer answerId = Integer.parseInt(value.replace(ANSWER_HEART_KEY_PREFIX, ""));
-            memberHeartAnswerIds.add(answerId);
+        for (String key : keys) {
+            if (redisTemplate.opsForSet().isMember(key, member)) {
+                String answerId = key.substring(ANSWER_HEART_KEY_PREFIX.length());
+                answerIds.add(Long.parseLong(answerId));
+            }
         }
-        return memberHeartAnswerIds;
+        return answerIds;
     }
 }
