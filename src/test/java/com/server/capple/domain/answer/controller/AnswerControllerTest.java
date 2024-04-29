@@ -11,11 +11,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithSecurityContext;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -129,5 +128,52 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.answerId").value(1L))
                 .andExpect(jsonPath("$.result.isLiked").value(Boolean.TRUE));
+    }
+
+    @Test
+    @DisplayName("작성한 답변 목록 조회 API 테스트")
+    public void getMyPageMemberAnswerTest() throws Exception {
+        //given
+        final String url = "/answers";
+        AnswerResponse.MemberAnswerList response = getMemberAnswerList();
+        given(answerService.getMemberAnswer(any(Member.class))).willReturn(response);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+        );
+
+        //then
+        resultActions.
+                andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("COMMON200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].nickname").value("루시"))
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].content").value("나는 무자비한 사람이 좋아"))
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].tags").value("#무자비 #와플 "));
+    }
+
+    @Test
+    @DisplayName("좋아한 답변 목록 조회 API 테스트")
+    public void getMyPageMemberHeartAnswerTest() throws Exception {
+        //given
+        final String url = "/answers/heart";
+        AnswerResponse.MemberAnswerList response = getMemberAnswerList();
+        given(answerService.getMemberHeartAnswer(any(Member.class))).willReturn(response);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+        );
+
+        //then
+        resultActions.
+                andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("COMMON200"))
+                .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].heartCount").value(1))
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].answerId").value(1));
     }
 }
