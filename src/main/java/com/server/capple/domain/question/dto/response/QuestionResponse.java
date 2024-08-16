@@ -2,12 +2,12 @@ package com.server.capple.domain.question.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.capple.domain.question.entity.QuestionStatus;
-
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class QuestionResponse {
 
@@ -31,7 +31,6 @@ public class QuestionResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime livedAt;
         private String content;
-        private String tag;
         // 추후 추가 예정
 //        private Long likeCount;
 //        private Long commentCount;

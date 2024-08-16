@@ -13,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class AdminQuestionServiceImpl implements AdminQuestionService {
@@ -22,7 +20,6 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     private final AdminQuestionRepository adminQuestionRepository;
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;
-    private final TagService tagService;
 
     @Override
     public QuestionId createQuestion(QuestionCreate request) {
@@ -60,13 +57,5 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
         question.setQuestionStatus(QuestionStatus.OLD);
 
         return new QuestionId(question.getId());
-    }
-
-    @Transactional
-    public void savePopularTags(Long questionId) {
-        Question question = questionService.findQuestion(questionId);
-        List<String> tags = tagService.getTagsByQuestion(questionId, 3).getTags();
-
-        question.setPopularTags(String.join(" ", tags) + " ");
     }
 }
