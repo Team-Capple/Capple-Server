@@ -2,8 +2,8 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
@@ -11,10 +11,8 @@ import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.question.entity.Question;
-import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.domain.report.repository.ReportRepository;
-import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
