@@ -8,7 +8,6 @@ import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionS
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.mapper.QuestionMapper;
 import com.server.capple.domain.question.repository.QuestionRepository;
-import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
-    private final TagService tagService;
     private final AnswerRepository answerRepository;
     private final QuestionMapper questionMapper;
 
