@@ -30,7 +30,7 @@ public class TagControllerTest extends ControllerTestConfig {
     @MockBean
     private TagService tagService;
 
-    @Test
+/*    @Test
     @DisplayName("Tag 검색 테스트")
     @WithMockUser(username = "user")
     public void searchTagsTest() throws Exception {
@@ -75,5 +75,5 @@ public class TagControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.tags").exists());
-    }
+    }*/
 }

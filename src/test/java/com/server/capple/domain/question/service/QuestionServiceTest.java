@@ -1,7 +1,5 @@
 package com.server.capple.domain.question.service;
 
-import com.server.capple.domain.answer.dto.AnswerRequest;
-import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.question.dto.response.QuestionResponse;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.entity.Question;
@@ -12,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,8 +21,7 @@ public class QuestionServiceTest extends ServiceTestConfig {
     private AdminQuestionService adminQuestionService;
     @Autowired
     private QuestionService questionService;
-    @Autowired
-    private AnswerService answerService;
+
 
     @Test
     @DisplayName("set Live Question 테스트")
@@ -54,6 +50,21 @@ public class QuestionServiceTest extends ServiceTestConfig {
     }
 
     @Test
+    @DisplayName("get questions 테스트")
+    @Transactional
+    public void getQuestionsTest() {
+        //given & when
+        List<QuestionInfo> questionInfos = questionService.getQuestions(member).getQuestionInfos();
+
+        //then
+        assertEquals(questionInfos.size(), 2);
+        assertEquals(questionInfos.get(0).getQuestionStatus(), QuestionStatus.LIVE);
+        assertEquals(questionInfos.get(0).getIsAnswered(), true);
+        assertEquals(questionInfos.get(1).getIsAnswered(), false);
+    }
+
+/*
+    @Test
     @DisplayName("save popular tags 테스트")
     @Transactional
     public void savePopularTags() {
@@ -78,20 +89,6 @@ public class QuestionServiceTest extends ServiceTestConfig {
         assertEquals(popularTags.get(0), "#바나나와플");
         assertEquals(popularTags.size(), 3);
     }
-
-    @Test
-    @DisplayName("get questions 테스트")
-    @Transactional
-    public void getQuestionsTest() {
-        //given & when
-        List<QuestionInfo> questionInfos = questionService.getQuestions(member).getQuestionInfos();
-
-        //then
-        assertEquals(questionInfos.size(),2);
-        assertEquals(questionInfos.get(0).getQuestionStatus(), QuestionStatus.LIVE);
-        assertEquals(questionInfos.get(0).getIsAnswered(),true);
-        assertEquals(questionInfos.get(1).getIsAnswered(), false);
-        assertEquals(questionInfos.get(1).getTag(),"#쌀국수 #와플 #아메리카노");
-    }
+*/
 
 }

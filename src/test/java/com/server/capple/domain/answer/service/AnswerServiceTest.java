@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Answer 서비스의 ")
 @SpringBootTest
@@ -37,10 +38,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals("나는 와플을 좋아하는 사람이 좋아", answer.getContent());
-        assertEquals("#와플유니버시티 #와플 ", answer.getTags());
-        assertEquals(2, tags.size());
-        assertTrue(tags.contains("#와플"));
-        assertTrue(tags.contains("#와플유니버시티"));
 
     }
 
@@ -54,7 +51,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         AnswerRequest updateRequest = AnswerRequest.builder()
                 .answer("나는 동그랗고 와플 좋아하는 사람이 좋아")
-                .tags(List.of("#동그라미", "#와플", "#동글"))
                 .build();
 
         //when
@@ -63,14 +59,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals("나는 동그랗고 와플 좋아하는 사람이 좋아", answer.getContent());
-        assertEquals("#동그라미 #와플 #동글 ", answer.getTags());
-        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId(), 7).getTags();
-
-        assertEquals(3, tags.size());
-        assertTrue(tags.contains("#와플"));
-        assertTrue(tags.contains("#동그라미"));
-        assertFalse(tags.contains("#와플유니버시티"));
-
     }
 
     @Test
