@@ -32,10 +32,7 @@ public class Answer extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    private String tags;
-
     public void update(AnswerRequest request) {
         this.content = request.getAnswer();
-        this.tags = String.join(" ", request.getTags()) + " ";
     }
 }

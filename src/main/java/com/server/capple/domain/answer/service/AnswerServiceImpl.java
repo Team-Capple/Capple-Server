@@ -35,7 +35,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final QuestionService questionService;
     private final AnswerMapper answerMapper;
     private final MemberService memberService;
-    private final TagService tagService;
     private final AnswerHeartRedisRepository answerHeartRedisRepository;
 
     @Transactional
@@ -48,16 +47,6 @@ public class AnswerServiceImpl implements AnswerService {
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
 
-        //rdb에 태그 저장
-        request.getTags().forEach(tagService::findOrCreateTag);
-
-        //redis에 태그 저장
-        tagService.saveTags(request.getTags());
-
-        //온에어 질문일 경우, redis 질문 별 태그 저장
-        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
-            tagService.saveQuestionTags(questionId, request.getTags());
-
         return new AnswerResponse.AnswerId(answer.getId());
     }
 
@@ -65,30 +54,8 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public AnswerResponse.AnswerId updateAnswer(Member loginMember, Long answerId, AnswerRequest request) {
         Answer answer = findAnswer(answerId);
-        Question question = questionService.findQuestion(answer.getQuestion().getId());
+
         checkPermission(loginMember, answer);
-
-        //rdb에 태그 update
-        request.getTags().forEach(tagService::findOrCreateTag);
-
-        //현재 답변의 태그들
-        List<String> answerTags = getCurrentAnswerTags(answer);
-
-        //추가된 태그들
-        List<String> addedTags = new ArrayList<>(request.getTags());
-        addedTags.removeAll(answerTags);
-
-        //삭제된 태그들
-        List<String> removedTags = new ArrayList<>(answerTags);
-        removedTags.removeAll(request.getTags());
-
-        //redis 태그 update
-        tagService.updateTags(addedTags, removedTags);
-
-        //온에어 시간이 지나면 순위에는 변동 X 온에어 시간일 경우에만 변동
-        //redis 질문별 태그 update
-        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
-            tagService.updateQuestionTags(question.getId(), addedTags, removedTags);
 
         //답변 update
         answer.update(request);
@@ -101,19 +68,8 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public AnswerResponse.AnswerId deleteAnswer(Member loginMember, Long answerId) {
         Answer answer = findAnswer(answerId);
-        Question question = answer.getQuestion();
+
         checkPermission(loginMember, answer);
-
-        //현재 답변의 태그들
-        List<String> answerTags = getCurrentAnswerTags(answer);
-
-        //redis tag 삭제
-        tagService.deleteTags(answerTags);
-
-        //온에어 시간이 지나면 순위에는 변동 X 온에어 시간일 경우에만 변동
-        //redis 질문별 tag 삭제
-        if (question.getQuestionStatus().equals(QuestionStatus.LIVE))
-            tagService.deleteQuestionTags(question.getId(), answerTags);
 
         answer.delete();
 
@@ -178,11 +134,6 @@ public class AnswerServiceImpl implements AnswerService {
 
         if (!member.getId().equals(answer.getMember().getId()))
             throw new RestApiException(AnswerErrorCode.ANSWER_UNAUTHORIZED);
-    }
-
-    private List<String> getCurrentAnswerTags(Answer answer) {
-        return Arrays.stream(answer.getTags().split(" "))
-                .filter(tag -> !tag.isEmpty()).toList();
     }
 
     @Override
