@@ -5,6 +5,7 @@ import com.server.capple.config.security.auth.CustomUserDetails;
 import com.server.capple.config.security.auth.service.JpaUserDetailService;
 import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
+import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
@@ -87,5 +88,19 @@ public abstract class ControllerTestConfig {
                 .answer("나는 와플을 좋아하는 사람이 좋아")
                 .tags(List.of("#와플유니버시티", "#와플"))
                 .build();
+    }
+
+    protected AnswerResponse.MemberAnswerList getMemberAnswerList () {
+        List<AnswerResponse.MemberAnswerInfo> memberAnswerInfos = List.of(AnswerResponse.MemberAnswerInfo.builder()
+                .questionId(answer.getQuestion().getId())
+                .answerId(answer.getId())
+                .nickname(answer.getMember().getNickname())
+                .profileImage(answer.getMember().getProfileImage())
+                .content(answer.getContent())
+                .tags(answer.getTags())
+                .heartCount(1)
+                .build());
+
+        return new AnswerResponse.MemberAnswerList(memberAnswerInfos);
     }
 }

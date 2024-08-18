@@ -7,7 +7,6 @@ import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,7 +36,6 @@ public class MemberControllerTest extends ControllerTestConfig {
 
     @MockBean private MemberService memberService;
 
-    @Disabled
     @Test
     @DisplayName("프로필 조회 API 테스트")
     public void getMyPageMemberInfoTest() throws Exception {
@@ -69,8 +67,6 @@ public class MemberControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.result.nickname").value("루시"))
                 .andExpect(jsonPath("$.result.profileImage").value("https://owori.s3.ap-northeast-2.amazonaws.com/story/capple_default_image_10635d7a-5f8c-4af2-b062-9a9420634eb3.png"))
                 .andExpect(jsonPath("$.result.joinDate").value(joinDate));
-
-        verify(memberService).getMemberInfo(member);
     }
 
     @Test

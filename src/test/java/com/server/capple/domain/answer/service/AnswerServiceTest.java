@@ -108,4 +108,29 @@ public class AnswerServiceTest extends ServiceTestConfig {
         assertEquals(Boolean.FALSE, answerLike2.getIsLiked());
 
     }
+
+    @Test
+    @DisplayName("작성한 Answer 목록 조회 테스트")
+    @Transactional
+    public void getMemberAnswerTest() {
+        //when
+        AnswerResponse.MemberAnswerList memberAnswer = answerService.getMemberAnswer(member);
+        //then
+        assertEquals(memberAnswer.getMemberAnswerInfos().get(0).getContent(), "나는 무자비한 사람이 좋아");
+    }
+
+    @Test
+    @DisplayName("좋아한 Answer 목록 조회 테스트")
+    @Transactional
+    public void getMemberHeartAnswerTest() {
+        //given
+        answerService.toggleAnswerHeart(member, answer.getId());
+
+        //when
+        AnswerResponse.MemberAnswerList memberHeartAnswer = answerService.getMemberHeartAnswer(member);
+
+        //then
+        assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getTags(), "#무자비 #와플 ");
+        assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getHeartCount(), 1);
+    }
 }
