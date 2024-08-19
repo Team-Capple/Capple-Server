@@ -19,6 +19,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -93,7 +95,6 @@ public abstract class ControllerTestConfig {
                 .nickname(answer.getMember().getNickname())
                 .profileImage(answer.getMember().getProfileImage())
                 .content(answer.getContent())
-                .tags(answer.getTags())
                 .heartCount(1)
                 .build());
 
