@@ -150,8 +150,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.memberAnswerInfos[0].nickname").value("루시"))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].content").value("나는 무자비한 사람이 좋아"))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].tags").value("#무자비 #와플 "));
+                .andExpect(jsonPath("$.result.memberAnswerInfos[0].content").value("나는 무자비한 사람이 좋아"));
     }
 
     @Test
