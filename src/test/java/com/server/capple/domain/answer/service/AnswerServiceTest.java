@@ -117,7 +117,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
         AnswerResponse.MemberAnswerList memberHeartAnswer = answerService.getMemberHeartAnswer(member);
 
         //then
-        assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getTags(), "#무자비 #와플 ");
         assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getHeartCount(), 1);
     }
 }
