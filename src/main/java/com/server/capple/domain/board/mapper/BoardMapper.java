@@ -20,7 +20,7 @@ public class BoardMapper {
             Integer commentCount
     ) {
         return Board.builder()
-                .member(member)
+                .writer(member)
                 .boardType(boardType)
                 .content(content)
                 .heartCount(heartCount)
@@ -48,11 +48,17 @@ public class BoardMapper {
             Board board
     ) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
-                .writerId(board.getMember().getId())
+                .writerId(board.getWriter().getId())
                 .content(board.getContent())
                 .heartCount(board.getHeartCount())
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
+                .build();
+    }
+
+    public BoardResponse.BoardDelete toBoardDelete(Board board) {
+        return BoardResponse.BoardDelete.builder()
+                .boardId(board.getId())
                 .build();
     }
 }

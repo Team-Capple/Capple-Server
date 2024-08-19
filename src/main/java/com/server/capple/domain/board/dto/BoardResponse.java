@@ -39,4 +39,12 @@ public class BoardResponse {
         private Integer commentCount;
         private LocalDateTime createAt;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardDelete {
+        private Long boardId;
+    }
 }

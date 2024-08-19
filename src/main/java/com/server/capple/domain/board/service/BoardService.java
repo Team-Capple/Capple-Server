@@ -8,4 +8,6 @@ public interface BoardService {
     BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content);
 
     BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
+
+    BoardResponse.BoardDelete deleteBoard(Member member, Long boardId);
 }

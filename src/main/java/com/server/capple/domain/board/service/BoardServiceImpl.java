@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +51,18 @@ public class BoardServiceImpl implements BoardService {
                 .map(boardMapper::toBoardsGetByBoardTypeBoardInfo)
                 .toList()
         );
+    }
+
+    @Override
+    public BoardResponse.BoardDelete deleteBoard(Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+
+        if (board.getWriter().getId() != member.getId()) {
+            throw new RestApiException(BoardErrorCode.BOARD_NO_AUTHORIZATION);
+        }
+
+        board.delete();
+        return boardMapper.toBoardDelete(board);
     }
 }

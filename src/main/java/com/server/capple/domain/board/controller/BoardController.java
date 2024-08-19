@@ -52,4 +52,16 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.getBoardsByBoardType(boardType));
     }
 
+    @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @DeleteMapping("/{boardId}")
+    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(
+            @AuthMember Member member,
+            @PathVariable(name = "boardId") Long boardId
+    ) {
+        return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
+    }
+
 }
