@@ -47,4 +47,24 @@ public class BoardResponse {
     public static class BoardDelete {
         private Long boardId;
     }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardsSearchByKeyword {
+        private List<BoardsSearchByKeywordBoardInfo> boards = new ArrayList<>();
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardsSearchByKeywordBoardInfo {
+        private Long writerId;
+        private String content;
+        private Integer heartCount;
+        private Integer commentCount;
+        private LocalDateTime createAt;
+    }
 }

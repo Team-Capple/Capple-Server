@@ -27,7 +27,7 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @Operation(summary = "게시판 생성 API", description = "게시판을 생성합니다.")
+    @Operation(summary = "게시글 생성 API", description = "게시글을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -39,7 +39,7 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
-    @Operation(summary = "카테고리별 게시판 조회 API", description = "카테고리별 게시판을 생성합니다.")
+    @Operation(summary = "카테고리별 게시글 조회 API", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -62,6 +62,17 @@ public class BoardController {
             @PathVariable(name = "boardId") Long boardId
     ) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
+    }
+
+    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/search")
+    private BaseResponse<BoardResponse.BoardsSearchByKeyword> searchBoardsByKeyword(
+            @RequestParam(name = "keyword") String keyword
+    ) {
+        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(keyword));
     }
 
 }

@@ -9,6 +9,7 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,4 +66,14 @@ public class BoardServiceImpl implements BoardService {
         board.delete();
         return boardMapper.toBoardDelete(board);
     }
+
+    @Override
+    public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
+        List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
+        return boardMapper.toBoardsSearchByKeyword(boards.stream()
+                .map(boardMapper::toBoardsSearchByKeywordBoardInfo)
+                .toList());
+    }
+
+
 }

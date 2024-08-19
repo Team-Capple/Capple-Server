@@ -61,4 +61,24 @@ public class BoardMapper {
                 .boardId(board.getId())
                 .build();
     }
+
+    public BoardResponse.BoardsSearchByKeywordBoardInfo toBoardsSearchByKeywordBoardInfo(
+            Board board
+    ) {
+        return BoardResponse.BoardsSearchByKeywordBoardInfo.builder()
+                .writerId(board.getWriter().getId())
+                .content(board.getContent())
+                .heartCount(board.getHeartCount())
+                .commentCount(board.getCommentCount())
+                .createAt(board.getCreatedAt())
+                .build();
+    }
+
+    public BoardResponse.BoardsSearchByKeyword toBoardsSearchByKeyword(
+            List<BoardResponse.BoardsSearchByKeywordBoardInfo> boards
+    ) {
+        return BoardResponse.BoardsSearchByKeyword.builder()
+                .boards(boards)
+                .build();
+    }
 }
