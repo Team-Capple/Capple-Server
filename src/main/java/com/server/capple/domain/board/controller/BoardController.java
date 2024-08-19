@@ -1,6 +1,7 @@
 package com.server.capple.domain.board.controller;
 
 import com.server.capple.config.security.AuthMember;
+import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.board.dto.BoardRequest;
 import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.board.entity.BoardType;
@@ -73,6 +74,13 @@ public class BoardController {
             @RequestParam(name = "keyword") String keyword
     ) {
         return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(keyword));
+    }
+
+    @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
+            "pathvariable 으로 boardId를 주세요.")
+    @PostMapping("/{boardId}/heart")
+    public BaseResponse<BoardResponse.BoardToggleHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+        return BaseResponse.onSuccess(boardService.toggleBoardHeart(member, boardId));
     }
 
 }

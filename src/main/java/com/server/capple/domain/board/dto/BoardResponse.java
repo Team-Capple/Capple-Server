@@ -33,6 +33,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsGetByBoardTypeBoardInfo {
+        private Long boardId;
         private Long writerId;
         private String content;
         private Integer heartCount;
@@ -61,10 +62,20 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsSearchByKeywordBoardInfo {
+        private Long boardId;
         private Long writerId;
         private String content;
         private Integer heartCount;
         private Integer commentCount;
         private LocalDateTime createAt;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardToggleHeart {
+        private Long boardId;
+        private Boolean isLiked;
     }
 }

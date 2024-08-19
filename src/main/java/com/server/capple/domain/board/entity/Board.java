@@ -26,12 +26,8 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private BoardType boardType;
 
-
     @Column(nullable = false)
     private String content;
-
-    @Column(nullable = false)
-    private Integer heartCount;
 
     @Column(nullable = false)
     private Integer commentCount;

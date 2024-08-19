@@ -4,18 +4,17 @@ import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.mapper.BoardMapper;
+import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +22,7 @@ import java.util.Optional;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
+    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
 
     @Override
@@ -49,7 +49,7 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(boardMapper::toBoardsGetByBoardTypeBoardInfo)
+                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
                 .toList()
         );
     }
@@ -71,8 +71,17 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
         List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
         return boardMapper.toBoardsSearchByKeyword(boards.stream()
-                .map(boardMapper::toBoardsSearchByKeywordBoardInfo)
+                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
                 .toList());
+    }
+
+    @Override
+    public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+
+        Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
+        return new BoardResponse.BoardToggleHeart(boardId, isLiked);
     }
 
 

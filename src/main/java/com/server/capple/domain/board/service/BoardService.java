@@ -13,4 +13,6 @@ public interface BoardService {
     BoardResponse.BoardDelete deleteBoard(Member member, Long boardId);
 
     BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword);
+
+    BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId);
 }

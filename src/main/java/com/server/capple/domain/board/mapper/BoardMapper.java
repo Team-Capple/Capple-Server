@@ -1,6 +1,5 @@
 package com.server.capple.domain.board.mapper;
 
-import com.server.capple.domain.board.dto.BoardRequest;
 import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
@@ -23,7 +22,6 @@ public class BoardMapper {
                 .writer(member)
                 .boardType(boardType)
                 .content(content)
-                .heartCount(heartCount)
                 .commentCount(commentCount)
                 .build();
     }
@@ -45,13 +43,15 @@ public class BoardMapper {
     }
 
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
-            Board board
-    ) {
+            Board board,
+            Integer boardHeartsCount) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
+                .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
-                .heartCount(board.getHeartCount())
-                .commentCount(board.getCommentCount())
+                .heartCount(boardHeartsCount)
+                // TODO : 댓글 작성 API 나오면 추후 구현
+                .commentCount(0)
                 .createAt(board.getCreatedAt())
                 .build();
     }
@@ -63,12 +63,14 @@ public class BoardMapper {
     }
 
     public BoardResponse.BoardsSearchByKeywordBoardInfo toBoardsSearchByKeywordBoardInfo(
-            Board board
+            Board board,
+            Integer heartCount
     ) {
         return BoardResponse.BoardsSearchByKeywordBoardInfo.builder()
+                .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
-                .heartCount(board.getHeartCount())
+                .heartCount(heartCount)
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
                 .build();
