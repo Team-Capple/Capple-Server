@@ -19,8 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
-
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -77,7 +75,6 @@ public abstract class ControllerTestConfig {
         return Answer.builder()
                 .id(1L)
                 .content("나는 무자비한 사람이 좋아")
-                .tags("#무자비 #와플 ")
                 .question(question)
                 .member(member)
                 .build();
@@ -86,7 +83,6 @@ public abstract class ControllerTestConfig {
     protected AnswerRequest getAnswerRequest() {
         return AnswerRequest.builder()
                 .answer("나는 와플을 좋아하는 사람이 좋아")
-                .tags(List.of("#와플유니버시티", "#와플"))
                 .build();
     }
 

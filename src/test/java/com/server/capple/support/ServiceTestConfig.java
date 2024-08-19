@@ -16,7 +16,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -75,8 +74,7 @@ public abstract class ServiceTestConfig {
                 Question.builder()
                         .content("오늘 뭐 먹을 거에요?")
                         .questionStatus(QuestionStatus.OLD)
-                        .livedAt(LocalDateTime.of(2024,04,01, 00,00,00))
-                        .popularTags("#쌀국수 #와플 #아메리카노")
+                        .livedAt(LocalDateTime.of(2024, 04, 01, 00, 00, 00))
                         .build()
         );
     }
@@ -93,7 +91,6 @@ public abstract class ServiceTestConfig {
     protected Answer createAnswer() {
         return answerRepository.save(Answer.builder()
                 .content("나는 무자비한 사람이 좋아")
-                .tags("#무자비 #와플 ")
                 .question(liveQuestion)
                 .member(member)
                 .build()
@@ -103,7 +100,6 @@ public abstract class ServiceTestConfig {
     protected AnswerRequest getAnswerRequest() {
         return AnswerRequest.builder()
                 .answer("나는 와플을 좋아하는 사람이 좋아")
-                .tags(List.of("#와플유니버시티", "#와플"))
                 .build();
     }
 }

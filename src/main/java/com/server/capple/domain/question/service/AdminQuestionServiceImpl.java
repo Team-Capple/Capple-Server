@@ -6,14 +6,11 @@ import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.mapper.QuestionMapper;
 import com.server.capple.domain.question.repository.AdminQuestionRepository;
-import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +19,6 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     private final AdminQuestionRepository adminQuestionRepository;
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;
-    private final TagService tagService;
 
     @Override
     public QuestionId createQuestion(QuestionCreate request) {
@@ -60,13 +56,5 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
         question.setQuestionStatus(QuestionStatus.OLD);
 
         return new QuestionId(question.getId());
-    }
-
-    @Transactional
-    public void savePopularTags(Long questionId) {
-        Question question = questionService.findQuestion(questionId);
-        List<String> tags = tagService.getTagsByQuestion(questionId, 3).getTags();
-
-        question.setPopularTags(String.join(" ", tags) + " ");
     }
 }

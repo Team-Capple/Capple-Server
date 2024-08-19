@@ -19,7 +19,6 @@ public class AnswerResponse {
         private String profileImage;
         private String nickname;
         private String content;
-        private String tags;
         private Boolean isMyAnswer;
         private Boolean isReported;
     }
@@ -48,7 +47,6 @@ public class AnswerResponse {
         private String nickname;
         private String profileImage;
         private String content;
-        private String tags;
         private int heartCount;
         private String writeAt;
     }
