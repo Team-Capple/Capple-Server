@@ -12,6 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -29,5 +32,23 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardCreate(board);
+    }
+
+    @Override
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType) {
+        List<Board> boards = new ArrayList<>();
+        if (boardType == null) {
+            boards = boardRepository.findAll();
+        } else if (boardType == BoardType.FREEBOARD) {
+            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
+        } else if (boardType == BoardType.HOTBOARD) {
+            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
+        } else {
+            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
+        }
+        return boardMapper.toBoardsGetByBoardType(boards.stream()
+                .map(boardMapper::toBoardsGetByBoardTypeBoardInfo)
+                .toList()
+        );
     }
 }

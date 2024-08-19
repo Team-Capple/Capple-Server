@@ -6,4 +6,6 @@ import com.server.capple.domain.member.entity.Member;
 
 public interface BoardService {
     BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content);
+
+    BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
 }

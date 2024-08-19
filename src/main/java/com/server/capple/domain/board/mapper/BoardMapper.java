@@ -7,6 +7,8 @@ import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class BoardMapper {
 
@@ -31,6 +33,26 @@ public class BoardMapper {
             ) {
         return BoardResponse.BoardCreate.builder()
                 .boardId(board.getId())
+                .build();
+    }
+
+    public BoardResponse.BoardsGetByBoardType toBoardsGetByBoardType(
+            List<BoardResponse.BoardsGetByBoardTypeBoardInfo> boards
+    ) {
+        return BoardResponse.BoardsGetByBoardType.builder()
+                .boards(boards)
+                .build();
+    }
+
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
+            Board board
+    ) {
+        return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
+                .writerId(board.getMember().getId())
+                .content(board.getContent())
+                .heartCount(board.getHeartCount())
+                .commentCount(board.getCommentCount())
+                .createAt(board.getCreatedAt())
                 .build();
     }
 }
