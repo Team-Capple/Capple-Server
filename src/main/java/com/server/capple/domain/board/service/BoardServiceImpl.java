@@ -80,6 +80,8 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
 
+        System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
+
         Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
         return new BoardResponse.BoardToggleHeart(boardId, isLiked);
     }
