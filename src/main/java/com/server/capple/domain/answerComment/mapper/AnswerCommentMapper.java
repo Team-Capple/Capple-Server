@@ -23,8 +23,7 @@ public class AnswerCommentMapper {
                 .writer(comment.getMember().getNickname())
                 .content(comment.getContent())
                 .heartCount(heartCount)
-                // todo: 작성 시간 변환 로직 추가
-                .writeAt(comment.getCreatedAt().toString())
+                .createdAt(comment.getCreatedAt())
                 .build();
     }
 

@@ -151,7 +151,8 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.result.answerCommentInfos[0].answerCommentId").value(1L))
                 .andExpect(jsonPath("$.result.answerCommentInfos[0].writer").value("루시"))
                 .andExpect(jsonPath("$.result.answerCommentInfos[0].content").value("댓글 1"))
-                .andExpect(jsonPath("$.result.answerCommentInfos[0].writeAt").value("1시간 전"))
-                .andExpect(jsonPath("$.result.answerCommentInfos[0].heartCount").value(3L));
+                .andExpect(jsonPath("$.result.answerCommentInfos[0].heartCount").value(3L))
+                .andExpect(jsonPath("$.result.answerCommentInfos[0].createdAt").value("2022-11-01T12:02:00"));
+
     }
 }

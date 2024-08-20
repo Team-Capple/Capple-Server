@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class AnswerCommentResponse {
@@ -27,7 +28,8 @@ public class AnswerCommentResponse {
         private String writer;
         private String content;
         private Long heartCount;
-        private String writeAt;
+        private LocalDateTime createdAt;
+
     }
 
     @Getter

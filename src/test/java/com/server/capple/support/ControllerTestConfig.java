@@ -21,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -114,7 +115,7 @@ public abstract class ControllerTestConfig {
                 .answerCommentId(1L)
                 .writer(member.getNickname())
                 .content("댓글 1")
-                .writeAt("1시간 전")
+                .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
                 .heartCount(3L)
                 .build());
 
