@@ -1,0 +1,31 @@
+package com.server.capple.domain.answerComment.mapper;
+
+import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
+import com.server.capple.domain.member.entity.Member;
+import org.springframework.stereotype.Component;
+
+
+@Component
+public class AnswerCommentMapper {
+    public AnswerComment toAnswerCommentEntity(Member member, Answer answer, String answerComment) {
+        return AnswerComment.builder()
+                .member(member)
+                .answer(answer)
+                .content(answerComment)
+                .build();
+    }
+
+    public AnswerCommentInfo toAnswerCommentInfo(AnswerComment comment, Long heartCount) {
+        return AnswerCommentInfo.builder()
+                .answerCommentId(comment.getId())
+                .writer(comment.getMember().getNickname())
+                .content(comment.getContent())
+                .heartCount(heartCount)
+                // todo: 작성 시간 변환 로직 추가
+                .writeAt(comment.getCreatedAt().toString())
+                .build();
+    }
+
+}
