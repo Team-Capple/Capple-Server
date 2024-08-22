@@ -49,26 +49,26 @@ public class ApnsServiceImpl implements ApnsService {
             .baseUrl(apnsBaseSubUrl)
             .build();
 
-        deviceToken.parallelStream().forEach(token -> {
-            tmpWebClient
-                .method(HttpMethod.POST)
-                .uri(token)
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnError(e -> { // 에러 발생 시 보조 채널로 재시도
-                    tmpSubWebClient
-                        .method(HttpMethod.POST)
-                        .uri(token)
-                        .bodyValue(request)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block();
-                    log.error("APNs 전송 중 오류 발생", e);
-                })
-                .block();
-        });
-
+        deviceToken.parallelStream()
+            .forEach(token -> {
+                tmpWebClient
+                    .method(HttpMethod.POST)
+                    .uri(token)
+                    .bodyValue(request)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .doOnError(e -> { // 에러 발생 시 보조 채널로 재시도
+                        tmpSubWebClient
+                            .method(HttpMethod.POST)
+                            .uri(token)
+                            .bodyValue(request)
+                            .retrieve()
+                            .bodyToMono(Void.class)
+                            .subscribe();
+                        log.error("APNs 전송 중 오류 발생", e);
+                    })
+                    .subscribe();
+            });
         return true;
     }
 }

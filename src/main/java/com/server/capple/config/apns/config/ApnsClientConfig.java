@@ -1,7 +1,5 @@
 package com.server.capple.config.apns.config;
 
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.timeout.WriteTimeoutHandler;
@@ -40,7 +38,6 @@ public class ApnsClientConfig {
             .keepAlive(true) // keep-alive 활성화
             .protocol(HttpProtocol.H2) // HTTP/2 활성화
             .doOnConnected(connection -> connection.addHandlerLast(new WriteTimeoutHandler(10, TimeUnit.SECONDS))) // 쓰기 타임 아웃
-            .doAfterRequest((req, conn) -> conn.addHandlerLast(new LoggingHandler(LogLevel.INFO)))
             .responseTimeout(Duration.ofSeconds(10)) // 응답 타임 아웃
             .secure(sslSpec -> sslSpec.sslContext(apnsSslContext)); // SSL 활성화
     }
