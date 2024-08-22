@@ -11,6 +11,10 @@ import com.server.capple.global.exception.errorCode.AuthErrorCode;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -18,15 +22,25 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
-public class JwtServiceImpl implements JwtService{
+public class JwtServiceImpl implements JwtService {
     private SecretKey secretKey;
     private final JwtProperties jwtProperties;
     private final JpaUserDetailService userDetailService;
     private final TokensMapper tokensMapper;
+
+    @Value("${apns.key-id}")
+    private String kid;
+    @Value("${apple-auth.team_id}")
+    private String iss;
+    @Value("${apns.key}")
+    private String apnsKeyString;
 
     @PostConstruct
     protected void init() {
@@ -118,5 +132,28 @@ public class JwtServiceImpl implements JwtService{
         String accessToken = createJwt(memberId, role.getName(), "access");
         String refreshToken = createJwt(memberId, role.getName(), "refresh");
         return tokensMapper.toTokens(accessToken, refreshToken);
+    }
+
+    @Override
+    @Cacheable(value = "ApnsJwt", cacheManager = "apnsJwtCacheManager")
+    public String createApnsJwt() {
+        return Jwts.builder()
+            .header().add("alg", "ES256").add("kid", kid).and()
+            .issuer(iss)
+            .issuedAt(new Date(System.currentTimeMillis()))
+            .signWith(getPrivateKey(), SignatureAlgorithm.ES256)
+            .compact();
+    }
+
+    private PrivateKey getPrivateKey() {
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+        try {
+            byte[] privateKeyBytes = Base64.getDecoder().decode(apnsKeyString);
+            PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(privateKeyBytes);
+            return converter.getPrivateKey(privateKeyInfo);
+        } catch (Exception e) {
+            throw new RuntimeException("Error converting private key from String", e);
+        }
     }
 }
