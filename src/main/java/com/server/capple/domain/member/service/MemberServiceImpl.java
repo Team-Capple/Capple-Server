@@ -107,7 +107,7 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         if(deviceToken != null)
-            deviceTokenRedisRepository.saveDeviceToken(memberId.toString(), deviceToken);
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
     }
 
@@ -125,7 +125,7 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         if(deviceToken != null)
-            deviceTokenRedisRepository.saveDeviceToken(memberId.toString(), deviceToken);
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return tokensMapper.toTokens(accessToken, refreshToken);
     }
 
@@ -141,7 +141,7 @@ public class MemberServiceImpl implements MemberService {
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
         if(deviceToken != null)
-            deviceTokenRedisRepository.saveDeviceToken(memberId.toString(), deviceToken);
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
     }
 
@@ -161,7 +161,7 @@ public class MemberServiceImpl implements MemberService {
         Member resignedMember = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         resignedMember.resignMember();
-        deviceTokenRedisRepository.deleteDeviceToken(member.getId().toString());
+        deviceTokenRedisRepository.deleteDeviceToken(member.getId());
         return memberMapper.toMemberId(member);
     }
 
@@ -224,7 +224,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Boolean logout(Member member) {
-        deviceTokenRedisRepository.deleteDeviceToken(member.getId().toString());
+        deviceTokenRedisRepository.deleteDeviceToken(member.getId());
         return true;
     }
 }

@@ -18,19 +18,19 @@ public class DeviceTokenRedisRepository {
     private ValueOperations<String, String> valueOperations;
     private final RedisTemplate<String, String> redisTemplate;
 
-    public void saveDeviceToken(String key, String deviceToken) {
-        valueOperations.set(DEVICE_TOKEN_KEY + key, deviceToken);
+    public void saveDeviceToken(Long memberId, String deviceToken) {
+        valueOperations.set(DEVICE_TOKEN_KEY + memberId.toString(), deviceToken);
     }
 
-    public String getDeviceToken(String key) {
-        return valueOperations.get(DEVICE_TOKEN_KEY + key);
+    public String getDeviceToken(Long memberId) {
+        return valueOperations.get(DEVICE_TOKEN_KEY + memberId.toString());
     }
 
-    public List<String> getDeviceTokens(List<String> keys) {
-        return valueOperations.multiGet(keys.stream().map(key -> DEVICE_TOKEN_KEY + key).toList());
+    public List<String> getDeviceTokens(List<Long> keys) {
+        return valueOperations.multiGet(keys.stream().map(key -> DEVICE_TOKEN_KEY + key.toString()).toList());
     }
 
-    public void deleteDeviceToken(String key) {
-        redisTemplate.delete(DEVICE_TOKEN_KEY + key);
+    public void deleteDeviceToken(Long memberId) {
+        redisTemplate.delete(DEVICE_TOKEN_KEY + memberId.toString());
     }
 }

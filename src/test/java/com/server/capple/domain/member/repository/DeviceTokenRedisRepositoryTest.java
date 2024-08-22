@@ -20,8 +20,8 @@ class DeviceTokenRedisRepositoryTest {
     @Autowired
     private DeviceTokenRedisRepository deviceTokenRedisRepository;
 
-    private String testKeyPrefix = "testKey-";
-    private List<String> testKeys = new ArrayList<>();
+    private Long testKeyPrefix = 1_000_000_000L;
+    private List<Long> testKeys = new ArrayList<>();
 
     @AfterEach
     void afterEach() {
@@ -32,7 +32,7 @@ class DeviceTokenRedisRepositoryTest {
     @DisplayName("디바이스 토큰 저장, 조회 테스트")
     void saveDeviceTokenTest() {
         //given
-        String key = testKeyPrefix + UUID.randomUUID().toString();
+        Long key = testKeyPrefix + 1;
         testKeys.add(key);
         String deviceToken = UUID.randomUUID().toString();
 
@@ -47,7 +47,7 @@ class DeviceTokenRedisRepositoryTest {
     @DisplayName("디바이스 토큰 삭제 테스트")
     void deleteDeviceTokenTest() {
         //given
-        String key = testKeyPrefix + UUID.randomUUID().toString();
+        Long key = testKeyPrefix + 1;
         String deviceToken = UUID.randomUUID().toString();
 
         //when
@@ -62,9 +62,9 @@ class DeviceTokenRedisRepositoryTest {
     @DisplayName("디바이스 토큰 여러개 조회 테스트")
     void getDeviceTokensTest() {
         //given
-        String key1 = testKeyPrefix + UUID.randomUUID().toString();
-        String key2 = testKeyPrefix + UUID.randomUUID().toString();
-        String key3 = testKeyPrefix + UUID.randomUUID().toString();
+        Long key1 = testKeyPrefix + 1;
+        Long key2 = testKeyPrefix + 2;
+        Long key3 = testKeyPrefix + 3;
         testKeys.add(key1);
         testKeys.add(key2);
         testKeys.add(key3);
@@ -89,9 +89,9 @@ class DeviceTokenRedisRepositoryTest {
     @DisplayName("디바이스 토큰 삭제 후 여러개 조회 테스트")
     void getDeviceTokensAfterDeleteTest() {
         //given
-        String key1 = testKeyPrefix + UUID.randomUUID().toString();
-        String key2 = testKeyPrefix + UUID.randomUUID().toString();
-        String key3 = testKeyPrefix + UUID.randomUUID().toString();
+        Long key1 = testKeyPrefix + 1;
+        Long key2 = testKeyPrefix + 2;
+        Long key3 = testKeyPrefix + 3;
         testKeys.add(key1);
         testKeys.add(key2);
         testKeys.add(key3);
@@ -118,7 +118,7 @@ class DeviceTokenRedisRepositoryTest {
     @DisplayName("디바이스 토큰 중복 저장, 조회 테스트")
     void saveDuplicateDeviceTokenTest() {
         //given
-        String key = testKeyPrefix + UUID.randomUUID().toString();
+        Long key = testKeyPrefix + 1;
         testKeys.add(key);
         String deviceToken1 = UUID.randomUUID().toString();
         String deviceToken2 = UUID.randomUUID().toString();

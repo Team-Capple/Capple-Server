@@ -1,6 +1,7 @@
 package com.server.capple.config.apns.service;
 
 import com.server.capple.config.security.jwt.service.JwtService;
+import com.server.capple.domain.member.repository.DeviceTokenRedisRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import java.util.List;
 public class ApnsServiceImpl implements ApnsService {
     private final JwtService jwtService;
     private final HttpClient apnsH2HttpClient;
+    private final DeviceTokenRedisRepository deviceTokenRedisRepository;
     private WebClient defaultApnsWebClient;
 
     @Value("${apns.base-url}")
@@ -70,5 +72,10 @@ public class ApnsServiceImpl implements ApnsService {
                     .subscribe();
             });
         return true;
+    }
+
+    @Override
+    public <T> Boolean sendApnsToMembers(T request, List<Long> memberIdList) {
+        return sendApns(request, deviceTokenRedisRepository.getDeviceTokens(memberIdList));
     }
 }

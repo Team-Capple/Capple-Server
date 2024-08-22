@@ -4,4 +4,5 @@ import java.util.List;
 
 public interface ApnsService {
     <T> Boolean sendApns(T request, List<String> deviceToken);
+    <T> Boolean sendApnsToMembers(T request, List<Long> memberIdList);
 }
