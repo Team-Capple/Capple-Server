@@ -25,7 +25,7 @@ public class BoardCommentController {
 
     @Operation(summary = "게시글 댓글 생성 API", description = " 게시글 댓글 생성 API 입니다. pathVariable 으로 boardId를 주세요.")
     @PostMapping("/board/{boardId}")
-    public BaseResponse<BoardCommentId> createAnswerComment(@AuthMember Member member,
+    public BaseResponse<BoardCommentId> createBoardComment(@AuthMember Member member,
                                                             @PathVariable(value = "boardId") Long boardId,
                                                             @RequestBody @Valid BoardCommentRequest request) {
         return BaseResponse.onSuccess(boardCommentService.createBoardComment(member, boardId, request));
@@ -33,7 +33,7 @@ public class BoardCommentController {
 
     @Operation(summary = "게시글 댓글 수정 API", description = " 게시글 댓글 수정 API 입니다. pathVariable 으로 commentId를 주세요.")
     @PatchMapping("/{commentId}")
-    public BaseResponse<BoardCommentId> updateAnswerComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId, @RequestBody @Valid BoardCommentRequest request) {
+    public BaseResponse<BoardCommentId> updateBoardComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId, @RequestBody @Valid BoardCommentRequest request) {
         return BaseResponse.onSuccess(boardCommentService.updateBoardComment(member, commentId, request));
     }
 
@@ -46,13 +46,13 @@ public class BoardCommentController {
 
     @Operation(summary = "게시글 댓글 좋아요/취소 토글 API", description = " 게시글 댓글 좋아요/취소 토글 API 입니다. pathVariable 으로 commentId를 주세요.")
     @PatchMapping("/heart/{commentId}")
-    public BaseResponse<BoardCommentHeart> heartAnswerComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
+    public BaseResponse<BoardCommentHeart> heartBoardComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
         return BaseResponse.onSuccess(boardCommentService.heartBoardComment(member, commentId));
     }
 
-    @Operation(summary = "게시글 댓글 목록 조회 API", description = " 게시글 댓글 조회 API 입니다. pathVariable 으로 boardId를 주세요.")
+    @Operation(summary = "게시글 댓글 리스트 조회 API", description = " 게시글 댓글 리스트 조회 API 입니다. pathVariable 으로 boardId를 주세요.")
     @GetMapping("/{boardId}")
-    public BaseResponse<BoardCommentInfos> getAnswerCommentInfos(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+    public BaseResponse<BoardCommentInfos> getBoardCommentInfos(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId));
     }
 

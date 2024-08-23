@@ -56,6 +56,7 @@ public class SecurityConfig {
                 .requestMatchers("/questions","/questions/**").authenticated()
                 .requestMatchers("/reports", "/reports/**").authenticated()
                 .requestMatchers("/boards", "/boards/**").authenticated()
+                .requestMatchers("/boardComments", "/boardComments/**").authenticated()
                 .anyRequest().denyAll());
         http
             .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);

@@ -16,7 +16,7 @@ public class BoardCommentMapper {
                 .build();
     }
 
-    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Long heartCount,Boolean isLiked) {
+    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Long heartCount, Boolean isLiked) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())
                 .writer(comment.getMember().getNickname())
