@@ -12,8 +12,8 @@ public class ApnsClientRequest {
     public static class SimplePushBody {
         private Aps aps;
 
-        public SimplePushBody(String title, String subTitle, String body, Integer badge, String threaId, String targetContentId) {
-            this.aps = new Aps(new Aps.Alert(title, subTitle, body), badge, threaId, targetContentId);
+        public SimplePushBody(String title, String subTitle, String body, Integer badge, String threadId, String targetContentId) {
+            this.aps = new Aps(new Aps.Alert(title, subTitle, body), badge, threadId, targetContentId);
         }
 
         @ToString

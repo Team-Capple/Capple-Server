@@ -42,6 +42,11 @@ public class ApnsServiceImpl implements ApnsService {
     }
 
     @Override
+    public <T> Boolean sendApns(T request, String... deviceToken) {
+        return sendApns(request, List.of(deviceToken));
+    }
+
+    @Override
     public <T> Boolean sendApns(T request, List<String> deviceToken) {
         WebClient tmpWebClient = defaultApnsWebClient.mutate()
             .defaultHeader("authorization", "bearer " + jwtService.createApnsJwt())
@@ -59,6 +64,16 @@ public class ApnsServiceImpl implements ApnsService {
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(Void.class)
+                    .doOnDiscard(Void.class, response -> {// 거절 시 보조 채널로 재시도
+                        tmpSubWebClient
+                            .method(HttpMethod.POST)
+                            .uri(token)
+                            .bodyValue(request)
+                            .retrieve()
+                            .bodyToMono(Void.class)
+                            .subscribe();
+                        log.info("APNs 전송 거절 발생");
+                    })
                     .doOnError(e -> { // 에러 발생 시 보조 채널로 재시도
                         tmpSubWebClient
                             .method(HttpMethod.POST)
@@ -72,6 +87,11 @@ public class ApnsServiceImpl implements ApnsService {
                     .subscribe();
             });
         return true;
+    }
+
+    @Override
+    public <T> Boolean sendApnsToMembers(T request, Long... memberIds) {
+        return sendApns(request, deviceTokenRedisRepository.getDeviceTokens(List.of(memberIds)));
     }
 
     @Override
