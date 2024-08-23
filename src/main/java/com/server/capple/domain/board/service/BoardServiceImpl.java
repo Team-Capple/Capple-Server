@@ -56,9 +56,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponse.BoardDelete deleteBoard(Member member, Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
-
+        Board board = findBoard(boardId);
         if (board.getWriter().getId() != member.getId()) {
             throw new RestApiException(BoardErrorCode.BOARD_NO_AUTHORIZATION);
         }
@@ -77,13 +75,17 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
-
+        Board board = findBoard(boardId);
         System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
 
         Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
         return new BoardResponse.BoardToggleHeart(boardId, isLiked);
+    }
+
+    @Override
+    public Board findBoard(Long boardId) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
 

@@ -1,18 +1,21 @@
 package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dto.BoardResponse.*;
+import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.member.entity.Member;
 import org.springframework.data.domain.Pageable;
 
 public interface BoardService {
-    BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content);
+    BoardCreate createBoard(Member member, BoardType boardType, String content);
 
-    BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
+    BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
 
-    BoardResponse.BoardDelete deleteBoard(Member member, Long boardId);
+    BoardDelete deleteBoard(Member member, Long boardId);
 
-    BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword);
+    BoardsSearchByKeyword searchBoardsByKeyword(String keyword);
 
-    BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId);
+    BoardToggleHeart toggleBoardHeart(Member member, Long boardId);
+    Board findBoard(Long boardId);
 }

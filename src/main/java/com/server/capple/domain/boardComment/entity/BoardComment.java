@@ -28,4 +28,8 @@ public class BoardComment extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    public void update(String content) {
+        this.content = content;
+    }
 }
