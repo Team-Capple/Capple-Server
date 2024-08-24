@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .requestMatchers("/members/sign-in","/members/sign-up", "/members/local-sign-in", "/token/**", "/members/email/check", "/members/nickname/check", "/members/email/certification", "/members/email/certification/check").permitAll()
                 .requestMatchers("/admin/**", "/members/email/whitelist/register").hasRole(Role.ROLE_ADMIN.getName())
                 .requestMatchers("/answers","/answers/**").authenticated()
+                .requestMatchers("/answerComments","/answerComments/**").authenticated()
                 .requestMatchers("/members","/members/**").authenticated()
                 .requestMatchers("/tags","/tags/**").authenticated()
                 .requestMatchers("/questions","/questions/**").authenticated()

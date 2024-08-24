@@ -7,6 +7,8 @@ import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.question.entity.Question;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -100,4 +103,23 @@ public abstract class ControllerTestConfig {
 
         return new AnswerResponse.MemberAnswerList(memberAnswerInfos);
     }
+
+    protected AnswerCommentRequest getAnswerCommentRequest() {
+        return AnswerCommentRequest.builder()
+                .answerComment("댓글이 잘 달렸으면 좋겠어 . .")
+                .build();
+    }
+
+    protected AnswerCommentInfos getAnswerCommentInfos () {
+        List<AnswerCommentInfo> answerCommentInfos = List.of(AnswerCommentInfo.builder()
+                .answerCommentId(1L)
+                .writer(member.getNickname())
+                .content("댓글 1")
+                .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
+                .heartCount(3L)
+                .build());
+
+        return new AnswerCommentInfos(answerCommentInfos);
+    }
+
 }
