@@ -3,6 +3,12 @@ package com.server.capple.support;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.repository.AnswerRepository;
+import com.server.capple.domain.board.entity.Board;
+import com.server.capple.domain.board.entity.BoardType;
+import com.server.capple.domain.board.repository.BoardRepository;
+import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
+import com.server.capple.domain.boardComment.entity.BoardComment;
+import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
@@ -31,12 +37,17 @@ public abstract class ServiceTestConfig {
     protected AnswerRepository answerRepository;
     @Autowired
     protected AnswerCommentRepository answerCommentRepository;
-
+    @Autowired
+    protected BoardRepository boardRepository;
+    @Autowired
+    BoardCommentRepository boardCommentRepository;
     protected Member member;
     protected Question liveQuestion;
     protected Question pendingQuestion;
     protected Question oldQuestion;
     protected Answer answer;
+    protected Board board;
+    protected BoardComment boardComment;
     protected AnswerComment answerComment;
 
     @Autowired
@@ -49,6 +60,8 @@ public abstract class ServiceTestConfig {
         pendingQuestion = createPendingQuestion();
         oldQuestion = createOldQuestion();
         answer = createAnswer();
+        board = createBoard();
+        boardComment = createBoardComment();
         answerComment = createAnswerComment();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
@@ -109,6 +122,30 @@ public abstract class ServiceTestConfig {
                 .answer("나는 와플을 좋아하는 사람이 좋아")
                 .build();
     }
+
+    protected Board createBoard() {
+        return boardRepository.save(Board.builder()
+                        .id(1L)
+                        .boardType(BoardType.FREEBOARD)
+                        .writer(member)
+                        .content("오늘 밥먹을 사람!")
+                        .commentCount(2)
+                        .build());
+    }
+    protected BoardComment createBoardComment() {
+        return boardCommentRepository.save(
+                BoardComment.builder()
+                        .member(member)
+                        .board(board)
+                        .content("게시글 댓글")
+                        .build());
+    }
+
+    protected BoardCommentRequest getBoardCommentRequest() {
+        return new BoardCommentRequest("게시글 댓글");
+    }
+
+
 
     protected AnswerCommentRequest getAnswerCommentRequest() {
         return AnswerCommentRequest.builder()
