@@ -84,8 +84,8 @@ public class MemberController {
                 """, description = "서버측의 애플 서버 접근 클라언트 관련 문제로 서버 관리자에게 문의해주세요."),
         })),
     })
-    public BaseResponse<MemberResponse.SignInResponse> login(@RequestParam String code) {
-        return BaseResponse.onSuccess(memberService.signIn(code));
+    public BaseResponse<MemberResponse.SignInResponse> login(@RequestParam String code, @RequestParam String deviceToken) {
+        return BaseResponse.onSuccess(memberService.signIn(code, deviceToken));
     }
 
     @Operation(summary = "회원가입 API", description = "회원가입 API 입니다." +
@@ -94,15 +94,15 @@ public class MemberController {
             "회원가입 성공시 accessToken과 refreshToken이 반환됩니다.")
     @PostMapping("/sign-up")
     public BaseResponse<MemberResponse.Tokens> signUp(@RequestBody MemberRequest.signUp request) {
-        return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getEmail(), request.getNickname(), request.getProfileImage()));
+        return BaseResponse.onSuccess(memberService.signUp(request.getSignUpToken(), request.getEmail(), request.getNickname(), request.getProfileImage(), request.getDeviceToken()));
     }
 
     @Operation(summary = "테스트용 로컬 로그인 API", description = "테스트용 로컬 로그인 API 입니다." +
             "쿼리 파라미터를 이용해 테스트용 아이디를 입력해주세요." +
             "refreshToken의 위치에 signUpToken이 반환됩니다.")
     @GetMapping("/local-sign-in")
-    public BaseResponse<MemberResponse.SignInResponse> localLogin(@RequestParam String testId) {
-        return BaseResponse.onSuccess(memberService.localSignIn(testId));
+    public BaseResponse<MemberResponse.SignInResponse> localLogin(@RequestParam String testId, @RequestParam String deviceToken) {
+        return BaseResponse.onSuccess(memberService.localSignIn(testId, deviceToken));
     }
 
     @Operation(summary = "회원탈퇴 API", description = "회원탈퇴 API 입니다.")
@@ -186,5 +186,11 @@ public class MemberController {
         @Parameter(description = "화이트 리스트 등록 기간 (분)")
         @RequestParam Long whitelistDurationMinutes) {
         return BaseResponse.onSuccess(memberService.registerEmailWhitelist(mail, whitelistDurationMinutes));
+    }
+
+    @Operation(summary = "로그아웃 API", description = "로그아웃 API 입니다.<br>저장된 디바이스 토큰을 지웁니다.")
+    @GetMapping("/logout")
+    public BaseResponse<Boolean> logout(@AuthMember Member member) {
+        return BaseResponse.onSuccess(memberService.logout(member));
     }
 }
