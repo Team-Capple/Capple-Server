@@ -13,9 +13,9 @@ public interface MemberService {
     MemberResponse.EditMemberInfo editMemberInfo(Member member, MemberRequest.EditMemberInfo request);
     MemberResponse.ProfileImage uploadImage(MultipartFile image);
     MemberResponse.DeleteProfileImages deleteOrphanageImages();
-    MemberResponse.SignInResponse signIn(String authorizationCode);
-    MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage);
-    MemberResponse.SignInResponse localSignIn(String testId);
+    MemberResponse.SignInResponse signIn(String authorizationCode, String deviceToken);
+    MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage, String deviceToken);
+    MemberResponse.SignInResponse localSignIn(String testId, String deviceToken);
     MemberResponse.Tokens changeRole(Long memberId, Role role);
     MemberResponse.MemberId resignMember (Member member);
     Boolean checkNickname(String nickname);
@@ -23,4 +23,5 @@ public interface MemberService {
     Boolean registerEmailWhitelist(String email, Long whitelistDurationMinutes);
     Boolean sendCertMail(String signUpToken, String email);
     Boolean checkCertCode(String signUpToken, String email, String certCode);
+    Boolean logout(Member member);
 }

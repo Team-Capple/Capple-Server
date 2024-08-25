@@ -6,9 +6,13 @@ import com.server.capple.config.security.auth.service.JpaUserDetailService;
 import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
+import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.question.entity.Question;
@@ -24,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.lang.Boolean.TRUE;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -91,7 +96,7 @@ public abstract class ControllerTestConfig {
                 .build();
     }
 
-    protected AnswerResponse.MemberAnswerList getMemberAnswerList () {
+    protected MemberAnswerList getMemberAnswerList () {
         List<AnswerResponse.MemberAnswerInfo> memberAnswerInfos = List.of(AnswerResponse.MemberAnswerInfo.builder()
                 .questionId(answer.getQuestion().getId())
                 .answerId(answer.getId())
@@ -101,7 +106,25 @@ public abstract class ControllerTestConfig {
                 .heartCount(1)
                 .build());
 
-        return new AnswerResponse.MemberAnswerList(memberAnswerInfos);
+        return new MemberAnswerList(memberAnswerInfos);
+    }
+
+    protected BoardCommentRequest getBoardCommentRequest() {
+        return new BoardCommentRequest("게시글 댓글");
+    }
+
+    protected BoardCommentInfos getBoardCommentInfos() {
+        List<BoardCommentInfo> commentInfos =
+                List.of(BoardCommentInfo.builder()
+                        .boardCommentId(1L)
+                        .writer(member.getNickname())
+                        .content("댓글")
+                        .createdAt(LocalDateTime.now())
+                        .heartCount(2L)
+                        .isLiked(TRUE)
+                        .build());
+
+        return new BoardCommentInfos(commentInfos);
     }
 
     protected AnswerCommentRequest getAnswerCommentRequest() {
