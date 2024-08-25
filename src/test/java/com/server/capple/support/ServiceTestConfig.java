@@ -9,6 +9,9 @@ import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
+import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
+import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.repository.MemberRepository;
@@ -33,6 +36,8 @@ public abstract class ServiceTestConfig {
     @Autowired
     protected AnswerRepository answerRepository;
     @Autowired
+    protected AnswerCommentRepository answerCommentRepository;
+    @Autowired
     protected BoardRepository boardRepository;
     @Autowired
     BoardCommentRepository boardCommentRepository;
@@ -43,6 +48,7 @@ public abstract class ServiceTestConfig {
     protected Answer answer;
     protected Board board;
     protected BoardComment boardComment;
+    protected AnswerComment answerComment;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -56,6 +62,7 @@ public abstract class ServiceTestConfig {
         answer = createAnswer();
         board = createBoard();
         boardComment = createBoardComment();
+        answerComment = createAnswerComment();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
     }
 
@@ -139,4 +146,19 @@ public abstract class ServiceTestConfig {
     }
 
 
+
+    protected AnswerCommentRequest getAnswerCommentRequest() {
+        return AnswerCommentRequest.builder()
+                .answerComment("댓글이 잘 달렸으면 좋겠어 . .")
+                .build();
+    }
+
+    protected AnswerComment createAnswerComment() {
+        return answerCommentRepository.save(AnswerComment.builder()
+                .member(member)
+                .answer(answer)
+                .content("답변에 대한 댓글이어유")
+                .build()
+        );
+    }
 }

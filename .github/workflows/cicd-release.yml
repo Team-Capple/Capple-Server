@@ -2,8 +2,8 @@ name: Release Deploy
 
 on:
   push:
-    branches:
-      - 'release-**'
+    tags:
+      - 'v**-**'
 
 env:
   REGISTRY: ghcr.io
@@ -38,7 +38,7 @@ jobs:
 
       - name: Get Version
         run: |
-          echo "VERSION=$( echo ${{ github.ref_name }} | cut -c 9- )" >> ${GITHUB_ENV}
+          echo "VERSION=$( git tag --points-at )" >> ${GITHUB_ENV}
 
       - name: Set Spring Image Environment Variable
         run: |
@@ -46,7 +46,7 @@ jobs:
 
       - name: Write Version
         run: |
-          echo "server-version: ${{ env.VERSION }}" >> config/application.yml
+          echo -e "\nserver-version: ${{ env.VERSION }}" >> config/application-release.yml
 
       - name: Build Image
         run: docker build --no-cache -t ${{ env.SPRING_IMAGE }} -f Dockerfile-deploy .
