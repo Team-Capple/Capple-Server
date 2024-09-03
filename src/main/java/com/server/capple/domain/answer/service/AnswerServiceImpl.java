@@ -90,14 +90,14 @@ public class AnswerServiceImpl implements AnswerService {
                     answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId())))
                             .toList());
         } else {
             return answerMapper.toAnswerList(
                     answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId())))
                             .toList());
         }
 

@@ -29,14 +29,17 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported) {
+    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported, Boolean isLiked) {
         return AnswerInfo.builder()
                 .answerId(answer.getId())
+                .writerId(answer.getMember().getId())
                 .profileImage(answer.getMember().getProfileImage())
                 .nickname(answer.getMember().getNickname())
                 .content(answer.getContent())
                 .isMyAnswer(answer.getMember().getId() == memberId)
                 .isReported(isReported)
+                .isLiked(isLiked)
+                .writeAt(answer.getCreatedAt().toString())
                 .build();
     }
 
@@ -44,11 +47,12 @@ public class AnswerMapper {
         return MemberAnswerInfo.builder()
                 .questionId(answer.getQuestion().getId())
                 .answerId(answer.getId())
+                .writerId(answer.getMember().getId())
                 .nickname(answer.getMember().getNickname())
                 .profileImage(answer.getMember().getProfileImage())
                 .content(answer.getContent())
                 .heartCount(heartCount)
-                .writeAt(answer.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")))
+                .writeAt(answer.getCreatedAt().toString())
                 .build();
     }
 
