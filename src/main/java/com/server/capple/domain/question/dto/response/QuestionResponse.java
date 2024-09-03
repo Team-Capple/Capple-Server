@@ -5,6 +5,7 @@ import com.server.capple.domain.question.entity.QuestionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,5 +51,14 @@ public class QuestionResponse {
     @Builder
     public static class QuestionInfos {
         private List<QuestionInfo> questionInfos;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QuestionToggleHeart {
+        private Long questionId;
+        private Boolean isLiked;
     }
 }
