@@ -77,7 +77,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
-        System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
+//        System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
 
         Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
         return new BoardResponse.BoardToggleHeart(boardId, isLiked);

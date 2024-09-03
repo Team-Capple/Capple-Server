@@ -42,6 +42,7 @@ public class AnswerServiceImpl implements AnswerService {
 
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
+        answer.getQuestion().increaseCommentCount();
 
         return new AnswerResponse.AnswerId(answer.getId());
     }
@@ -66,6 +67,7 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = findAnswer(answerId);
 
         checkPermission(loginMember, answer);
+        answer.getQuestion().decreaseCommentCount();
 
         answer.delete();
 
