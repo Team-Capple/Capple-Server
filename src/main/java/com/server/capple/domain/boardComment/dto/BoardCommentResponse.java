@@ -26,7 +26,7 @@ public class BoardCommentResponse {
     @Builder
     public static class BoardCommentInfo {
         private Long boardCommentId;
-        private String writer;
+        private Long writerId;
         private String content;
         private Long heartCount;
         private Boolean isLiked;

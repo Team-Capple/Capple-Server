@@ -39,6 +39,7 @@ public class BoardResponse {
         private Integer heartCount;
         private Integer commentCount;
         private LocalDateTime createAt;
+        private Boolean isLiked;
     }
 
     @Getter

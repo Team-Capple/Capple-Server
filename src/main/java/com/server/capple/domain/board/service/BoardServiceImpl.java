@@ -6,6 +6,7 @@ import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
+import com.server.capple.domain.boardComment.repository.BoardCommentHeartRedisRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
@@ -37,7 +38,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType) {
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
         List<Board> boards = new ArrayList<>();
         if (boardType == null) {
             boards = boardRepository.findAll();
@@ -49,7 +50,7 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId()), boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId())))
                 .toList()
         );
     }

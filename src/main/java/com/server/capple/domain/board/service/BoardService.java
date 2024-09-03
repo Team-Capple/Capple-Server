@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface BoardService {
     BoardCreate createBoard(Member member, BoardType boardType, String content);
 
-    BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
+    BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType);
 
     BoardDelete deleteBoard(Member member, Long boardId);
 
