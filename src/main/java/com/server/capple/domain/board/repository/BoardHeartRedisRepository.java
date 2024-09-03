@@ -71,4 +71,10 @@ public class BoardHeartRedisRepository implements Serializable {
         }
         return boardIds;
     }
+
+    public boolean isMemberLikedBoard(Long memberId, Long boardId) {
+        String key = BOARD_HEART_KEY_PREFIX + boardId;
+        String memberKey = MEMBER_KEY_PREFIX + memberId;
+        return redisTemplate.opsForSet().isMember(key, memberKey);
+    }
 }
