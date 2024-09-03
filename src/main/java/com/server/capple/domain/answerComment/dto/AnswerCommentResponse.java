@@ -25,7 +25,7 @@ public class AnswerCommentResponse {
     @Builder
     public static class AnswerCommentInfo {
         private Long answerCommentId;
-        private String writer;
+        private Long writerId;
         private String content;
         private Long heartCount;
         private LocalDateTime createdAt;
