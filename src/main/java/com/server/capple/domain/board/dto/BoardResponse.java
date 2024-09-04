@@ -25,7 +25,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsGetByBoardType {
-        private List<BoardsGetByBoardTypeBoardInfo> boards = new ArrayList<>();
+        private List<BoardsGetByBoardTypeBoardInfo> boards;
     }
 
     @Getter
@@ -55,7 +55,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsSearchByKeyword {
-        private List<BoardsSearchByKeywordBoardInfo> boards = new ArrayList<>();
+        private List<BoardsSearchByKeywordBoardInfo> boards;
     }
 
     @Getter
