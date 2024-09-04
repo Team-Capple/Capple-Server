@@ -43,7 +43,7 @@ public class AnswerMapper {
                 .build();
     }
 
-    public MemberAnswerInfo toMemberAnswerInfo(Answer answer, int heartCount) {
+    public MemberAnswerInfo toMemberAnswerInfo(Answer answer, int heartCount, Boolean isLiked) {
         return MemberAnswerInfo.builder()
                 .questionId(answer.getQuestion().getId())
                 .answerId(answer.getId())
@@ -53,6 +53,7 @@ public class AnswerMapper {
                 .content(answer.getContent())
                 .heartCount(heartCount)
                 .writeAt(answer.getCreatedAt().toString())
+                .isLiked(isLiked)
                 .build();
     }
 

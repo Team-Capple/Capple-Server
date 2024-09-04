@@ -53,6 +53,7 @@ public class AnswerResponse {
         private String content;
         private int heartCount;
         private String writeAt;
+        private Boolean isLiked;
     }
 
     @Getter

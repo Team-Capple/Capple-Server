@@ -111,7 +111,7 @@ public class AnswerServiceImpl implements AnswerService {
         List<Answer> answers = answerRepository.findByMember(member).orElse(null);
         return answerMapper.toMemberAnswerList(
                 answers.stream()
-                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId())))
+                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())))
                         .toList()
         );
     }
@@ -122,7 +122,7 @@ public class AnswerServiceImpl implements AnswerService {
         return answerMapper.toMemberAnswerList(
                 answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
                         .stream()
-                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId)))
+                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answerId)))
                         .toList()
         );
     }
