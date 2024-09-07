@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import static java.lang.Boolean.FALSE;
@@ -26,7 +27,7 @@ public class BoardHeartRedisRepository implements Serializable {
     public Boolean toggleBoardHeart(Long boardId, Long memberId) {
         String key = BOARD_HEART_KEY_PREFIX + boardId.toString();
         String member = MEMBER_KEY_PREFIX + memberId.toString();
-        String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKeyㄱ
+        String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKey
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
@@ -70,5 +71,23 @@ public class BoardHeartRedisRepository implements Serializable {
             }
         }
         return boardIds;
+    }
+
+
+    //더미 데이터 생성용
+    public void generateDummyBoardLikes(int boardCount) {
+        SetOperations<String, String> setOperations = redisTemplate.opsForSet();
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+
+        Random random = new Random();
+        for (int boardId = 0; boardId < boardCount; boardId++) {
+            for (int memberId = 1; memberId <= 10; memberId++) {
+                if(random.nextBoolean()) {
+                    String key = BOARD_HEART_KEY_PREFIX + boardId;
+                    String member = MEMBER_KEY_PREFIX + memberId;
+                    setOperations.add(key, member);
+                }
+            }
+        }
     }
 }
