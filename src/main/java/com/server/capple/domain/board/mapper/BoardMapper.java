@@ -43,9 +43,8 @@ public class BoardMapper {
                 .build();
     }
 
-/*    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
-            Board board,
-            Integer boardHeartsCount) {
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
+            Board board, Integer boardHeartsCount) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
@@ -54,7 +53,7 @@ public class BoardMapper {
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
                 .build();
-    }*/
+    }
 
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board) {

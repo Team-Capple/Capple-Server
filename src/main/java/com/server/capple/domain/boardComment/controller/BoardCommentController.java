@@ -56,4 +56,10 @@ public class BoardCommentController {
         return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId));
     }
 
+    @Operation(summary = "게시글 댓글 리스트 조회 API(프론트 사용 X, 성능 테스트 용)", description = " 게시글 댓글 리스트 조회 API 입니다. pathVariable 으로 boardId를 주세요.")
+    @GetMapping("/{boardId}/rdb")
+    public BaseResponse<BoardCommentInfos> getBoardCommentInfosWithRDB(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+        return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfosWithRDB(member,boardId));
+    }
+
 }

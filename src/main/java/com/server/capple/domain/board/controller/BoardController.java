@@ -40,7 +40,7 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
-    @Operation(summary = "카테고리별 게시글 조회 API", description = "카테고리별 게시글을 조회합니다.")
+    @Operation(summary = "카테고리별 게시글 조회 with REDIS API", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -51,6 +51,19 @@ public class BoardController {
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
             ) {
         return BaseResponse.onSuccess(boardService.getBoardsByBoardType(boardType));
+    }
+
+    @Operation(summary = "카테고리별 게시글 조회 WITH RDB API (프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/rdb")
+    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRDB(
+            @RequestParam(name = "boardType", required = false) BoardType boardType
+            // TODO: 페이징 프론트 이슈로 추후 구현
+//            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
+    ) {
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRDB(boardType));
     }
 
     @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")

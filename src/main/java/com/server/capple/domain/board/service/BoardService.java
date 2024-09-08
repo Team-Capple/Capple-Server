@@ -11,6 +11,7 @@ public interface BoardService {
     BoardCreate createBoard(Member member, BoardType boardType, String content);
 
     BoardsGetByBoardType getBoardsByBoardType(BoardType boardType);
+    BoardsGetByBoardType getBoardsByBoardTypeWithRDB(BoardType boardType);
 
     BoardDelete deleteBoard(Member member, Long boardId);
 

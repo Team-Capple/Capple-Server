@@ -73,17 +73,18 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         return new BoardCommentId(boardComment.getId());
     }
 
-/*  redis 용
+    //redis 용
     @Override
     @Transactional
-    public BoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId) {
+    public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId) {
         Boolean isLiked = boardCommentHeartRedisRepository.
                 toggleBoardCommentHeart(commentId, member.getId());
 
-        return new BoardCommentHeart(commentId, isLiked);
-    }*/
+        return new ToggleBoardCommentHeart(commentId, isLiked);
+    }
 
     //rdb용
+    /*
     @Override
     @Transactional
     public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long boardCommentId) {
@@ -101,14 +102,26 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
         return new ToggleBoardCommentHeart(boardCommentId, isLiked);
     }
+     */
 
     @Override
     public BoardCommentInfos getBoardCommentInfos(Member member, Long boardId) {
         List<BoardCommentInfo> commentInfos = boardCommentRepository
                 .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
                         comment -> {
-                            //Long heartCount = boardCommentHeartRedisRepository.getBoardCommentsCount(comment.getId());
-                            //Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
+                            Long heartCount = boardCommentHeartRedisRepository.getBoardCommentsCount(comment.getId());
+                            Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
+                            return boardCommentMapper.toBoardCommentInfo(comment, isLiked);
+                        }).toList();
+
+        return new BoardCommentInfos(commentInfos);
+    }
+
+    @Override
+    public BoardCommentInfos getBoardCommentInfosWithRDB(Member member, Long boardId) {
+        List<BoardCommentInfo> commentInfos = boardCommentRepository
+                .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
+                        comment -> {
                             Boolean isLiked = boardCommentHeartRepository.findByMemberAndBoardComment(member, comment)
                                     .map(BoardCommentHeart::isLiked)
                                     .orElse(false);

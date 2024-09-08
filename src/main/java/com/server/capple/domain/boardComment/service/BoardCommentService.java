@@ -13,5 +13,7 @@ public interface BoardCommentService {
     BoardCommentId deleteBoardComment(Member member, Long commentId);
     ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId);
     BoardCommentInfos getBoardCommentInfos(Member member, Long boardId);
+   BoardCommentInfos getBoardCommentInfosWithRDB(Member member, Long boardId);
+
     BoardComment findBoardComment(Long commentId);
 }
