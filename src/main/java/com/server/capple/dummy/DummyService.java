@@ -40,7 +40,6 @@ public class DummyService {
 
         for (long i = 1; i <= 10; i++) {
             Member member = Member.builder()
-                    .id(i)
                     .nickname("User" + i)
                     .email("user" + i + "@example.com")
                     .sub("sub" + i)
