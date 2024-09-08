@@ -4,6 +4,7 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -29,10 +30,10 @@ public class Board extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @ColumnDefault("0")
     private Integer commentCount;
 
-    @Column(nullable = false)
+    @ColumnDefault("0")
     private Integer heartCount;
 
     public void setHeartCount(boolean isLiked) {
@@ -41,5 +42,13 @@ public class Board extends BaseEntity {
         } else {
             this.heartCount--;
         }
+    }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
     }
 }
