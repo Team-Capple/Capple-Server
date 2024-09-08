@@ -14,16 +14,14 @@ public class BoardMapper {
     public Board toBoard(
             Member member,
             BoardType boardType,
-            String content,
-            Integer heartCount,
-            Integer commentCount
+            String content
     ) {
         return Board.builder()
                 .writer(member)
                 .boardType(boardType)
                 .content(content)
-                .commentCount(commentCount)
-                .heartCount(heartCount)
+                .commentCount(0)
+                .heartCount(0)
                 .build();
     }
 
@@ -43,6 +41,7 @@ public class BoardMapper {
                 .build();
     }
 
+    //redis
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board, Integer boardHeartsCount) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
@@ -55,8 +54,8 @@ public class BoardMapper {
                 .build();
     }
 
-    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
-            Board board) {
+    //rdb
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(Board board) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())

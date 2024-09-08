@@ -45,9 +45,10 @@ public class BoardCommentHeartRedisRepository implements Serializable {
         return setOperations.isMember(key, member);
     }
 
-    public Long getBoardCommentsCount(Long commentId) {
+    public Integer getBoardCommentsCount(Long commentId) {
         String key = BOARD_COMMENT_HEART_KEY_PREFIX + commentId.toString();
-        return redisTemplate.opsForSet().size(key);
+        Long size = redisTemplate.opsForSet().size(key);
+        return (size != null) ? size.intValue() : 0;
     }
 
 }
