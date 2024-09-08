@@ -79,33 +79,6 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     public void heartBoardCommentTest() {
         //1. 좋아요
         //given & when
-        ToggleBoardCommentHeart liked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
-        BoardCommentInfos likedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
-        //then
-        assertEquals(boardComment.getId(), liked.getBoardCommentId());
-        assertEquals(true, liked.getIsLiked());
-        assertEquals(true, likedResponse.getBoardCommentInfos().get(0).getIsLiked());
-
-        //2. 좋아요 취소
-        //given & when
-        ToggleBoardCommentHeart unLiked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
-        BoardCommentInfos unLikedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
-
-        //then
-        assertEquals(boardComment.getId(), unLiked.getBoardCommentId());
-        assertEquals(false, unLiked.getIsLiked());
-        assertEquals(false, unLikedResponse.getBoardCommentInfos().get(0).getIsLiked());
-    }
-
-
-    //rdb용
-    /*
-    @Test
-    @DisplayName("게시글 댓글 좋아요/취소 토글 테스트 - rdb용")
-    @Transactional
-    public void heartBoardCommentTest() {
-        //1. 좋아요
-        //given & when
         int heartCount = boardComment.getHeartCount();
         ToggleBoardCommentHeart liked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
 
@@ -122,8 +95,8 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         assertEquals(boardComment.getId(), unLiked.getBoardCommentId());
         assertEquals(false, unLiked.getIsLiked());
         assertEquals(heartCount - 1, boardComment.getHeartCount());
+
     }
-     */
 
     @Test
     @DisplayName("게시판 댓글 리스트 조회 테스트")
