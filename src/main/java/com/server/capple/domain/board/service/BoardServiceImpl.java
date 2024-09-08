@@ -79,7 +79,9 @@ public class BoardServiceImpl implements BoardService {
                 .toList());
     }
 
- /*   @Override
+    //redis 용
+ /*
+    @Override
     public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
         System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
@@ -89,8 +91,9 @@ public class BoardServiceImpl implements BoardService {
     }
 */
 
+    //rdb용
     @Override
-    public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
+    public BoardResponse.ToggleBoardHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
         // 좋아요 눌렀는지 확인
 
@@ -104,7 +107,7 @@ public class BoardServiceImpl implements BoardService {
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
 
-        return new BoardResponse.BoardToggleHeart(boardId, isLiked);
+        return new BoardResponse.ToggleBoardHeart(boardId, isLiked);
     }
 
     @Override

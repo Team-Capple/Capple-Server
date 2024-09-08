@@ -16,6 +16,6 @@ public interface BoardService {
 
     BoardsSearchByKeyword searchBoardsByKeyword(String keyword);
 
-    BoardToggleHeart toggleBoardHeart(Member member, Long boardId);
+    ToggleBoardHeart toggleBoardHeart(Member member, Long boardId);
     Board findBoard(Long boardId);
 }

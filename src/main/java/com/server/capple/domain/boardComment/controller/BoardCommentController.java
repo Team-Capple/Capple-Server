@@ -3,7 +3,7 @@ package com.server.capple.domain.boardComment.controller;
 
 import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentHeart;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
 import com.server.capple.domain.boardComment.service.BoardCommentService;
@@ -46,8 +46,8 @@ public class BoardCommentController {
 
     @Operation(summary = "게시글 댓글 좋아요/취소 토글 API", description = " 게시글 댓글 좋아요/취소 토글 API 입니다. pathVariable 으로 commentId를 주세요.")
     @PatchMapping("/heart/{commentId}")
-    public BaseResponse<BoardCommentHeart> heartBoardComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
-        return BaseResponse.onSuccess(boardCommentService.heartBoardComment(member, commentId));
+    public BaseResponse<ToggleBoardCommentHeart> heartBoardComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
+        return BaseResponse.onSuccess(boardCommentService.toggleBoardCommentHeart(member, commentId));
     }
 
     @Operation(summary = "게시글 댓글 리스트 조회 API", description = " 게시글 댓글 리스트 조회 API 입니다. pathVariable 으로 boardId를 주세요.")

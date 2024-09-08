@@ -74,7 +74,7 @@ public class BoardResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BoardToggleHeart {
+    public static class ToggleBoardHeart {
         private Long boardId;
         private Boolean isLiked;
     }

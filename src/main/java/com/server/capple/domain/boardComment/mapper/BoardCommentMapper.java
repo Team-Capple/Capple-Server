@@ -8,20 +8,21 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BoardCommentMapper {
-    public BoardComment toBoardCommentEntity(Member member, Board board, String comment) {
+    public BoardComment toBoardComment(Member member, Board board, String comment) {
         return BoardComment.builder()
                 .member(member)
                 .board(board)
                 .content(comment)
+                .heartCount(0)
                 .build();
     }
 
-    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Long heartCount, Boolean isLiked) {
+    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Boolean isLiked) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())
                 .writer(comment.getMember().getNickname())
                 .content(comment.getContent())
-                .heartCount(heartCount)
+                .heartCount(comment.getHeartCount())
                 .isLiked(isLiked)
                 .createdAt(comment.getCreatedAt())
                 .build();
