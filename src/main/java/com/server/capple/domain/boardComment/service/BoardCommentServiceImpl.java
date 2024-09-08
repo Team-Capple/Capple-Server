@@ -40,6 +40,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         BoardComment boardComment = boardCommentRepository.save(
                 boardCommentMapper.toBoardCommentEntity(loginMember, board, request.getComment()));
 
+        board.increaseCommentCount();
         return new BoardCommentId(boardComment.getId());
     }
 
@@ -59,7 +60,10 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         BoardComment boardComment = findBoardComment(commentId);
         checkPermission(member, boardComment);
 
+        Board board = boardComment.getBoard();
+
         boardComment.delete();
+        board.decreaseCommentCount();
 
         return new BoardCommentId(boardComment.getId());
     }

@@ -27,13 +27,14 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     public void createBoardCommentTest() {
         //given
         BoardCommentRequest request = getBoardCommentRequest();
-
+        int commentCount = board.getCommentCount();
         //when
         Long boardCommentId = boardCommentService.createBoardComment(member, board.getId(), request).getBoardCommentId();
         BoardComment comment = boardCommentService.findBoardComment(boardCommentId);
 
         //then
         assertEquals("게시글 댓글", comment.getContent());
+        assertEquals(commentCount+1, board.getCommentCount());
     }
 
     @Test
@@ -61,6 +62,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         //given
         BoardCommentRequest request = getBoardCommentRequest();
         Long boardCommentId = boardCommentService.createBoardComment(member, board.getId(), request).getBoardCommentId();
+        int commentCount = board.getCommentCount();
 
         //when
         boardCommentService.deleteBoardComment(member, boardCommentId);
@@ -68,6 +70,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
 
         //then
         assertNotNull(comment.getDeletedAt());
+        assertEquals(commentCount-1,board.getCommentCount());
     }
 
     @Test
