@@ -85,6 +85,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
     //rdb용
     @Override
+    @Transactional
     public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long boardCommentId) {
         BoardComment boardComment = findBoardComment(boardCommentId);
 
