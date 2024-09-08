@@ -23,6 +23,7 @@ public class BoardMapper {
                 .boardType(boardType)
                 .content(content)
                 .commentCount(commentCount)
+                .heartCount(heartCount)
                 .build();
     }
 
@@ -42,7 +43,7 @@ public class BoardMapper {
                 .build();
     }
 
-    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
+/*    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board,
             Integer boardHeartsCount) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
@@ -50,8 +51,19 @@ public class BoardMapper {
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
                 .heartCount(boardHeartsCount)
-                // TODO : 댓글 작성 API 나오면 추후 구현
-                .commentCount(0)
+                .commentCount(board.getCommentCount())
+                .createAt(board.getCreatedAt())
+                .build();
+    }*/
+
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
+            Board board) {
+        return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
+                .boardId(board.getId())
+                .writerId(board.getWriter().getId())
+                .content(board.getContent())
+                .heartCount(board.getHeartCount())
+                .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
                 .build();
     }

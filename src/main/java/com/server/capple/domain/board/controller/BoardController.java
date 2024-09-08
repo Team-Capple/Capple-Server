@@ -82,5 +82,4 @@ public class BoardController {
     public BaseResponse<BoardResponse.BoardToggleHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.toggleBoardHeart(member, boardId));
     }
-
 }

@@ -31,4 +31,15 @@ public class Board extends BaseEntity {
 
     @Column(nullable = false)
     private Integer commentCount;
+
+    @Column(nullable = false)
+    private Integer heartCount;
+
+    public void setHeartCount(boolean isLiked) {
+        if (isLiked) {
+            this.heartCount++;
+        } else {
+            this.heartCount--;
+        }
+    }
 }
