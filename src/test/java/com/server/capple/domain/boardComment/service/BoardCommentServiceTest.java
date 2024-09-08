@@ -79,22 +79,22 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     public void heartBoardCommentTest() {
         //1. 좋아요
         //given & when
-        int heartCount = boardComment.getHeartCount();
         ToggleBoardCommentHeart liked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
-
+        BoardCommentInfos likedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
         //then
         assertEquals(boardComment.getId(), liked.getBoardCommentId());
         assertEquals(true, liked.getIsLiked());
-        assertEquals(heartCount + 1, boardComment.getHeartCount());
+        assertEquals(true, likedResponse.getBoardCommentInfos().get(0).getIsLiked());
+
         //2. 좋아요 취소
         //given & when
-        heartCount = boardComment.getHeartCount();
         ToggleBoardCommentHeart unLiked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
+        BoardCommentInfos unLikedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
 
         //then
         assertEquals(boardComment.getId(), unLiked.getBoardCommentId());
         assertEquals(false, unLiked.getIsLiked());
-        assertEquals(heartCount - 1, boardComment.getHeartCount());
+        assertEquals(false, unLikedResponse.getBoardCommentInfos().get(0).getIsLiked());
 
     }
 
