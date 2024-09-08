@@ -50,7 +50,8 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId()), boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId())))
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId()), boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId()), board.getWriter().getId().equals(member.getId()), false))
                 .toList()
         );
     }

@@ -45,7 +45,9 @@ public class BoardMapper {
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board,
             Integer boardHeartsCount,
-            Boolean isLiked) {
+            Boolean isLiked,
+            Boolean isMine,
+            Boolean isReported) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
@@ -54,6 +56,9 @@ public class BoardMapper {
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
                 .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
                 .build();
     }
 
