@@ -11,8 +11,8 @@ import com.server.capple.domain.report.entity.Report;
 public interface BoardReportService {
 
     BoardReport findBoardReport(Long boardReportId);
-//    BoardReportResponse.BoardReportsGet getBoardReports(Member member);
-//
+    BoardReportResponse.BoardReportsGet getMyBoardReports(Member member);
+
     BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType);
 
 //    BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType);

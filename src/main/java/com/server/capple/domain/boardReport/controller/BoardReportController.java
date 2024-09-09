@@ -34,16 +34,16 @@ public class BoardReportController {
         return BaseResponse.onSuccess(boardReportService.createBoardReport(member, request.getBoardId(), request.getBoardReportType()));
     }
 
-//    @Operation(summary = "게시판 신고함 조회 API", description = "게시판 신고함을 조회합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-//    })
-//    @GetMapping
-//    private BaseResponse<BoardReportResponse.BoardReportsGet> getBoardReports(
-//            @AuthMember Member member) {
-//        return BaseResponse.onSuccess(boardReportService.getBoardReports(member));
-//    }
-//
+    @Operation(summary = "내 게시판 신고함 조회 API", description = "내가 신고한 게시판을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/mine")
+    private BaseResponse<BoardReportResponse.BoardReportsGet> getMyBoardReports(
+            @AuthMember Member member) {
+        return BaseResponse.onSuccess(boardReportService.getMyBoardReports(member));
+    }
+
 //    @Operation(summary = "게시판 신고함 수정 API", description = "게시판 신고함을 수정합니다.")
 //    @ApiResponses(value = {
 //            @ApiResponse(responseCode = "COMMON200", description = "성공"),

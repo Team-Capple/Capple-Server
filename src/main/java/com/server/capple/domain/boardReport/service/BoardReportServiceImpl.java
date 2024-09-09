@@ -1,9 +1,7 @@
 package com.server.capple.domain.boardReport.service;
 
 import com.server.capple.domain.board.entity.Board;
-import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.service.BoardService;
-import com.server.capple.domain.boardReport.dto.BoardReportRequest;
 import com.server.capple.domain.boardReport.dto.BoardReportResponse;
 import com.server.capple.domain.boardReport.entity.BoardReport;
 import com.server.capple.domain.boardReport.entity.BoardReportType;
@@ -16,6 +14,8 @@ import com.server.capple.global.exception.errorCode.BoardReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,10 +33,17 @@ public class BoardReportServiceImpl implements BoardReportService {
                 -> new RestApiException(BoardReportErrorCode.BOARD_REPORT_NOT_FOUND));
     }
 
-//    @Override
-//    public BoardReportResponse.BoardReportsGet getBoardReports(Member member) {
-//        return null;
-//    }
+    @Override
+    public BoardReportResponse.BoardReportsGet getMyBoardReports(Member member) {
+        Member findMember = memberService.findMember(member.getId());
+
+        List<BoardReport> boardReports = boardReportRepository.findByMember(member);
+
+        return boardReportMapper.toBoardReportsGet(boardReports
+                .stream()
+                .map(boardReportMapper::toBoardReportInfo)
+                .toList());
+    }
 
     @Override
     public BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType) {

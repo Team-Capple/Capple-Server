@@ -7,6 +7,8 @@ import com.server.capple.domain.boardReport.entity.BoardReportType;
 import com.server.capple.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class BoardReportMapper {
 
@@ -21,6 +23,21 @@ public class BoardReportMapper {
     public BoardReportResponse.BoardReportCreate toBoardReportCreate(BoardReport boardReport) {
         return BoardReportResponse.BoardReportCreate.builder()
                 .boardReportId(boardReport.getId())
+                .build();
+    }
+
+    public BoardReportResponse.BoardReportsGet toBoardReportsGet(List<BoardReportResponse.BoardReportInfo> boardReportInfos) {
+        return BoardReportResponse.BoardReportsGet.builder()
+                .boardReportInfos(boardReportInfos)
+                .build();
+    }
+
+    public BoardReportResponse.BoardReportInfo toBoardReportInfo(BoardReport boardReport) {
+        return BoardReportResponse.BoardReportInfo.builder()
+                .boardReportId(boardReport.getId())
+                .reporterId(boardReport.getMember().getId())
+                .boardId(boardReport.getBoard().getId())
+                .boardReportType(boardReport.getReportType())
                 .build();
     }
 }
