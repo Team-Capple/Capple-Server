@@ -44,7 +44,7 @@ public class QuestionServiceImpl implements QuestionService {
 
         boolean isAnswered = answerRepository.existsByQuestionAndMember(mainQuestion, member);
 
-        return questionMapper.toQuestionSummary(mainQuestion, isAnswered, questionHeartRepository.getQuestionHeartsCount(mainQuestion.getId()));
+        return questionMapper.toQuestionSummary(mainQuestion, isAnswered/*, questionHeartRepository.getQuestionHeartsCount(mainQuestion.getId())*/);
     }
 
     @Override
@@ -54,8 +54,8 @@ public class QuestionServiceImpl implements QuestionService {
         return questionMapper.toQuestionInfos(questions.stream()
                 .map(questionInfo ->
                         questionMapper.toQuestionInfo(questionInfo.getQuestion(),
-                                questionInfo.getIsAnsweredByMember(),
-                                questionHeartRepository.getQuestionHeartsCount(questionInfo.getQuestion().getId()))
+                                questionInfo.getIsAnsweredByMember()/*,
+                                questionHeartRepository.getQuestionHeartsCount(questionInfo.getQuestion().getId())*/)
                 ).toList());
     }
 
