@@ -31,7 +31,7 @@ public class BoardReportController {
     private BaseResponse<BoardReportResponse.BoardReportCreate> createBoardReport(
             @AuthMember Member member,
             @RequestBody BoardReportRequest.BoardReportCreate request) {
-        return BaseResponse.onSuccess(boardReportService.createReport(member, request.getBoardReportType()));
+        return BaseResponse.onSuccess(boardReportService.createBoardReport(member, request.getBoardReportType()));
     }
 
     @Operation(summary = "게시판 신고함 조회 API", description = "게시판 신고함을 조회합니다.")
