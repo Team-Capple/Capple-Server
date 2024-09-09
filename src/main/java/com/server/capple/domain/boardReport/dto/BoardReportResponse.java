@@ -39,17 +39,20 @@ public class BoardReportResponse {
         BoardReportType boardReportType;
     }
 
-//    @Getter
-//    @Builder
-//    @AllArgsConstructor
-//    @NoArgsConstructor
-//    public static class BoardReportUpdate {
-//    }
-//
-//    @Getter
-//    @Builder
-//    @AllArgsConstructor
-//    @NoArgsConstructor
-//    public static class BoardReportResign {
-//    }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardReportUpdate {
+        Long boardReportId;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BoardReportResign {
+        Long boardReportId;
+    }
+
 }

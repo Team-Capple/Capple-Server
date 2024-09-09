@@ -44,28 +44,28 @@ public class BoardReportController {
         return BaseResponse.onSuccess(boardReportService.getMyBoardReports(member));
     }
 
-//    @Operation(summary = "게시판 신고함 수정 API", description = "게시판 신고함을 수정합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-//    })
-//    @PostMapping("/{boardReportId}")
-//    private BaseResponse<BoardReportResponse.BoardReportUpdate> updateBoardReport(
-//            @AuthMember Member member,
-//            @PathVariable(value = "boardReportId") Long reportId,
-//            @RequestBody @Valid BoardReportRequest.BoardReportUpdate request) {
-//
-//        return BaseResponse.onSuccess(boardReportService.updateBoardReport(member, reportId, request.getBoardReportType()));
-//    }
-//
-//    @Operation(summary = "게시판 신고함 삭제 API", description = "게시판 신고를 삭제합니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-//    })
-//    @DeleteMapping("/{boardReportId}")
-//    private BaseResponse<BoardReportResponse.BoardReportResign> resignBoardReport(
-//            @AuthMember Member member,
-//            @PathVariable(value = "boardReportId") Long boardReportId) {
-//
-//        return BaseResponse.onSuccess(boardReportService.resignBoardReport(member, boardReportId));
-//    }
+    @Operation(summary = "게시판 신고함 수정 API", description = "게시판 신고함을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @PostMapping("/{boardReportId}")
+    private BaseResponse<BoardReportResponse.BoardReportUpdate> updateBoardReport(
+            @AuthMember Member member,
+            @PathVariable(value = "boardReportId") Long reportId,
+            @RequestBody @Valid BoardReportRequest.BoardReportUpdate request) {
+
+        return BaseResponse.onSuccess(boardReportService.updateBoardReport(member, reportId, request.getBoardReportType()));
+    }
+
+    @Operation(summary = "게시판 신고함 삭제 API", description = "게시판 신고를 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @DeleteMapping("/{boardReportId}")
+    private BaseResponse<BoardReportResponse.BoardReportResign> resignBoardReport(
+            @AuthMember Member member,
+            @PathVariable(value = "boardReportId") Long boardReportId) {
+
+        return BaseResponse.onSuccess(boardReportService.resignBoardReport(member, boardReportId));
+    }
 }

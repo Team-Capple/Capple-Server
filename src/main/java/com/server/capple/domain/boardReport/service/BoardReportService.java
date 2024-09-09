@@ -15,8 +15,7 @@ public interface BoardReportService {
 
     BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType);
 
-//    BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType);
-//
-//    BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId);
+    BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long reportId, BoardReportType boardReportType);
 
+    BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId);
 }

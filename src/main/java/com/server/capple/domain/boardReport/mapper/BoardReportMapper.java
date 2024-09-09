@@ -16,7 +16,7 @@ public class BoardReportMapper {
         return BoardReport.builder()
                 .member(member)
                 .board(board)
-                .reportType(boardReportType)
+                .boardReportType(boardReportType)
                 .build();
     }
 
@@ -37,7 +37,19 @@ public class BoardReportMapper {
                 .boardReportId(boardReport.getId())
                 .reporterId(boardReport.getMember().getId())
                 .boardId(boardReport.getBoard().getId())
-                .boardReportType(boardReport.getReportType())
+                .boardReportType(boardReport.getBoardReportType())
+                .build();
+    }
+
+    public BoardReportResponse.BoardReportUpdate toBoardReportUpdate(BoardReport boardReport) {
+        return BoardReportResponse.BoardReportUpdate.builder()
+                .boardReportId(boardReport.getId())
+                .build();
+    }
+
+    public BoardReportResponse.BoardReportResign toBoardReportResign(BoardReport boardReport) {
+        return BoardReportResponse.BoardReportResign.builder()
+                .boardReportId(boardReport.getId())
                 .build();
     }
 }

@@ -9,13 +9,16 @@ import com.server.capple.domain.boardReport.mapper.BoardReportMapper;
 import com.server.capple.domain.boardReport.repository.BoardReportRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
+import com.server.capple.domain.report.entity.Report;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardReportErrorCode;
+import com.server.capple.global.exception.errorCode.ReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,13 +62,36 @@ public class BoardReportServiceImpl implements BoardReportService {
         return boardReportMapper.toBoardReportCreate(boardReport);
     }
 
-//    @Override
-//    public BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long reportId, BoardReportType boardReportType) {
-//        return null;
-//    }
-//
-//    @Override
-//    public BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId) {
-//        return null;
-//    }
+    @Override
+    public BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType) {
+        Member reportMember = memberService.findMember(member.getId());
+
+        BoardReport boardReport = boardReportRepository.findById(boardReportId)
+                .orElseThrow(() -> new RestApiException(BoardReportErrorCode.BOARD_REPORT_NOT_FOUND));
+
+        // 만약 본인이 작성자가 아니면
+        if (!reportMember.getId().equals(boardReport.getBoard().getWriter().getId())) {
+            throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_NO_AUTHORIZATION);
+        }
+
+        boardReport.updateBoardReportType(boardReportType);
+
+        return boardReportMapper.toBoardReportUpdate(boardReport);
+    }
+
+    @Override
+    public BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId) {
+        Member reportMember = memberService.findMember(member.getId());
+
+        BoardReport boardReport = boardReportRepository.findById(boardReportId)
+                .orElseThrow(() -> new RestApiException(BoardReportErrorCode.BOARD_REPORT_NOT_FOUND));
+
+        // 만약 본인이 작성자가 아니면
+        if (!reportMember.getId().equals(boardReport.getBoard().getWriter().getId())) {
+            throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_NO_AUTHORIZATION);
+        }
+
+        boardReport.delete();
+        return boardReportMapper.toBoardReportResign(boardReport);
+    }
 }

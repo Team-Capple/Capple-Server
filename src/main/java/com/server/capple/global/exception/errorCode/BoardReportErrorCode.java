@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 public enum BoardReportErrorCode implements ErrorCodeInterface {
     BOARD_REPORT_NOT_FOUND("BOARDREPORT001", "게시글 신고가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     BOARD_REPORT_ALREADY_EXIST("BOARDREPORT002", "이미 신고한 게시글입니다.", HttpStatus.ALREADY_REPORTED),
+    BOARD_REPORT_NO_AUTHORIZATION("BOARDREPORT003", "해당 신고를 삭제할 권한이 없습니다.", HttpStatus.FORBIDDEN)
     ;
     private final String code;
     private final String message;

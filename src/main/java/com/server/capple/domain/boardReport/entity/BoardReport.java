@@ -29,5 +29,9 @@ public class BoardReport extends BaseEntity {
     private Board board;
 
     @Column(nullable = false)
-    private BoardReportType reportType;
+    private BoardReportType boardReportType;
+
+    public void updateBoardReportType(BoardReportType boardReportType) {
+        this.boardReportType = boardReportType;
+    }
 }
