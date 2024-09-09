@@ -9,16 +9,13 @@ import com.server.capple.domain.boardReport.mapper.BoardReportMapper;
 import com.server.capple.domain.boardReport.repository.BoardReportRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
-import com.server.capple.domain.report.entity.Report;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardReportErrorCode;
-import com.server.capple.global.exception.errorCode.ReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,8 +34,12 @@ public class BoardReportServiceImpl implements BoardReportService {
     }
 
     @Override
+    public Boolean isReporter(Long reporterId, Long memberId) {
+        return reporterId.equals(memberId);
+    }
+
+    @Override
     public BoardReportResponse.BoardReportsGet getMyBoardReports(Member member) {
-        Member findMember = memberService.findMember(member.getId());
 
         List<BoardReport> boardReports = boardReportRepository.findByMember(member);
 
@@ -50,48 +51,44 @@ public class BoardReportServiceImpl implements BoardReportService {
 
     @Override
     public BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType) {
-        Member reportMember = memberService.findMember(member.getId());
 
         Board board = boardService.findBoard(boardId);
 
-        if (boardReportRepository.existsByMemberAndBoard(reportMember, board)) {
+        if (boardReportRepository.existsByMemberAndBoard(member, board)) {
             throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_ALREADY_EXIST);
         }
-        BoardReport boardReport = boardReportRepository.save(boardReportMapper.toBoardReport(reportMember, board, boardReportType));
+        BoardReport boardReport = boardReportRepository.save(boardReportMapper.toBoardReport(member, board, boardReportType));
 
         return boardReportMapper.toBoardReportCreate(boardReport);
     }
 
     @Override
     public BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType) {
-        Member reportMember = memberService.findMember(member.getId());
 
-        BoardReport boardReport = boardReportRepository.findById(boardReportId)
-                .orElseThrow(() -> new RestApiException(BoardReportErrorCode.BOARD_REPORT_NOT_FOUND));
+        BoardReport boardReport = findBoardReport(boardReportId);
 
         // 만약 본인이 작성자가 아니면
-        if (!reportMember.getId().equals(boardReport.getBoard().getWriter().getId())) {
-            throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_NO_AUTHORIZATION);
+        if (isReporter(member.getId(), boardReport.getMember().getId())) {
+            boardReport.updateBoardReportType(boardReportType);
+        } else {
+             throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_NO_AUTHORIZATION);
         }
-
-        boardReport.updateBoardReportType(boardReportType);
 
         return boardReportMapper.toBoardReportUpdate(boardReport);
     }
 
     @Override
     public BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId) {
-        Member reportMember = memberService.findMember(member.getId());
 
-        BoardReport boardReport = boardReportRepository.findById(boardReportId)
-                .orElseThrow(() -> new RestApiException(BoardReportErrorCode.BOARD_REPORT_NOT_FOUND));
+        BoardReport boardReport = findBoardReport(boardReportId);
 
         // 만약 본인이 작성자가 아니면
-        if (!reportMember.getId().equals(boardReport.getBoard().getWriter().getId())) {
+        if (isReporter(member.getId(), boardReport.getMember().getId())) {
+            boardReport.delete();
+        } else {
             throw new RestApiException(BoardReportErrorCode.BOARD_REPORT_NO_AUTHORIZATION);
         }
 
-        boardReport.delete();
         return boardReportMapper.toBoardReportResign(boardReport);
     }
 }

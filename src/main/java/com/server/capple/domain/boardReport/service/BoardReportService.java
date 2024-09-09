@@ -11,6 +11,9 @@ import com.server.capple.domain.report.entity.Report;
 public interface BoardReportService {
 
     BoardReport findBoardReport(Long boardReportId);
+
+    Boolean isReporter(Long reporterId, Long memberId);
+
     BoardReportResponse.BoardReportsGet getMyBoardReports(Member member);
 
     BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType);

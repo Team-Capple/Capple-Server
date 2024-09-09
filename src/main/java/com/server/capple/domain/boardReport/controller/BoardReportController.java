@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "게시판 신고 API", description = "게시판 신고 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/board-reports")
+@RequestMapping("/boardReports")
 public class BoardReportController {
 
     private final BoardReportService boardReportService;
