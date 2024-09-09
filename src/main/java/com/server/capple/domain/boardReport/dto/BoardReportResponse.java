@@ -12,26 +12,27 @@ public class BoardReportResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardReportCreate {
+        Long boardReportId;
     }
 
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardReportsGet {
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardReportUpdate {
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardReportResign {
-    }
+//    @Getter
+//    @Builder
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class BoardReportsGet {
+//    }
+//
+//    @Getter
+//    @Builder
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class BoardReportUpdate {
+//    }
+//
+//    @Getter
+//    @Builder
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class BoardReportResign {
+//    }
 }

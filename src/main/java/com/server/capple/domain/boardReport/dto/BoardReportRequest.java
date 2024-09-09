@@ -14,7 +14,6 @@ public class BoardReportRequest {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardReportCreate {
-        Long memberId;
         Long boardId;
         BoardReportType boardReportType;
     }

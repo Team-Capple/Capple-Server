@@ -11,12 +11,12 @@ import com.server.capple.domain.report.entity.Report;
 public interface BoardReportService {
 
     BoardReport findBoardReport(Long boardReportId);
-    BoardReportResponse.BoardReportsGet getBoardReports(Member member);
+//    BoardReportResponse.BoardReportsGet getBoardReports(Member member);
+//
+    BoardReportResponse.BoardReportCreate createBoardReport(Member member, Long boardId, BoardReportType boardReportType);
 
-    BoardReportResponse.BoardReportCreate createBoardReport(Member member, BoardReportType boardReportType);
-
-    BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType);
-
-    BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId);
+//    BoardReportResponse.BoardReportUpdate updateBoardReport(Member member, Long boardReportId, BoardReportType boardReportType);
+//
+//    BoardReportResponse.BoardReportResign resignBoardReport(Member member, Long boardReportId);
 
 }
