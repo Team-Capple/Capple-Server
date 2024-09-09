@@ -26,20 +26,15 @@ public class QuestionHeartRedisRepository implements Serializable {
     public Boolean toggleBoardHeart(Long memberId, Long boardId) {
         String key = QUESTION_HEART_KEY_PREFIX + boardId.toString();
         String member = MEMBER_KEY_PREFIX + memberId.toString();
-        String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKey
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
         //해당 key에 member가 존재하지 않으면 추가, 존재하면 삭제
         if (FALSE.equals(setOperations.isMember(key, member))) {
             setOperations.add(key, member);
-            // 현재 시간을 createAtKey로 저장
-            valueOperations.set(createAtKey, LocalDateTime.now().toString());
             return TRUE;
         } else {
             setOperations.remove(key, member);
             // 좋아요 취소 시 생성 시간도 삭제할 수 있음
-            redisTemplate.delete(createAtKey);
             return FALSE;
         }
     }
