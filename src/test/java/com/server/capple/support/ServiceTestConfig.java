@@ -85,7 +85,6 @@ public abstract class ServiceTestConfig {
                         .content("아카데미 러너 중 가장 마음에 드는 유형이 있나요?")
                         .questionStatus(QuestionStatus.LIVE)
                         .livedAt(LocalDateTime.now())
-                        .commentCount(0)
                         .build()
         );
     }
@@ -96,7 +95,6 @@ public abstract class ServiceTestConfig {
                         .content("오늘 뭐 먹을 거에요?")
                         .questionStatus(QuestionStatus.OLD)
                         .livedAt(LocalDateTime.of(2024, 04, 01, 00, 00, 00))
-                        .commentCount(0)
                         .build()
         );
     }
@@ -106,7 +104,6 @@ public abstract class ServiceTestConfig {
                 Question.builder()
                         .content("가장 좋아하는 음식은 무엇인가요?")
                         .questionStatus(QuestionStatus.PENDING)
-                        .commentCount(0)
                         .build()
         );
     }
@@ -132,7 +129,7 @@ public abstract class ServiceTestConfig {
                         .boardType(BoardType.FREEBOARD)
                         .writer(member)
                         .content("오늘 밥먹을 사람!")
-                        .commentCount(2)
+                        .commentCount(0)
                         .build());
     }
     protected BoardComment createBoardComment() {
