@@ -40,6 +40,10 @@ public class AnswerServiceImpl implements AnswerService {
         Member member = memberService.findMember(loginMember.getId());
         Question question = questionService.findQuestion(questionId);
 
+        if (answerRepository.existsByQuestionAndMember(question, loginMember)) {
+            throw new RestApiException(AnswerErrorCode.ANSWER_ALREADY_EXIST);
+        }
+
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
         answer.getQuestion().increaseCommentCount();
