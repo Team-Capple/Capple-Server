@@ -29,14 +29,14 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported, Boolean isLiked) {
+    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported, Boolean isLiked, Boolean isMine) {
         return AnswerInfo.builder()
                 .answerId(answer.getId())
                 .writerId(answer.getMember().getId())
                 .profileImage(answer.getMember().getProfileImage())
                 .nickname(answer.getMember().getNickname())
                 .content(answer.getContent())
-                .isMyAnswer(answer.getMember().getId() == memberId)
+                .isMine(isMine)
                 .isReported(isReported)
                 .isLiked(isLiked)
                 .writeAt(answer.getCreatedAt().toString())

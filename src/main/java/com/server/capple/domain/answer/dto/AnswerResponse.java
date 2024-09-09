@@ -20,7 +20,7 @@ public class AnswerResponse {
         private String profileImage;
         private String nickname;
         private String content;
-        private Boolean isMyAnswer;
+        private Boolean isMine;
         private Boolean isReported;
         private Boolean isLiked;
         private String writeAt;
