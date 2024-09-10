@@ -2,24 +2,15 @@ package com.server.capple.dummy;
 
 
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
-import com.server.capple.domain.board.repository.BoardRepository;
-import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.repository.MemberRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
-
 @Service
 @RequiredArgsConstructor
 public class DummyService {
-   // private final DummyRepository dummyRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
 
     @PersistenceContext
