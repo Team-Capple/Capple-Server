@@ -101,7 +101,7 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
         AnswerCommentInfos response = answerCommentService.getAnswerCommentInfos(answer.getId());
 
         //then
-        assertEquals("루시", response.getAnswerCommentInfos().get(0).getWriter());
+        assertEquals(member.getId(), response.getAnswerCommentInfos().get(0).getWriterId());
         assertEquals("답변에 대한 댓글이어유", response.getAnswerCommentInfos().get(0).getContent());
         assertEquals(0L, response.getAnswerCommentInfos().get(0).getHeartCount());
     }

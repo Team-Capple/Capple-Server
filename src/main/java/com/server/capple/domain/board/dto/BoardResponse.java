@@ -25,7 +25,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsGetByBoardType {
-        private List<BoardsGetByBoardTypeBoardInfo> boards = new ArrayList<>();
+        private List<BoardsGetByBoardTypeBoardInfo> boards;
     }
 
     @Getter
@@ -39,6 +39,10 @@ public class BoardResponse {
         private Integer heartCount;
         private Integer commentCount;
         private LocalDateTime createAt;
+        private Boolean liLiked;
+        private Boolean isMine;
+        private Boolean isReported;
+        private Boolean isLiked;
     }
 
     @Getter
@@ -54,7 +58,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsSearchByKeyword {
-        private List<BoardsSearchByKeywordBoardInfo> boards = new ArrayList<>();
+        private List<BoardsSearchByKeywordBoardInfo> boards;
     }
 
     @Getter

@@ -129,7 +129,7 @@ public abstract class ServiceTestConfig {
                         .boardType(BoardType.FREEBOARD)
                         .writer(member)
                         .content("오늘 밥먹을 사람!")
-                        .commentCount(2)
+                        .commentCount(0)
                         .build());
     }
     protected BoardComment createBoardComment() {
