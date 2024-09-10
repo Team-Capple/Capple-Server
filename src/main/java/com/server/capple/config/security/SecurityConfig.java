@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/reports", "/reports/**").authenticated()
                 .requestMatchers("/boards", "/boards/**").authenticated()
                 .requestMatchers("/boardComments", "/boardComments/**").authenticated()
+                .requestMatchers("/boardCommentReports", "/boardCommentReports/**").authenticated()
                 .requestMatchers("/dummy","/dummy/**").hasRole(Role.ROLE_ADMIN.getName())
                 .anyRequest().denyAll());
         http
