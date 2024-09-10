@@ -110,5 +110,6 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         assertEquals("게시글 댓글", response.getBoardCommentInfos().get(0).getContent());
         assertEquals(0, response.getBoardCommentInfos().get(0).getHeartCount());
         assertEquals(false, response.getBoardCommentInfos().get(0).getIsLiked());
+        assertEquals(true, response.getBoardCommentInfos().get(0).getIsMine());
     }
 }

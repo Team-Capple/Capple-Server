@@ -88,7 +88,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                         comment -> {
                             Integer heartCount = boardCommentHeartRedisRepository.getBoardCommentsCount(comment.getId());
                             Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
-                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked);
+                            Boolean isMine = comment.getMember().getId().equals(member.getId());
+                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked, isMine);
                         }).toList();
 
         return new BoardCommentInfos(commentInfos);
@@ -100,9 +101,9 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                 .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
                         comment -> {
                             Boolean isLiked = boardCommentHeartRepository.findByMemberAndBoardComment(member, comment)
-                                    .map(BoardCommentHeart::isLiked)
-                                    .orElse(false);
-                            return boardCommentMapper.toBoardCommentInfo(comment, isLiked);
+                                    .isPresent();
+                            Boolean isMine = comment.getMember().getId().equals(member.getId());
+                            return boardCommentMapper.toBoardCommentInfo(comment, isLiked, isMine);
                         }).toList();
 
         return new BoardCommentInfos(commentInfos);
