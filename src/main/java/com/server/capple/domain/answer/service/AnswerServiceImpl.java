@@ -90,14 +90,14 @@ public class AnswerServiceImpl implements AnswerService {
                     answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId()), answer.getMember().getId().equals(memberId)))
                             .toList());
         } else {
             return answerMapper.toAnswerList(
                     answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
                                     -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
                             .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer)))
+                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId()), answer.getMember().getId().equals(memberId)))
                             .toList());
         }
 
@@ -109,7 +109,7 @@ public class AnswerServiceImpl implements AnswerService {
         List<Answer> answers = answerRepository.findByMember(member).orElse(null);
         return answerMapper.toMemberAnswerList(
                 answers.stream()
-                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId())))
+                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())))
                         .toList()
         );
     }
@@ -120,11 +120,10 @@ public class AnswerServiceImpl implements AnswerService {
         return answerMapper.toMemberAnswerList(
                 answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
                         .stream()
-                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId)))
+                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answerId)))
                         .toList()
         );
     }
-
 
     //로그인된 유저와 작성자가 같은지 체크
     private void checkPermission(Member loginMember, Answer answer) {
