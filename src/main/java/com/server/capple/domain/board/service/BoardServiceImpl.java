@@ -5,6 +5,7 @@ import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
+import com.server.capple.domain.board.repository.BoardHeartRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.exception.RestApiException;
@@ -22,7 +23,9 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
-    private final BoardMapper  boardMapper;
+    private final BoardMapper boardMapper;
+    private final BoardHeartRepository boardHeartRepository;
+
     @Override
     public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
         Board board;
@@ -36,7 +39,7 @@ public class BoardServiceImpl implements BoardService {
 
     //redis
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType) {
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
         List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();
@@ -48,14 +51,20 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .map(board -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
+                    boolean isMine =  board.getWriter().getId().equals(member.getId());
+                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, heartCount, isLiked, isMine, false);
+                })
                 .toList()
         );
     }
 
     //rdb
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRDB(BoardType boardType) {
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRDB(Member member, BoardType boardType) {
         List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();
@@ -67,7 +76,12 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board))
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .map(board -> {
+                    boolean isLiked = boardHeartRepository.findByMemberAndBoard(member,board).isPresent();
+                    boolean isMine =  board.getWriter().getId().equals(member.getId());
+                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, isLiked, isMine,false);
+                })
                 .toList()
         );
     }
@@ -91,7 +105,6 @@ public class BoardServiceImpl implements BoardService {
                 .toList());
     }
 
-    //redis 용
     @Override
     public BoardResponse.ToggleBoardHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
@@ -106,4 +119,6 @@ public class BoardServiceImpl implements BoardService {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
+
+
 }

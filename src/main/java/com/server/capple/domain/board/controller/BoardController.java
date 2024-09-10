@@ -46,11 +46,12 @@ public class BoardController {
     })
     @GetMapping()
     private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
+            @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
             ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(boardType));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
     }
 
     @Operation(summary = "카테고리별 게시글 조회 WITH RDB API (프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
@@ -59,11 +60,12 @@ public class BoardController {
     })
     @GetMapping("/rdb")
     private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRDB(
+            @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRDB(boardType));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRDB(member, boardType));
     }
 
     @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")

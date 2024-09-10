@@ -100,7 +100,7 @@ public abstract class ControllerTestConfig {
         List<AnswerResponse.MemberAnswerInfo> memberAnswerInfos = List.of(AnswerResponse.MemberAnswerInfo.builder()
                 .questionId(answer.getQuestion().getId())
                 .answerId(answer.getId())
-                .nickname(answer.getMember().getNickname())
+                .writerId(member.getId())
                 .profileImage(answer.getMember().getProfileImage())
                 .content(answer.getContent())
                 .heartCount(1)
@@ -117,7 +117,7 @@ public abstract class ControllerTestConfig {
         List<BoardCommentInfo> commentInfos =
                 List.of(BoardCommentInfo.builder()
                         .boardCommentId(1L)
-                        .writer(member.getNickname())
+                        .writerId(member.getId())
                         .content("댓글")
                         .createdAt(LocalDateTime.now())
                         .heartCount(2)
@@ -136,7 +136,7 @@ public abstract class ControllerTestConfig {
     protected AnswerCommentInfos getAnswerCommentInfos () {
         List<AnswerCommentInfo> answerCommentInfos = List.of(AnswerCommentInfo.builder()
                 .answerCommentId(1L)
-                .writer(member.getNickname())
+                .writerId(member.getId())
                 .content("댓글 1")
                 .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
                 .heartCount(3L)

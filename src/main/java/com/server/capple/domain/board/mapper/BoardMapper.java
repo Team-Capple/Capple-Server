@@ -11,11 +11,7 @@ import java.util.List;
 @Component
 public class BoardMapper {
 
-    public Board toBoard(
-            Member member,
-            BoardType boardType,
-            String content
-    ) {
+    public Board toBoard(Member member, BoardType boardType, String content) {
         return Board.builder()
                 .writer(member)
                 .boardType(boardType)
@@ -25,9 +21,7 @@ public class BoardMapper {
                 .build();
     }
 
-    public BoardResponse.BoardCreate toBoardCreate(
-            Board board
-            ) {
+    public BoardResponse.BoardCreate toBoardCreate(Board board) {
         return BoardResponse.BoardCreate.builder()
                 .boardId(board.getId())
                 .build();
@@ -43,7 +37,11 @@ public class BoardMapper {
 
     //redis
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
-            Board board, Integer boardHeartsCount) {
+            Board board,
+            Integer boardHeartsCount,
+            Boolean isLiked,
+            Boolean isMine,
+            Boolean isReported) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
@@ -51,11 +49,18 @@ public class BoardMapper {
                 .heartCount(boardHeartsCount)
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
+                .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
                 .build();
     }
 
     //rdb
-    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(Board board) {
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(Board board,
+                                                                                       Boolean isLiked,
+                                                                                       Boolean isMine,
+                                                                                       Boolean isReported) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
@@ -63,6 +68,10 @@ public class BoardMapper {
                 .heartCount(board.getHeartCount())
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
+                .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
                 .build();
     }
 

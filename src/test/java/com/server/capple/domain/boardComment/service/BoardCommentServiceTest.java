@@ -106,7 +106,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         BoardCommentInfos response = boardCommentService.getBoardCommentInfos(member, board.getId());
 
         //then
-        assertEquals("루시", response.getBoardCommentInfos().get(0).getWriter());
+        assertEquals(member.getId(), response.getBoardCommentInfos().get(0).getWriterId());
         assertEquals("게시글 댓글", response.getBoardCommentInfos().get(0).getContent());
         assertEquals(0, response.getBoardCommentInfos().get(0).getHeartCount());
         assertEquals(false, response.getBoardCommentInfos().get(0).getIsLiked());
