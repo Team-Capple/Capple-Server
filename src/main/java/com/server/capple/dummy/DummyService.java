@@ -31,7 +31,7 @@ public class DummyService {
                 .setParameter("memberCount", memberCount)
                 .setParameter("boardCount", boardCount)
                 .getSingleResult(); //프로시저 수행 후 아무것도 반환하지 않음
-        //excuteUpdate() 수행시 int 값을 반환해야하는데, 반환하지 않아서 Error -> getSingleResult() 사용해서 null값 받음
+        //executeUpdate() 수행시 int 값을 반환해야하는데, 반환하지 않아서 Error -> getSingleResult() 사용해서 null값 받음
     }
 
 
