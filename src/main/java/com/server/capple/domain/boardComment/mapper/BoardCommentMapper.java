@@ -13,7 +13,7 @@ public class BoardCommentMapper {
                 .member(member)
                 .board(board)
                 .content(comment)
-                .isReport(false)
+                .isReport(Boolean.FALSE)
                 .build();
     }
 
