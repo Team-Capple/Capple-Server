@@ -44,15 +44,21 @@ public class BoardMapper {
 
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board,
-            Integer boardHeartsCount) {
+            Integer boardHeartsCount,
+            Boolean isLiked,
+            Boolean isMine,
+            Boolean isReported) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
                 .heartCount(boardHeartsCount)
-                // TODO : 댓글 작성 API 나오면 추후 구현
-                .commentCount(0)
+                .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
+                .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
                 .build();
     }
 

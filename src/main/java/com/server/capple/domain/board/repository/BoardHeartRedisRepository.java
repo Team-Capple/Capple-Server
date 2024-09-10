@@ -24,7 +24,7 @@ public class BoardHeartRedisRepository implements Serializable {
     private final RedisTemplate<String, String> redisTemplate;
 
     // 게시판 좋아요 토글
-    public Boolean toggleBoardHeart(Long boardId, Long memberId) {
+    public Boolean toggleBoardHeart(Long memberId, Long boardId) {
         String key = BOARD_HEART_KEY_PREFIX + boardId.toString();
         String member = MEMBER_KEY_PREFIX + memberId.toString();
         String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKey
@@ -45,7 +45,6 @@ public class BoardHeartRedisRepository implements Serializable {
         }
     }
 
-    //
     public String getBoardHeartCreateAt(Long boardId, Long memberId) {
         String createAtKey = BOARD_HEART_KEY_PREFIX + boardId.toString() + ":" + MEMBER_KEY_PREFIX + memberId.toString() + ":createAt";
         return redisTemplate.opsForValue().get(createAtKey);
@@ -73,6 +72,11 @@ public class BoardHeartRedisRepository implements Serializable {
         return boardIds;
     }
 
+    public boolean isMemberLikedBoard(Long memberId, Long boardId) {
+        String key = BOARD_HEART_KEY_PREFIX + boardId;
+        String memberKey = MEMBER_KEY_PREFIX + memberId;
+        return redisTemplate.opsForSet().isMember(key, memberKey);
+    }
 
     //더미 데이터 생성용
     public void generateDummyBoardLikes(int boardCount) {
