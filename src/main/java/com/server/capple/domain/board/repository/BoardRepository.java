@@ -14,7 +14,4 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b WHERE b.content LIKE %:keyword%")
     List<Board> findBoardsByKeyword(String keyword);
-
-    @Query(value = "SELECT generate_dummy_boards(:num)", nativeQuery = true)
-    void generateDummyBoards(@Param("num") int num);
 }

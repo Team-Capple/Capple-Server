@@ -19,37 +19,30 @@ import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 @Service
 @RequiredArgsConstructor
 public class DummyService {
-    private final BoardRepository boardRepository;
+   // private final DummyRepository dummyRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
-    private final MemberRepository memberRepository;
 
     @PersistenceContext
     private EntityManager em;
 
+    //멤버, 게시글, 게시글 좋아요 생성
     @Transactional
-    public Object generateDummyBoards(int num) {
-        boardRepository.generateDummyBoards(num);
+    public Object generateDummy(int memberCount, int boardCount) {
+        generateDummyData(memberCount,boardCount);
         em.flush();
-        boardHeartRedisRepository.generateDummyBoardLikes(num);
+        boardHeartRedisRepository.generateDummyBoardLikes(memberCount, boardCount);
         return null;
     }
 
     @Transactional
-    public Object generateDummyMembers() {
-        List<Member> members = new ArrayList<>();
-
-        for (long i = 1; i <= 10; i++) {
-            Member member = Member.builder()
-                    .nickname("User" + i)
-                    .email("user" + i + "@example.com")
-                    .sub("sub" + i)
-                    .role(ROLE_ACADEMIER)
-                    .build();
-
-            members.add(member);
-        }
-
-        memberRepository.saveAll(members);
-        return null;
+    public void generateDummyData(int memberCount, int boardCount) {
+        em.createNativeQuery("select generate_dummy_data(:memberCount, :boardCount)")
+                .setParameter("memberCount", memberCount)
+                .setParameter("boardCount", boardCount)
+                .getSingleResult(); //프로시저 수행 후 아무것도 반환하지 않음
+        //excuteUpdate() 수행시 int 값을 반환해야하는데, 반환하지 않아서 Error -> getSingleResult() 사용해서 null값 받음
     }
+
+
+
 }
