@@ -13,16 +13,19 @@ public class BoardCommentMapper {
                 .member(member)
                 .board(board)
                 .content(comment)
+                .isReport(false)
                 .build();
     }
 
-    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Long heartCount, Boolean isLiked) {
+    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Long heartCount, Boolean isLiked, Boolean isMine) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())
                 .writerId(comment.getMember().getId())
                 .content(comment.getContent())
                 .heartCount(heartCount)
                 .isLiked(isLiked)
+                .isMine(isMine)
+                .isReport(comment.getIsReport())
                 .createdAt(comment.getCreatedAt())
                 .build();
     }

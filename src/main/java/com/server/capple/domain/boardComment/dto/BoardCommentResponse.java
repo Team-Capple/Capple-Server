@@ -30,6 +30,8 @@ public class BoardCommentResponse {
         private String content;
         private Long heartCount;
         private Boolean isLiked;
+        private Boolean isMine;
+        private Boolean isReport;
         private LocalDateTime createdAt;
     }
 

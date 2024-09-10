@@ -1,7 +1,6 @@
 package com.server.capple.domain.boardCommentReport.service;
 
 import com.server.capple.domain.boardComment.entity.BoardComment;
-import com.server.capple.domain.boardComment.mapper.BoardCommentMapper;
 import com.server.capple.domain.boardComment.service.BoardCommentService;
 import com.server.capple.domain.boardCommentReport.dto.BoardCommentReportResponse;
 import com.server.capple.domain.boardCommentReport.entity.BoardCommentReport;
@@ -36,6 +35,7 @@ public class BoardCommentReportServiceImpl implements BoardCommentReportService 
 
         // 신고
         BoardCommentReport newReport = boardCommentReportMapper.toBoardCommentReportEntity(member, boardComment, boardCommentReportType);
+        boardComment.submitReport();
         boardCommentReportRepository.save(newReport);
 
         return new BoardCommentReportResponse.BoardCommentReportCreate(newReport.getId());

@@ -82,7 +82,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                         comment -> {
                             Long heartCount = boardCommentHeartRedisRepository.getBoardCommentsCount(comment.getId());
                             Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
-                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked);
+                            Boolean isMine = member.getId().equals(comment.getMember().getId());
+                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked, isMine);
                         }).toList();
 
         return new BoardCommentInfos(commentInfos);
