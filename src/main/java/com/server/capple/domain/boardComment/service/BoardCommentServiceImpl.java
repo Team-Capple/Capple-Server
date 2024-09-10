@@ -9,6 +9,7 @@ import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardComme
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardComment.entity.BoardCommentHeart;
+import com.server.capple.domain.boardComment.mapper.BoardCommentHeartMapper;
 import com.server.capple.domain.boardComment.mapper.BoardCommentMapper;
 import com.server.capple.domain.boardComment.repository.BoardCommentHeartRedisRepository;
 import com.server.capple.domain.boardComment.repository.BoardCommentHeartRepository;
@@ -33,6 +34,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     private final BoardCommentHeartRedisRepository boardCommentHeartRedisRepository;
     private final BoardCommentHeartRepository boardCommentHeartRepository;
     private final BoardCommentMapper boardCommentMapper;
+    private final BoardCommentHeartMapper boardCommentHeartMapper;
 
     @Override
     @Transactional
@@ -71,32 +73,24 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         return new BoardCommentId(boardComment.getId());
     }
 
-    //redis 용
     @Override
     @Transactional
-    public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId) {
-        Boolean isLiked = boardCommentHeartRedisRepository.
-                toggleBoardCommentHeart(commentId, member.getId());
-
-        return new ToggleBoardCommentHeart(commentId, isLiked);
+    public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long boardCommentId) {
+        BoardComment boardComment = findBoardComment(boardCommentId);
+        //boardCommentHeart에 없다면 새로 저장
+        BoardCommentHeart boardCommentHeart = boardCommentHeartRepository.findByMemberAndBoardComment(member, boardComment)
+                .orElseGet(() -> {
+                    BoardCommentHeart newHeart = boardCommentHeartMapper.toBoardCommentHeart(boardComment, member);
+                    return boardCommentHeartRepository.save(newHeart);
+                });
+        boolean isLiked = boardCommentHeart.toggleHeart();
+        boardComment.setHeartCount(boardCommentHeart.isLiked());
+        return new ToggleBoardCommentHeart(boardCommentId, isLiked);
     }
 
+    //rdb
     @Override
     public BoardCommentInfos getBoardCommentInfos(Member member, Long boardId) {
-        List<BoardCommentInfo> commentInfos = boardCommentRepository
-                .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
-                        comment -> {
-                            Integer heartCount = boardCommentHeartRedisRepository.getBoardCommentsCount(comment.getId());
-                            Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
-                            Boolean isMine = comment.getMember().getId().equals(member.getId());
-                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked, isMine);
-                        }).toList();
-
-        return new BoardCommentInfos(commentInfos);
-    }
-
-    @Override
-    public BoardCommentInfos getBoardCommentInfosWithRDB(Member member, Long boardId) {
         List<BoardCommentInfo> commentInfos = boardCommentRepository
                 .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
                         comment -> {

@@ -34,11 +34,11 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
-    @Operation(summary = "카테고리별 게시글 조회 with REDIS API", description = "카테고리별 게시글을 조회합니다.")
+    @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
-    @GetMapping()
+    @GetMapping("/redis")
     private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
@@ -48,11 +48,11 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
     }
 
-    @Operation(summary = "카테고리별 게시글 조회 WITH RDB API (프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
+    @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
-    @GetMapping("/rdb")
+    @GetMapping()
     private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRDB(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
