@@ -6,7 +6,9 @@ import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
+import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
+    private final NotificationService notificationService;
+    private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
     public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
@@ -33,6 +37,7 @@ public class BoardServiceImpl implements BoardService {
         } else {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
+        boardSubscribeMemberService.createBoardSubscribeMember(member, board);
         return boardMapper.toBoardCreate(board);
     }
 
@@ -49,8 +54,8 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
-                .toList()
+            .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+            .toList()
         );
     }
 
@@ -62,6 +67,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         board.delete();
+        boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
         return boardMapper.toBoardDelete(board);
     }
 
@@ -69,23 +75,22 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
         List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
         return boardMapper.toBoardsSearchByKeyword(boards.stream()
-                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
-                .toList());
+            .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+            .toList());
     }
 
     @Override
     public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
-        System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
-
-        Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
+        boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
+        if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
         return new BoardResponse.BoardToggleHeart(boardId, isLiked);
     }
 
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
 

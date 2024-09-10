@@ -11,9 +11,9 @@ public class ApnsClientRequest {
     @ToString
     public static class SimplePushBody {
         private Aps aps;
-
-        public SimplePushBody(String title, String subTitle, String body, Integer badge, String threadId, String targetContentId) {
-            this.aps = new Aps(new Aps.Alert(title, subTitle, body), badge, threadId, targetContentId);
+        @Builder
+        public SimplePushBody(String title, String subTitle, String body, Integer badge, String sound, String threadId, String targetContentId) {
+            this.aps = new Aps(new Aps.Alert(title, subTitle, body), badge, sound, threadId, targetContentId);
         }
 
         @ToString
@@ -23,6 +23,8 @@ public class ApnsClientRequest {
         public static class Aps {
             private Alert alert;
             private Integer badge;
+            @Schema(defaultValue = "default")
+            private String sound; // Library/Sounds 폴더 내의 파일 이름
             @JsonProperty("thread-id")
             private String threadId;
             @JsonProperty("target-content-id")
@@ -58,7 +60,7 @@ public class ApnsClientRequest {
             private Integer badge; // 앱 아이콘에 표시할 뱃지 숫자
             @Schema(defaultValue = "default")
             private String sound; // Library/Sounds 폴더 내의 파일 이름
-            @Schema(defaultValue = "thread-id")
+            @JsonProperty("thread-id")
             private String threadId; // 알림 그룹화를 위한 thread id (UNNotificationContent 객체의 threadIdentifier와 일치해야 함)
             private String category; // 알림 그룹화를 위한 category, (UNNotificationCategory 식별자와 일치해야 함)
             @Schema(defaultValue = "0")

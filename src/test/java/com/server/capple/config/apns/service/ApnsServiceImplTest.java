@@ -34,7 +34,7 @@ class ApnsServiceImplTest {
         String targetContentId = "targetContentId";
 
         //when
-        Boolean result = apnsService.sendApns(new SimplePushBody(title, subTitle, body, null, threadId, targetContentId), List.of(simulatorDeviceToken));
+        Boolean result = apnsService.sendApns(new SimplePushBody(title, subTitle, body, null, "default", threadId, targetContentId), List.of(simulatorDeviceToken));
 
         //then
         assertTrue(result);
@@ -55,7 +55,7 @@ class ApnsServiceImplTest {
         for (int i = 0; i < 100; i++) deviceTokens.add(simulatorDeviceToken);
 
         //when
-        Boolean result = apnsService.sendApns(new SimplePushBody(title, subTitle, body, null, threadId, targetContentId), deviceTokens);
+        Boolean result = apnsService.sendApns(new SimplePushBody(title, subTitle, body, null, "default", threadId, targetContentId), deviceTokens);
 
         //then
         assertTrue(result);
