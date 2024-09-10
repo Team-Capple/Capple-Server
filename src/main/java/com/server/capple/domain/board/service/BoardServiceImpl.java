@@ -42,9 +42,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     //redis
-
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
         List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();
@@ -69,7 +68,7 @@ public class BoardServiceImpl implements BoardService {
 
     //rdb
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRDB(Member member, BoardType boardType) {
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
         List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();

@@ -39,7 +39,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/redis")
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
+    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
@@ -53,13 +53,13 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping()
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRDB(
+    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
     ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRDB(member, boardType));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
     }
 
     @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")
