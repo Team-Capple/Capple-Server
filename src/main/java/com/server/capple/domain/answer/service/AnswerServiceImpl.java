@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
@@ -40,8 +41,13 @@ public class AnswerServiceImpl implements AnswerService {
         Member member = memberService.findMember(loginMember.getId());
         Question question = questionService.findQuestion(questionId);
 
+        if (answerRepository.existsByQuestionAndMember(question, loginMember)) {
+            throw new RestApiException(AnswerErrorCode.ANSWER_ALREADY_EXIST);
+        }
+
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
+//        answer.getQuestion().increaseCommentCount();
 
         return new AnswerResponse.AnswerId(answer.getId());
     }
@@ -66,6 +72,8 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = findAnswer(answerId);
 
         checkPermission(loginMember, answer);
+//        answer.getQuestion().decreaseCommentCount();
+
 
         answer.delete();
 
@@ -75,11 +83,11 @@ public class AnswerServiceImpl implements AnswerService {
 
     //답변 좋아요 / 취소
     @Override
-    public AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
+    public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
 
         Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
-        return new AnswerResponse.AnswerLike(answerId, isLiked);
+        return new AnswerLike(answerId, isLiked);
     }
 
     @Override
