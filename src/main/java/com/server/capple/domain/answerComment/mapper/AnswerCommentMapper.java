@@ -20,7 +20,7 @@ public class AnswerCommentMapper {
     public AnswerCommentInfo toAnswerCommentInfo(AnswerComment comment, Long heartCount) {
         return AnswerCommentInfo.builder()
                 .answerCommentId(comment.getId())
-                .writer(comment.getMember().getNickname())
+                .writerId(comment.getMember().getId())
                 .content(comment.getContent())
                 .heartCount(heartCount)
                 .createdAt(comment.getCreatedAt())

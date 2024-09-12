@@ -11,24 +11,17 @@ import java.util.List;
 @Component
 public class BoardMapper {
 
-    public Board toBoard(
-            Member member,
-            BoardType boardType,
-            String content,
-            Integer heartCount,
-            Integer commentCount
-    ) {
+    public Board toBoard(Member member, BoardType boardType, String content) {
         return Board.builder()
                 .writer(member)
                 .boardType(boardType)
                 .content(content)
-                .commentCount(commentCount)
+                .commentCount(0)
+                .heartCount(0)
                 .build();
     }
 
-    public BoardResponse.BoardCreate toBoardCreate(
-            Board board
-            ) {
+    public BoardResponse.BoardCreate toBoardCreate(Board board) {
         return BoardResponse.BoardCreate.builder()
                 .boardId(board.getId())
                 .build();
@@ -42,17 +35,43 @@ public class BoardMapper {
                 .build();
     }
 
+    //redis
     public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(
             Board board,
-            Integer boardHeartsCount) {
+            Integer boardHeartsCount,
+            Boolean isLiked,
+            Boolean isMine,
+            Boolean isReported) {
         return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
                 .heartCount(boardHeartsCount)
-                // TODO : 댓글 작성 API 나오면 추후 구현
-                .commentCount(0)
+                .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
+                .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
+                .build();
+    }
+
+    //rdb
+    public BoardResponse.BoardsGetByBoardTypeBoardInfo toBoardsGetByBoardTypeBoardInfo(Board board,
+                                                                                       Boolean isLiked,
+                                                                                       Boolean isMine,
+                                                                                       Boolean isReported) {
+        return BoardResponse.BoardsGetByBoardTypeBoardInfo.builder()
+                .boardId(board.getId())
+                .writerId(board.getWriter().getId())
+                .content(board.getContent())
+                .heartCount(board.getHeartCount())
+                .commentCount(board.getCommentCount())
+                .createAt(board.getCreatedAt())
+                .isLiked(isLiked)
+                .isMine(isMine)
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .isReported(isReported)
                 .build();
     }
 

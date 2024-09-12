@@ -4,6 +4,7 @@ import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.tag.service.TagService;
+import com.server.capple.global.exception.RestApiException;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Answer 서비스의 ")
 @SpringBootTest
@@ -25,9 +25,25 @@ public class AnswerServiceTest extends ServiceTestConfig {
     private TagService tagService;
 
     @Test
-    @DisplayName("Answer 생성 테스트")
+    @DisplayName("Answer 중복 생성 시 예외 발생 테스트")
+    @Transactional
+    public void createDuplicateAnswerTest() {
+        // given
+        AnswerRequest request = getAnswerRequest();
+
+        // 이미 `setUp()`에서 답변이 생성된 상태이므로, 다시 답변을 생성하면 예외 발생
+        // then
+        assertThrows(RestApiException.class, () -> {
+            answerService.createAnswer(member, liveQuestion.getId(), request);
+        });
+    }
+
+    @Test
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 생성 테스트")
     @Transactional
     public void createAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
 
@@ -41,9 +57,11 @@ public class AnswerServiceTest extends ServiceTestConfig {
     }
 
     @Test
-    @DisplayName("Answer 수정 테스트")
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 수정 테스트")
     @Transactional
     public void updateAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
@@ -61,9 +79,11 @@ public class AnswerServiceTest extends ServiceTestConfig {
     }
 
     @Test
-    @DisplayName("Answer 삭제 테스트")
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 삭제 테스트")
     @Transactional
     public void deleteAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();

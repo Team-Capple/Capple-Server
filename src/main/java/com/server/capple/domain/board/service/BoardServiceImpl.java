@@ -1,10 +1,14 @@
 package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
+import com.server.capple.domain.board.entity.BoardHeart;
 import com.server.capple.domain.board.entity.BoardType;
+import com.server.capple.domain.board.mapper.BoardHeartMapper;
 import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
+import com.server.capple.domain.board.repository.BoardHeartRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.exception.RestApiException;
@@ -13,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,21 +27,24 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
+    private final BoardHeartRepository boardHeartRepository;
+    private final BoardHeartMapper boardHeartMapper;
 
     @Override
     public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
         Board board;
         if (content != null) {
-            board = boardRepository.save(boardMapper.toBoard(member, boardType, content, 0, 0));
+            board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         } else {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardCreate(board);
     }
 
+    //redis
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(BoardType boardType) {
-        List<Board> boards = new ArrayList<>();
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
+        List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();
         } else if (boardType == BoardType.FREEBOARD) {
@@ -49,7 +55,37 @@ public class BoardServiceImpl implements BoardService {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
         return boardMapper.toBoardsGetByBoardType(boards.stream()
-                .map(board -> boardMapper.toBoardsGetByBoardTypeBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .map(board -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
+                    boolean isMine =  board.getWriter().getId().equals(member.getId());
+                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, heartCount, isLiked, isMine, false);
+                })
+                .toList()
+        );
+    }
+
+    //rdb
+    @Override
+    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
+        List<Board> boards;
+        if (boardType == null) {
+            boards = boardRepository.findAll();
+        } else if (boardType == BoardType.FREEBOARD) {
+            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
+        } else if (boardType == BoardType.HOTBOARD) {
+            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
+        } else {
+            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
+        }
+        return boardMapper.toBoardsGetByBoardType(boards.stream()
+                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
+                .map(board -> {
+                    boolean isLiked = boardHeartRepository.findByMemberAndBoard(member,board).isPresent();
+                    boolean isMine =  board.getWriter().getId().equals(member.getId());
+                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, isLiked, isMine,false);
+                })
                 .toList()
         );
     }
@@ -69,17 +105,24 @@ public class BoardServiceImpl implements BoardService {
     public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
         List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
         return boardMapper.toBoardsSearchByKeyword(boards.stream()
-                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
+                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, board.getHeartCount()))
                 .toList());
     }
 
     @Override
-    public BoardResponse.BoardToggleHeart toggleBoardHeart(Member member, Long boardId) {
+    @Transactional
+    public ToggleBoardHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
-        System.out.println(boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId()));
-
-        Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
-        return new BoardResponse.BoardToggleHeart(boardId, isLiked);
+        // 좋아요 눌렀는지 확인
+        //boardHeart에 없다면 새로 저장
+        BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
+                .orElseGet(() -> {
+                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                    return boardHeartRepository.save(newHeart);
+                });
+        boolean isLiked = boardHeart.toggleHeart();
+        board.setHeartCount(boardHeart.isLiked());
+        return new ToggleBoardHeart(boardId, isLiked);
     }
 
     @Override
@@ -87,6 +130,4 @@ public class BoardServiceImpl implements BoardService {
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
-
-
 }

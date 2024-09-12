@@ -54,4 +54,10 @@ public class AnswerHeartRedisRepository implements Serializable {
         }
         return answerIds;
     }
+
+    public boolean isMemberLikedAnswer(Long memberId, Long answerId) {
+        String key = ANSWER_HEART_KEY_PREFIX + answerId;
+        String memberKey = MEMBER_KEY_PREFIX + memberId;
+        return redisTemplate.opsForSet().isMember(key, memberKey);
+    }
 }
