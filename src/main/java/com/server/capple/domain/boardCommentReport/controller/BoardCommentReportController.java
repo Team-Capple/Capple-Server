@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "게시판 댓글 신고 API", description = "게시판 댓글 신고 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/boardCommentReports")
+@RequestMapping("/reports/board-comment")
 public class BoardCommentReportController {
     private final BoardCommentReportService boardCommentReportService;
 
-    @Operation(summary = "게시판 신고함 작성 API", description = "게시판 신고를 작성합니다.")
+    @Operation(summary = "게시판 댓글 신고 API", description = "게시판 댓글 신고를 작성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
