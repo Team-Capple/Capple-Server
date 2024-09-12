@@ -40,4 +40,11 @@ public class BoardCommentReportServiceImpl implements BoardCommentReportService 
 
         return new BoardCommentReportResponse.BoardCommentReportCreate(newReport.getId());
     }
+
+    @Override
+    public BoardCommentReport findBoardCommentReport(Long id) {
+        return boardCommentReportRepository.findById(id).orElseThrow(
+                () -> new RestApiException(BoardCommentReportErrorCode.COMMENT_REPORT_NOT_FOUND)
+        );
+    }
 }
