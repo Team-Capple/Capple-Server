@@ -16,28 +16,30 @@ public class QuestionMapper {
         return Question.builder()
                 .questionStatus(request.getQuestionStatus())
                 .content(request.getContent())
+//                .commentCount(0)
                 .build();
     }
 
 
-    public QuestionSummary toQuestionSummary(Question question, boolean isAnswered) {
+    public QuestionSummary toQuestionSummary(Question question, boolean isAnswered/*, Integer likeCount*/) {
         return QuestionSummary.builder()
                 .questionId(question.getId())
                 .questionStatus(question.getQuestionStatus())
                 .content(question.getContent())
                 .isAnswered(isAnswered)
+//                .likeCount(likeCount)
+//                .commentCount(question.getCommentCount())
                 .build();
     }
 
-    public QuestionInfo toQuestionInfo(Question question, boolean isAnswered) {
+    public QuestionInfo toQuestionInfo(Question question, boolean isAnswered/*, Integer likeCount*/) {
         return QuestionInfo.builder()
                 .questionId(question.getId())
                 .questionStatus(question.getQuestionStatus())
                 .livedAt(question.getLivedAt())
                 .content(question.getContent())
-                // Count는 추후 수정 예정(필드 수정해야함...)
-//                .likeCount(100L)
-//                .commentCount(0L)
+//                .likeCount(likeCount)
+//                .commentCount(question.getCommentCount())
                 .isAnswered(isAnswered)
                 .build();
     }

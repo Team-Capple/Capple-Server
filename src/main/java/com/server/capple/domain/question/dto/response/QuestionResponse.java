@@ -5,6 +5,7 @@ import com.server.capple.domain.question.entity.QuestionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,8 @@ public class QuestionResponse {
         private Long questionId;
         private QuestionStatus questionStatus;
         private String content;
+//        private Integer likeCount;
+//        private Integer commentCount;
         private Boolean isAnswered;
     }
 
@@ -31,9 +34,8 @@ public class QuestionResponse {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime livedAt;
         private String content;
-        // 추후 추가 예정
-//        private Long likeCount;
-//        private Long commentCount;
+//        private Integer likeCount;
+//        private Integer commentCount;
         private Boolean isAnswered;
     }
 
@@ -49,5 +51,14 @@ public class QuestionResponse {
     @Builder
     public static class QuestionInfos {
         private List<QuestionInfo> questionInfos;
+    }
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class QuestionToggleHeart {
+        private Long questionId;
+        private Boolean isLiked;
     }
 }

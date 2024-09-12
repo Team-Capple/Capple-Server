@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import static java.lang.Boolean.FALSE;
@@ -23,10 +24,10 @@ public class BoardHeartRedisRepository implements Serializable {
     private final RedisTemplate<String, String> redisTemplate;
 
     // 게시판 좋아요 토글
-    public Boolean toggleBoardHeart(Long boardId, Long memberId) {
+    public Boolean toggleBoardHeart(Long memberId, Long boardId) {
         String key = BOARD_HEART_KEY_PREFIX + boardId.toString();
         String member = MEMBER_KEY_PREFIX + memberId.toString();
-        String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKeyㄱ
+        String createAtKey = key + ":" + member + ":createAt"; // member ID를 포함한 createAtKey
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
@@ -44,7 +45,6 @@ public class BoardHeartRedisRepository implements Serializable {
         }
     }
 
-    //
     public String getBoardHeartCreateAt(Long boardId, Long memberId) {
         String createAtKey = BOARD_HEART_KEY_PREFIX + boardId.toString() + ":" + MEMBER_KEY_PREFIX + memberId.toString() + ":createAt";
         return redisTemplate.opsForValue().get(createAtKey);
@@ -70,5 +70,27 @@ public class BoardHeartRedisRepository implements Serializable {
             }
         }
         return boardIds;
+    }
+
+    public boolean isMemberLikedBoard(Long memberId, Long boardId) {
+        String key = BOARD_HEART_KEY_PREFIX + boardId;
+        String memberKey = MEMBER_KEY_PREFIX + memberId;
+        return redisTemplate.opsForSet().isMember(key, memberKey);
+    }
+
+    //더미 데이터 생성용
+    public void generateDummyBoardLikes(int memberCount, int boardCount) {
+        SetOperations<String, String> setOperations = redisTemplate.opsForSet();
+
+        Random random = new Random();
+        for (int boardId = 1; boardId <= boardCount; boardId++) {
+            for (int memberId = 1; memberId <= memberCount; memberId++) {
+                if(random.nextBoolean()) {
+                    String key = BOARD_HEART_KEY_PREFIX + boardId;
+                    String member = MEMBER_KEY_PREFIX + memberId;
+                    setOperations.add(key, member);
+                }
+            }
+        }
     }
 }

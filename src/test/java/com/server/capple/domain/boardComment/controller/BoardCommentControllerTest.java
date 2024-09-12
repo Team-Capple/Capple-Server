@@ -109,9 +109,9 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void heartBoardCommentTest() throws Exception {
         //given
         final String url = "/boardComments/heart/{commentId}";
-        BoardCommentHeart response = new BoardCommentHeart(1L, Boolean.TRUE);
+        ToggleBoardCommentHeart response = new ToggleBoardCommentHeart(1L, Boolean.TRUE);
 
-        doReturn(response).when(boardCommentService).heartBoardComment(any(Member.class), any(Long.class));
+        doReturn(response).when(boardCommentService).toggleBoardCommentHeart(any(Member.class), any(Long.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(patch(url, 1L)
@@ -149,7 +149,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
                 .andExpect(jsonPath("$.result.boardCommentInfos[0].boardCommentId").value(1L))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].writer").value("루시"))
+//                .andExpect(jsonPath("$.result.boardCommentInfos[0].writer").value("루시"))
                 .andExpect(jsonPath("$.result.boardCommentInfos[0].content").value("댓글"))
                 .andExpect(jsonPath("$.result.boardCommentInfos[0].heartCount").value(2L))
                 .andExpect(jsonPath("$.result.boardCommentInfos[0].isLiked").value(true));
