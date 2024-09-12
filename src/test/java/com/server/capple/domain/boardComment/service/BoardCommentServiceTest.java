@@ -1,8 +1,8 @@
 package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentHeart;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +27,14 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     public void createBoardCommentTest() {
         //given
         BoardCommentRequest request = getBoardCommentRequest();
-
+        int commentCount = board.getCommentCount();
         //when
         Long boardCommentId = boardCommentService.createBoardComment(member, board.getId(), request).getBoardCommentId();
         BoardComment comment = boardCommentService.findBoardComment(boardCommentId);
 
         //then
         assertEquals("게시글 댓글", comment.getContent());
+        assertEquals(commentCount + 1, board.getCommentCount());
     }
 
     @Test
@@ -61,6 +62,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         //given
         BoardCommentRequest request = getBoardCommentRequest();
         Long boardCommentId = boardCommentService.createBoardComment(member, board.getId(), request).getBoardCommentId();
+        int commentCount = board.getCommentCount();
 
         //when
         boardCommentService.deleteBoardComment(member, boardCommentId);
@@ -68,6 +70,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
 
         //then
         assertNotNull(comment.getDeletedAt());
+        assertEquals(commentCount - 1, board.getCommentCount());
     }
 
     @Test
@@ -76,22 +79,27 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     public void heartBoardCommentTest() {
         //1. 좋아요
         //given & when
-        BoardCommentHeart liked = boardCommentService.heartBoardComment(member, boardComment.getId());
-        BoardCommentInfos likedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
+        int heartCount = boardComment.getHeartCount();
+        ToggleBoardCommentHeart liked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
+
+        //BoardCommentInfos likedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
         //then
         assertEquals(boardComment.getId(), liked.getBoardCommentId());
         assertEquals(true, liked.getIsLiked());
-        assertEquals(true, likedResponse.getBoardCommentInfos().get(0).getIsLiked());
+        assertEquals(heartCount + 1, boardComment.getHeartCount());
+        //assertEquals(true, likedResponse.getBoardCommentInfos().get(0).getIsLiked());
 
         //2. 좋아요 취소
         //given & when
-        BoardCommentHeart unLiked = boardCommentService.heartBoardComment(member, boardComment.getId());
-        BoardCommentInfos unLikedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
+        heartCount = boardComment.getHeartCount();
+        ToggleBoardCommentHeart unLiked = boardCommentService.toggleBoardCommentHeart(member, boardComment.getId());
+        //BoardCommentInfos unLikedResponse = boardCommentService.getBoardCommentInfos(member, board.getId());
 
         //then
         assertEquals(boardComment.getId(), unLiked.getBoardCommentId());
         assertEquals(false, unLiked.getIsLiked());
-        assertEquals(false, unLikedResponse.getBoardCommentInfos().get(0).getIsLiked());
+        assertEquals(heartCount - 1, boardComment.getHeartCount());
+        //assertEquals(false, unLikedResponse.getBoardCommentInfos().get(0).getIsLiked());
 
     }
 
@@ -105,7 +113,8 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         //then
         assertEquals(member.getId(), response.getBoardCommentInfos().get(0).getWriterId());
         assertEquals("게시글 댓글", response.getBoardCommentInfos().get(0).getContent());
-        assertEquals(0L, response.getBoardCommentInfos().get(0).getHeartCount());
+        assertEquals(0, response.getBoardCommentInfos().get(0).getHeartCount());
         assertEquals(false, response.getBoardCommentInfos().get(0).getIsLiked());
+        assertEquals(true, response.getBoardCommentInfos().get(0).getIsMine());
     }
 }

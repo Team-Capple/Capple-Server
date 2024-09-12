@@ -2,6 +2,7 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
@@ -73,6 +74,7 @@ public class AnswerServiceImpl implements AnswerService {
         checkPermission(loginMember, answer);
 //        answer.getQuestion().decreaseCommentCount();
 
+
         answer.delete();
 
         return new AnswerResponse.AnswerId(answerId);
@@ -81,11 +83,11 @@ public class AnswerServiceImpl implements AnswerService {
 
     //답변 좋아요 / 취소
     @Override
-    public AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
+    public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
 
         Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
-        return new AnswerResponse.AnswerLike(answerId, isLiked);
+        return new AnswerLike(answerId, isLiked);
     }
 
     @Override
@@ -130,7 +132,6 @@ public class AnswerServiceImpl implements AnswerService {
                         .toList()
         );
     }
-
 
     //로그인된 유저와 작성자가 같은지 체크
     private void checkPermission(Member loginMember, Answer answer) {

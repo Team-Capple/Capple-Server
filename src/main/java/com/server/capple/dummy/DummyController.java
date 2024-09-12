@@ -19,22 +19,13 @@ public class DummyController {
 
     private final DummyService dummyService;
 
-    @Operation(summary = "게시글,게시글 좋아요 더미 생성 API", description = "게시글과 게시글 좋아요 더미를 생성합니다." +
-            "멤버 더미 먼저 생성 후 실행해주세요.")
+    @Operation(summary = "멤버, 게시글,게시글 좋아요 더미 생성 API", description = "멤버, 게시글과 게시글 좋아요 더미를 생성합니다." +
+            "생성하고싶은 멤버 수와, 게시글 수를 파라미터로 입력해주세요. 좋아요는 redis와 rdb에 동시에 저장됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
-    @PostMapping("/board")
-    private BaseResponse<Object> generateDummyBoards(@RequestParam("num") int num) {
-        return BaseResponse.onSuccess(dummyService.generateDummyBoards(num));
-    }
-
-    @Operation(summary = "멤버 더미 생성 API", description = "멤버 더미를 생성합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-    })
-    @PostMapping("/member")
-    private BaseResponse<Object> generateDummyMembers() {
-        return BaseResponse.onSuccess(dummyService.generateDummyMembers());
+    @PostMapping()
+    private BaseResponse<Object> generateDummyBoards(@RequestParam("memberCount") int memberCount, @RequestParam("boardCount") int boardCount) {
+        return BaseResponse.onSuccess(dummyService.generateDummy(memberCount, boardCount));
     }
 }

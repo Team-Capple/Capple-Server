@@ -2,8 +2,6 @@ package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.answerComment.repository.AnswerCommentHeartRedisRepository;
-import com.server.capple.domain.board.dto.BoardResponse;
-import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.dto.response.QuestionResponse;

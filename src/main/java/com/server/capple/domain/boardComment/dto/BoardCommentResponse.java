@@ -17,7 +17,7 @@ public class BoardCommentResponse {
 
     @Getter
     @AllArgsConstructor
-    public static class BoardCommentHeart {
+    public static class ToggleBoardCommentHeart {
         private Long boardCommentId;
         private Boolean isLiked;
     }
@@ -28,8 +28,9 @@ public class BoardCommentResponse {
         private Long boardCommentId;
         private Long writerId;
         private String content;
-        private Long heartCount;
+        private Integer heartCount;
         private Boolean isLiked;
+        private Boolean isMine;
         private LocalDateTime createdAt;
     }
 

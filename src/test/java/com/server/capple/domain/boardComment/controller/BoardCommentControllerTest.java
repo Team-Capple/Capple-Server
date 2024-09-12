@@ -109,9 +109,9 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void heartBoardCommentTest() throws Exception {
         //given
         final String url = "/boardComments/heart/{commentId}";
-        BoardCommentHeart response = new BoardCommentHeart(1L, Boolean.TRUE);
+        ToggleBoardCommentHeart response = new ToggleBoardCommentHeart(1L, Boolean.TRUE);
 
-        doReturn(response).when(boardCommentService).heartBoardComment(any(Member.class), any(Long.class));
+        doReturn(response).when(boardCommentService).toggleBoardCommentHeart(any(Member.class), any(Long.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(patch(url, 1L)
