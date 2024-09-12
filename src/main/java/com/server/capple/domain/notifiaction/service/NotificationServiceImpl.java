@@ -27,6 +27,7 @@ public class NotificationServiceImpl implements NotificationService {
             .body(board.getContent())
             .threadId("board-" + board.getId())
             .sound("default")
+            .boardId(board.getId().toString())
             .build(), board.getWriter().getId());
         // TODO 알림 데이터베이스 저장
     }
@@ -46,6 +47,8 @@ public class NotificationServiceImpl implements NotificationService {
                         .body(board.getContent())
                         .threadId("board-" + board.getId())
                         .sound("default")
+                        .boardId(board.getId().toString())
+                        .boardCommentId(boardComment.getId().toString())
                         .build(), subscriberId);
                 }
             })
@@ -57,6 +60,8 @@ public class NotificationServiceImpl implements NotificationService {
             .body(board.getContent())
             .threadId("board-" + board.getId())
             .sound("default")
+            .boardId(board.getId().toString())
+            .boardCommentId(boardComment.getId().toString())
             .build();
         apnsService.sendApnsToMembers(simplePushBody, subscriberIds);
         // TODO 알림 데이터베이스 저장
@@ -70,6 +75,8 @@ public class NotificationServiceImpl implements NotificationService {
             .body(board.getContent())
             .threadId("board-" + board.getId())
             .sound("default")
+            .boardId(board.getId().toString())
+            .boardCommentId(boardComment.getId().toString())
             .build(), boardComment.getMember().getId());
         // TODO 알림 데이터베이스 저장
     }

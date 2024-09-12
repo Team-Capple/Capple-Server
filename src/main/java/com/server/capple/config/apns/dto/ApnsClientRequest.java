@@ -11,9 +11,13 @@ public class ApnsClientRequest {
     @ToString
     public static class SimplePushBody {
         private Aps aps;
+        private String boardId;
+        private String boardCommentId;
         @Builder
-        public SimplePushBody(String title, String subTitle, String body, Integer badge, String sound, String threadId, String targetContentId) {
+        public SimplePushBody(String title, String subTitle, String body, Integer badge, String sound, String threadId, String targetContentId, String boardId, String boardCommentId) {
             this.aps = new Aps(new Aps.Alert(title, subTitle, body), badge, sound, threadId, targetContentId);
+            this.boardId = boardId;
+            this.boardCommentId = boardCommentId;
         }
 
         @ToString
