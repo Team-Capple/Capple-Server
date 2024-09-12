@@ -33,7 +33,7 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
     @DisplayName("답변 댓글 생성 API 테스트")
     public void createAnswerCommentTest() throws Exception {
         //given
-        final String url = "/answerComments/answer/{answerId}";
+        final String url = "/answer-comments/answer/{answerId}";
 
         AnswerCommentRequest request = getAnswerCommentRequest();
         AnswerCommentResponse.AnswerCommentId response = new AnswerCommentResponse.AnswerCommentId(1L);
@@ -59,7 +59,7 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
     @DisplayName("답변 댓글 수정 API 테스트")
     public void updateAnswerCommentTest() throws Exception {
         //given
-        final String url = "/answerComments/{commentId}";
+        final String url = "/answer-comments/{commentId}";
 
         AnswerCommentRequest request = getAnswerCommentRequest();
         AnswerCommentResponse.AnswerCommentId response = new AnswerCommentResponse.AnswerCommentId(1L);
@@ -85,7 +85,7 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
     @DisplayName("답변 댓글 삭제 API 테스트")
     public void deleteAnswerCommentTest() throws Exception {
         //given
-        final String url = "/answerComments/{commentId}";
+        final String url = "/answer-comments/{commentId}";
         AnswerCommentResponse.AnswerCommentId response = new AnswerCommentResponse.AnswerCommentId(1L);
 
         doReturn(response).when(answerCommentService).deleteAnswerComment(any(Member.class), any(Long.class));
@@ -108,7 +108,7 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
     @DisplayName("답변 좋아요/취소 API 테스트")
     public void heartAnswerCommentTest() throws Exception {
         //given
-        final String url = "/answerComments/heart/{commentId}";
+        final String url = "/answer-comments/heart/{commentId}";
         AnswerCommentResponse.AnswerCommentHeart response = new AnswerCommentResponse.AnswerCommentHeart(1L, Boolean.TRUE);
 
         doReturn(response).when(answerCommentService).heartAnswerComment(any(Member.class), any(Long.class));
@@ -132,7 +132,7 @@ public class AnswerCommentControllerTest extends ControllerTestConfig {
     @DisplayName("답변에 대한 댓글 조회 API 테스트")
     public void getAnswerCommentInfosTest() throws Exception {
         //given
-        final String url = "/answerComments/{answerId}";
+        final String url = "/answer-comments/{answerId}";
         AnswerCommentResponse.AnswerCommentInfos response = getAnswerCommentInfos();
 
         doReturn(response).when(answerCommentService).getAnswerCommentInfos(any(Long.class));

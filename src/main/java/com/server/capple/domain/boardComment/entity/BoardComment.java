@@ -29,6 +29,7 @@ public class BoardComment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private Boolean isReport;
 
     public void update(String content) {
