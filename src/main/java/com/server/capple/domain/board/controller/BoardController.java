@@ -45,7 +45,7 @@ public class BoardController {
             // TODO: 페이징 프론트 이슈로 추후 구현
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
             ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType));
     }
 
     @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.")
