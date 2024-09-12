@@ -79,13 +79,12 @@ public class BoardHeartRedisRepository implements Serializable {
     }
 
     //더미 데이터 생성용
-    public void generateDummyBoardLikes(int boardCount) {
+    public void generateDummyBoardLikes(int memberCount, int boardCount) {
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
         Random random = new Random();
-        for (int boardId = 0; boardId < boardCount; boardId++) {
-            for (int memberId = 1; memberId <= 10; memberId++) {
+        for (int boardId = 1; boardId <= boardCount; boardId++) {
+            for (int memberId = 1; memberId <= memberCount; memberId++) {
                 if(random.nextBoolean()) {
                     String key = BOARD_HEART_KEY_PREFIX + boardId;
                     String member = MEMBER_KEY_PREFIX + memberId;

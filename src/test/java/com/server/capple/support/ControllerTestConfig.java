@@ -121,7 +121,7 @@ public abstract class ControllerTestConfig {
                         .writerId(member.getId())
                         .content("댓글")
                         .createdAt(LocalDateTime.now())
-                        .heartCount(2L)
+                        .heartCount(2)
                         .isLiked(TRUE)
                         .isReport(FALSE)
                         .build());

@@ -1,4 +1,4 @@
-package com.server.capple.domain.boardCommentReport.boardComment.controller;
+package com.server.capple.domain.boardComment.controller;
 
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.service.BoardCommentService;
@@ -109,9 +109,9 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void heartBoardCommentTest() throws Exception {
         //given
         final String url = "/board-comments/heart/{commentId}";
-        BoardCommentHeart response = new BoardCommentHeart(1L, Boolean.TRUE);
+        ToggleBoardCommentHeart response = new ToggleBoardCommentHeart(1L, Boolean.TRUE);
 
-        doReturn(response).when(boardCommentService).heartBoardComment(any(Member.class), any(Long.class));
+        doReturn(response).when(boardCommentService).toggleBoardCommentHeart(any(Member.class), any(Long.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(patch(url, 1L)

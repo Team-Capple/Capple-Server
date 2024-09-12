@@ -1,13 +1,11 @@
 package com.server.capple.domain.board.dto;
 
-import com.server.capple.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BoardResponse {
@@ -39,7 +37,6 @@ public class BoardResponse {
         private Integer heartCount;
         private Integer commentCount;
         private LocalDateTime createAt;
-        private Boolean liLiked;
         private Boolean isMine;
         private Boolean isReported;
         private Boolean isLiked;
@@ -78,7 +75,7 @@ public class BoardResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BoardToggleHeart {
+    public static class ToggleBoardHeart {
         private Long boardId;
         private Boolean isLiked;
     }

@@ -5,6 +5,8 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
 @Getter
@@ -13,6 +15,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
+@DynamicInsert
 public class BoardComment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +35,9 @@ public class BoardComment extends BaseEntity {
     @Column(nullable = false)
     private Boolean isReport;
 
+    @ColumnDefault("0")
+    private Integer heartCount;
+
     public void update(String content) {
         this.content = content;
     }
@@ -39,4 +45,11 @@ public class BoardComment extends BaseEntity {
     public void submitReport() { this.isReport = Boolean.TRUE; }
 
     public void cancelReport() { this.isReport = Boolean.FALSE; }
+    public void setHeartCount(boolean isLiked) {
+        if (isLiked) {
+            this.heartCount++;
+        } else {
+            this.heartCount--;
+        }
+    }
 }

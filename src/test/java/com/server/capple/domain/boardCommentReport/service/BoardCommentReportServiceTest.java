@@ -1,4 +1,4 @@
-package com.server.capple.domain.boardComment.service;
+package com.server.capple.domain.boardCommentRe.service;
 
 import com.server.capple.domain.boardCommentReport.entity.BoardCommentReport;
 import com.server.capple.domain.boardCommentReport.entity.BoardCommentReportType;

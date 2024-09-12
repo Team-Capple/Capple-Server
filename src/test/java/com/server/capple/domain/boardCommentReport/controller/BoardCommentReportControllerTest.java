@@ -1,4 +1,4 @@
-package com.server.capple.domain.boardComment.controller;
+package com.server.capple.domain.boardCommentRe.controller;
 
 import com.server.capple.domain.boardCommentReport.dto.BoardCommentReportRequest;
 import com.server.capple.domain.boardCommentReport.dto.BoardCommentReportResponse;

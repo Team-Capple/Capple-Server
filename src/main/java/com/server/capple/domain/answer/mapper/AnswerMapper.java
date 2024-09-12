@@ -10,7 +10,6 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
