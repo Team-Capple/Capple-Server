@@ -22,12 +22,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendBoardHeartNotification(Long actorId, Board board) {
         if (actorId.equals(board.getWriter().getId())) return;
-        apnsService.sendApnsToMembers(ApnsClientRequest.SimplePushBody.builder()
-            .title(BOARD_HEART.getTitle())
-            .body(board.getContent())
-            .threadId("board-" + board.getId())
-            .sound("default")
-            .boardId(board.getId().toString())
+        apnsService.sendApnsToMembers(ApnsClientRequest.BoardNotificationBody.builder()
+            .type(BOARD_HEART)
+            .board(board)
             .build(), board.getWriter().getId());
         // TODO 알림 데이터베이스 저장
     }
@@ -41,42 +38,29 @@ public class NotificationServiceImpl implements NotificationService {
 //        게시판 구독자에게 알림 전송
             .peek(subscriberId -> {
                 if (subscriberId.equals(board.getWriter().getId())) {
-                    apnsService.sendApnsToMembers(ApnsClientRequest.SimplePushBody.builder()
-                        .title(BOARD_COMMENT.getTitle())
-                        .subTitle(boardComment.getContent())
-                        .body(board.getContent())
-                        .threadId("board-" + board.getId())
-                        .sound("default")
-                        .boardId(board.getId().toString())
-                        .boardCommentId(boardComment.getId().toString())
+                    apnsService.sendApnsToMembers(ApnsClientRequest.BoardCommentNotificationBody.builder()
+                        .type(BOARD_COMMENT)
+                        .board(board)
+                        .boardComment(boardComment)
                         .build(), subscriberId);
                 }
             })
             .filter(id -> !id.equals(board.getWriter().getId()))
             .toList();
-        ApnsClientRequest.SimplePushBody simplePushBody = ApnsClientRequest.SimplePushBody.builder()
-            .title(BAORD_COMMENT_DUPLCATE.getTitle())
-            .subTitle(boardComment.getContent())
-            .body(board.getContent())
-            .threadId("board-" + board.getId())
-            .sound("default")
-            .boardId(board.getId().toString())
-            .boardCommentId(boardComment.getId().toString())
-            .build();
-        apnsService.sendApnsToMembers(simplePushBody, subscriberIds);
+        apnsService.sendApnsToMembers(ApnsClientRequest.BoardCommentNotificationBody.builder()
+            .type(BAORD_COMMENT_DUPLCATE)
+            .board(board)
+            .boardComment(boardComment)
+            .build(), subscriberIds);
         // TODO 알림 데이터베이스 저장
     }
 
     @Override
     public void sendBoardCommentHeartNotification(Long actorId, Board board, BoardComment boardComment) {
-        apnsService.sendApnsToMembers(ApnsClientRequest.SimplePushBody.builder()
-            .title(BOARD_COMMENT_HEART.getTitle())
-            .subTitle(boardComment.getContent())
-            .body(board.getContent())
-            .threadId("board-" + board.getId())
-            .sound("default")
-            .boardId(board.getId().toString())
-            .boardCommentId(boardComment.getId().toString())
+        apnsService.sendApnsToMembers(ApnsClientRequest.BoardCommentNotificationBody.builder()
+            .type(BOARD_COMMENT_HEART)
+            .board(board)
+            .boardComment(boardComment)
             .build(), boardComment.getMember().getId());
         // TODO 알림 데이터베이스 저장
     }
