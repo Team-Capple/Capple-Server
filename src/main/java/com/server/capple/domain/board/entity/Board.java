@@ -33,17 +33,6 @@ public class Board extends BaseEntity {
     @ColumnDefault("0")
     private Integer commentCount;
 
-    @ColumnDefault("0")
-    private Integer heartCount;
-
-    public void setHeartCount(boolean isLiked) {
-        if (isLiked) {
-            this.heartCount++;
-        } else {
-            this.heartCount--;
-        }
-    }
-
     public void increaseCommentCount() {
         this.commentCount++;
     }

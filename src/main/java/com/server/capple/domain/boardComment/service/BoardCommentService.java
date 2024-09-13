@@ -1,9 +1,9 @@
 package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.member.entity.Member;
 

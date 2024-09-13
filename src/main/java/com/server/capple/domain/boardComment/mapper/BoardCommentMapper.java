@@ -13,7 +13,6 @@ public class BoardCommentMapper {
                 .member(member)
                 .board(board)
                 .content(comment)
-                .heartCount(0)
                 .build();
     }
 

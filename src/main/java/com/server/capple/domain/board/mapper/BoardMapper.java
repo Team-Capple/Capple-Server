@@ -20,7 +20,6 @@ public class BoardMapper {
                 .boardType(boardType)
                 .content(content)
                 .commentCount(0)
-                .heartCount(0)
                 .build();
     }
 
@@ -58,12 +57,12 @@ public class BoardMapper {
                 .build();
     }
 
-    public BoardResponse.BoardsSearchByKeywordBoardInfo toBoardsSearchByKeywordBoardInfo(Board board, Integer heartCount) {
+    public BoardResponse.BoardsSearchByKeywordBoardInfo toBoardsSearchByKeywordBoardInfo(Board board, Integer boardHeartCount) {
         return BoardResponse.BoardsSearchByKeywordBoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
-                .heartCount(heartCount)
+                .heartCount(boardHeartCount)
                 .commentCount(board.getCommentCount())
                 .createAt(board.getCreatedAt())
                 .build();

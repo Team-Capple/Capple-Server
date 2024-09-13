@@ -32,18 +32,8 @@ public class BoardComment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @ColumnDefault("0")
-    private Integer heartCount;
-
     public void update(String content) {
         this.content = content;
     }
 
-    public void setHeartCount(boolean isLiked) {
-        if (isLiked) {
-            this.heartCount++;
-        } else {
-            this.heartCount--;
-        }
-    }
 }
