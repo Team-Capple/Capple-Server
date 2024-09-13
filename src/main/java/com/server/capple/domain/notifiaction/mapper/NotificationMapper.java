@@ -1,7 +1,6 @@
 package com.server.capple.domain.notifiaction.mapper;
 
 import com.server.capple.config.apns.dto.ApnsClientRequest;
-import com.server.capple.domain.notifiaction.dto.NotificationResponse.NotificationInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import org.springframework.stereotype.Component;
 

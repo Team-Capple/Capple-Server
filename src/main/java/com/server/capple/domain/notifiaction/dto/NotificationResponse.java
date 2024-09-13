@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 public class NotificationResponse {
     @Getter
     @Builder
@@ -16,5 +18,6 @@ public class NotificationResponse {
         private String content;
         private String boardId;
         private String boardCommentId;
+        private LocalDateTime createdAt;
     }
 }
