@@ -10,7 +10,9 @@ import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
 import com.server.capple.domain.board.repository.BoardHeartRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
+import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,8 @@ public class BoardServiceImpl implements BoardService {
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
+    private final NotificationService notificationService;
+    private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
     public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
@@ -38,6 +42,7 @@ public class BoardServiceImpl implements BoardService {
         } else {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
+        boardSubscribeMemberService.createBoardSubscribeMember(member, board);
         return boardMapper.toBoardCreate(board);
     }
 
@@ -98,6 +103,7 @@ public class BoardServiceImpl implements BoardService {
         }
 
         board.delete();
+        boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
         return boardMapper.toBoardDelete(board);
     }
 
@@ -122,12 +128,13 @@ public class BoardServiceImpl implements BoardService {
                 });
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
+        if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
         return new ToggleBoardHeart(boardId, isLiked);
     }
 
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 }
