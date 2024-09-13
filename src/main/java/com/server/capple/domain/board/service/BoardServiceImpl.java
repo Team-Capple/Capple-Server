@@ -89,8 +89,6 @@ public class BoardServiceImpl implements BoardService {
     public ToggleBoardHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
 
-        boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId());
-
         Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
         if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
 

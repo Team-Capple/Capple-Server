@@ -138,7 +138,6 @@ public abstract class ServiceTestConfig {
                         .member(member)
                         .board(board)
                         .content("게시글 댓글")
-                        .heartCount(0)
                         .build());
     }
 
