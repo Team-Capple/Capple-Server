@@ -23,7 +23,6 @@ public class BoardCommentHeartRedisRepository implements Serializable {
         String member = MEMBER_PREFIX + memberId.toString();
 
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
-
         Boolean isLiked = setOperations.isMember(key, member);
 
         if(FALSE.equals(isLiked)) {
@@ -41,7 +40,6 @@ public class BoardCommentHeartRedisRepository implements Serializable {
         String member = MEMBER_PREFIX + memberId.toString();
 
         SetOperations<String, String> setOperations = redisTemplate.opsForSet();
-
         return setOperations.isMember(key, member);
     }
 
