@@ -1,14 +1,10 @@
 package com.server.capple.domain.board.service;
 
-import com.server.capple.domain.board.dto.BoardResponse;
-import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
+import com.server.capple.domain.board.dto.BoardResponse.*;
 import com.server.capple.domain.board.entity.Board;
-import com.server.capple.domain.board.entity.BoardHeart;
 import com.server.capple.domain.board.entity.BoardType;
-import com.server.capple.domain.board.mapper.BoardHeartMapper;
 import com.server.capple.domain.board.mapper.BoardMapper;
 import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
-import com.server.capple.domain.board.repository.BoardHeartRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
@@ -29,13 +25,11 @@ public class BoardServiceImpl implements BoardService {
     private final BoardRepository boardRepository;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
-    private final BoardHeartRepository boardHeartRepository;
-    private final BoardHeartMapper boardHeartMapper;
     private final NotificationService notificationService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
-    public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
+    public BoardCreate createBoard(Member member, BoardType boardType, String content) {
         Board board;
         if (content != null) {
             board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
@@ -46,9 +40,8 @@ public class BoardServiceImpl implements BoardService {
         return boardMapper.toBoardCreate(board);
     }
 
-    //redis
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
+    public BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
         List<Board> boards;
         if (boardType == null) {
             boards = boardRepository.findAll();
@@ -64,39 +57,15 @@ public class BoardServiceImpl implements BoardService {
                 .map(board -> {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
-                    boolean isMine =  board.getWriter().getId().equals(member.getId());
+                    boolean isMine = board.getWriter().getId().equals(member.getId());
                     return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, heartCount, isLiked, isMine, false);
                 })
                 .toList()
         );
     }
 
-    //rdb
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
-        List<Board> boards;
-        if (boardType == null) {
-            boards = boardRepository.findAll();
-        } else if (boardType == BoardType.FREEBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
-        } else if (boardType == BoardType.HOTBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
-        } else {
-            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
-        }
-        return boardMapper.toBoardsGetByBoardType(boards.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(board -> {
-                    boolean isLiked = boardHeartRepository.findByMemberAndBoard(member,board).isPresent();
-                    boolean isMine =  board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, isLiked, isMine,false);
-                })
-                .toList()
-        );
-    }
-
-    @Override
-    public BoardResponse.BoardDelete deleteBoard(Member member, Long boardId) {
+    public BoardDelete deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
         if (board.getWriter().getId() != member.getId()) {
             throw new RestApiException(BoardErrorCode.BOARD_NO_AUTHORIZATION);
@@ -108,10 +77,10 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
+    public BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
         List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
         return boardMapper.toBoardsSearchByKeyword(boards.stream()
-                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, board.getHeartCount()))
+                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, boardHeartRedisRepository.getBoardHeartsCount(board.getId())))
                 .toList());
     }
 
@@ -119,16 +88,12 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public ToggleBoardHeart toggleBoardHeart(Member member, Long boardId) {
         Board board = findBoard(boardId);
-        // 좋아요 눌렀는지 확인
-        //boardHeart에 없다면 새로 저장
-        BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-                .orElseGet(() -> {
-                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                    return boardHeartRepository.save(newHeart);
-                });
-        boolean isLiked = boardHeart.toggleHeart();
-        board.setHeartCount(boardHeart.isLiked());
+
+        boardHeartRedisRepository.getBoardHeartCreateAt(board.getId(), member.getId());
+
+        Boolean isLiked = boardHeartRedisRepository.toggleBoardHeart(member.getId(), board.getId());
         if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
+
         return new ToggleBoardHeart(boardId, isLiked);
     }
 

@@ -2,7 +2,7 @@ package com.server.capple.domain.board.controller;
 
 import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.board.dto.BoardRequest;
-import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dto.BoardResponse.*;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.service.BoardService;
 import com.server.capple.domain.member.entity.Member;
@@ -27,38 +27,20 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping()
-    private BaseResponse<BoardResponse.BoardCreate> createBoard(
-            @AuthMember Member member,
-            @RequestBody BoardRequest.BoardCreate request
-    ) {
+    private BaseResponse<BoardCreate> createBoard(@AuthMember Member member, @RequestBody BoardRequest.BoardCreate request) {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
-    }
-
-    @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-    })
-    @GetMapping("/redis")
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRedis(
-            @AuthMember Member member,
-            @RequestParam(name = "boardType", required = false) BoardType boardType
-            // TODO: 페이징 프론트 이슈로 추후 구현
-//            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
-            ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType));
     }
 
     @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
-    @GetMapping()
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
-            @AuthMember Member member,
+    @GetMapping
+    private BaseResponse<BoardsGetByBoardType> getBoardsByBoardType(@AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
 //            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
-    ) {
+            ) {
         return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
     }
 
@@ -67,10 +49,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @DeleteMapping("/{boardId}")
-    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(
-            @AuthMember Member member,
-            @PathVariable(name = "boardId") Long boardId
-    ) {
+    private BaseResponse<BoardDelete> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
     }
 
@@ -79,16 +58,14 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/search")
-    private BaseResponse<BoardResponse.BoardsSearchByKeyword> searchBoardsByKeyword(
-            @RequestParam(name = "keyword") String keyword
-    ) {
+    private BaseResponse<BoardsSearchByKeyword> searchBoardsByKeyword(@RequestParam(name = "keyword") String keyword) {
         return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(keyword));
     }
 
     @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
-            "pathvariable 으로 boardId를 주세요.")
+            "pathVariable 으로 boardId를 주세요.")
     @PostMapping("/{boardId}/heart")
-    public BaseResponse<BoardResponse.ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+    public BaseResponse<ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.toggleBoardHeart(member, boardId));
     }
 }

@@ -8,11 +8,8 @@ import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardComme
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
-import com.server.capple.domain.boardComment.entity.BoardCommentHeart;
-import com.server.capple.domain.boardComment.mapper.BoardCommentHeartMapper;
 import com.server.capple.domain.boardComment.mapper.BoardCommentMapper;
 import com.server.capple.domain.boardComment.repository.BoardCommentHeartRedisRepository;
-import com.server.capple.domain.boardComment.repository.BoardCommentHeartRepository;
 import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
@@ -34,9 +31,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     private final BoardService boardService;
     private final BoardCommentRepository boardCommentRepository;
     private final BoardCommentHeartRedisRepository boardCommentHeartRedisRepository;
-    private final BoardCommentHeartRepository boardCommentHeartRepository;
     private final BoardCommentMapper boardCommentMapper;
-    private final BoardCommentHeartMapper boardCommentHeartMapper;
     private final NotificationService notificationService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
 
@@ -83,14 +78,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Transactional
     public ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long boardCommentId) {
         BoardComment boardComment = findBoardComment(boardCommentId);
-        //boardCommentHeart에 없다면 새로 저장
-        BoardCommentHeart boardCommentHeart = boardCommentHeartRepository.findByMemberAndBoardComment(member, boardComment)
-                .orElseGet(() -> {
-                    BoardCommentHeart newHeart = boardCommentHeartMapper.toBoardCommentHeart(boardComment, member);
-                    return boardCommentHeartRepository.save(newHeart);
-                });
-        boolean isLiked = boardCommentHeart.toggleHeart();
-        boardComment.setHeartCount(boardCommentHeart.isLiked());
+        Boolean isLiked = boardCommentHeartRedisRepository.toggleBoardCommentHeart(boardCommentId, member.getId());
         if(isLiked && !boardComment.getMember().getId().equals(member.getId())) {
             notificationService.sendBoardCommentHeartNotification(member.getId(), boardComment.getBoard(), boardComment);
         }
@@ -103,10 +91,10 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         List<BoardCommentInfo> commentInfos = boardCommentRepository
                 .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
                         comment -> {
-                            Boolean isLiked = boardCommentHeartRepository.findByMemberAndBoardComment(member, comment)
-                                    .isPresent();
+                            Boolean isLiked = boardCommentHeartRedisRepository.isMemberLiked(comment.getId(), member.getId());
+                            Integer heartCount = boardCommentHeartRedisRepository.getBoardCommentsHeartCount(comment.getId());
                             Boolean isMine = comment.getMember().getId().equals(member.getId());
-                            return boardCommentMapper.toBoardCommentInfo(comment, isLiked, isMine);
+                            return boardCommentMapper.toBoardCommentInfo(comment, heartCount, isLiked, isMine);
                         }).toList();
 
         return new BoardCommentInfos(commentInfos);

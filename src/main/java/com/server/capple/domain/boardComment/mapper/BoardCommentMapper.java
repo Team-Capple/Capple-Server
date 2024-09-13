@@ -17,26 +17,12 @@ public class BoardCommentMapper {
                 .build();
     }
 
-    //redis
     public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Integer boardHeart, Boolean isLiked, Boolean isMine) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())
                 .writerId(comment.getMember().getId())
                 .content(comment.getContent())
                 .heartCount(boardHeart)
-                .isLiked(isLiked)
-                .isMine(isMine)
-                .createdAt(comment.getCreatedAt())
-                .build();
-    }
-
-    //rdb
-    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Boolean isLiked, Boolean isMine) {
-        return BoardCommentInfo.builder()
-                .boardCommentId(comment.getId())
-                .writerId(comment.getMember().getId())
-                .content(comment.getContent())
-                .heartCount(comment.getHeartCount())
                 .isLiked(isLiked)
                 .isMine(isMine)
                 .createdAt(comment.getCreatedAt())

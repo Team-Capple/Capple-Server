@@ -8,8 +8,6 @@ import com.server.capple.domain.member.entity.Member;
 public interface BoardService {
     BoardCreate createBoard(Member member, BoardType boardType, String content);
 
-    BoardsGetByBoardType getBoardsByBoardTypeWithRedis(Member member, BoardType boardType);
-
     BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType);
 
     BoardDelete deleteBoard(Member member, Long boardId);
