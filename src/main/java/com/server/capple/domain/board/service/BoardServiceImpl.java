@@ -1,5 +1,6 @@
 package com.server.capple.domain.board.service;
 
+import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
@@ -74,23 +75,19 @@ public class BoardServiceImpl implements BoardService {
     //rdb
     @Override
     public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
-        List<Board> boards;
+        List<BoardInfoInterface> boardInfos;
         if (boardType == null) {
-            boards = boardRepository.findAll();
+            boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, null);
         } else if (boardType == BoardType.FREEBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
+            boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, BoardType.FREEBOARD);
         } else if (boardType == BoardType.HOTBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
+            boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, BoardType.HOTBOARD);
         } else {
             throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
         }
-        return boardMapper.toBoardsGetByBoardType(boards.stream()
+        return boardMapper.toBoardsGetByBoardType(boardInfos.stream()
                 // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(board -> {
-                    boolean isLiked = boardHeartRepository.findByMemberAndBoard(member,board).isPresent();
-                    boolean isMine =  board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, isLiked, isMine,false);
-                })
+                .map(boardInfo -> boardMapper.toBoardsGetByBoardTypeBoardInfo(boardInfo.getBoard(),boardInfo.getIsLike() , boardInfo.getIsMine(),false))
                 .toList()
         );
     }
