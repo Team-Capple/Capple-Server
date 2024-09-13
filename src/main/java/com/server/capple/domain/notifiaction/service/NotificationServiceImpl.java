@@ -7,11 +7,14 @@ import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.notifiaction.dto.NotificationResponse.NotificationInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import com.server.capple.domain.notifiaction.mapper.NotificationMapper;
 import com.server.capple.domain.notifiaction.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -84,5 +87,10 @@ public class NotificationServiceImpl implements NotificationService {
         // TODO 알림 데이터베이스 저장
         Notification notification = notificationMapper.toNotification(boardComment.getMember().getId(), boardCommentNotificationBody);
         notificationRepository.save(notification);
+    }
+
+    @Override
+    public Slice<NotificationInfo> getNotifications(Member member, Pageable pageable) {
+        return notificationRepository.findByMemberId(member.getId(), pageable, NotificationInfo.class);
     }
 }
