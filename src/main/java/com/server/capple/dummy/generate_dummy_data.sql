@@ -1,4 +1,4 @@
-create procedure generate_dummy_data2(IN member_count integer, IN board_count integer)
+create procedure generate_dummy_data(IN member_count integer, IN board_count integer)
     language plpgsql
 as
 $$
