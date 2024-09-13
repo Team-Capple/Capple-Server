@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.server.capple.domain.notifiaction.entity.NotificationType.*;
@@ -92,5 +93,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public Slice<NotificationInfo> getNotifications(Member member, Pageable pageable) {
         return notificationRepository.findByMemberId(member.getId(), pageable, NotificationInfo.class);
+    }
+
+    @Override
+    @Transactional
+    public void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime) {
+        notificationRepository.deleteNotificationsByCreatedAtBefore(targetTime);
     }
 }
