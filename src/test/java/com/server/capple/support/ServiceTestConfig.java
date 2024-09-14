@@ -135,7 +135,7 @@ public abstract class ServiceTestConfig {
     protected BoardComment createBoardComment() {
         return boardCommentRepository.save(
                 BoardComment.builder()
-                        .member(member)
+                        .writer(member)
                         .board(board)
                         .content("게시글 댓글")
                         .heartCount(0)

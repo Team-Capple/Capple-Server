@@ -29,12 +29,6 @@ public class BoardMapper {
                 .build();
     }
 
-    public BoardsGetBoardInfos toBoardsGetBoardInfos(List<BoardsGetBoardInfo> boards) {
-        return BoardsGetBoardInfos.builder()
-                .boards(boards)
-                .build();
-    }
-
     //redis
     public BoardsGetBoardInfo toBoardsGetBoardInfo(Board board, Integer boardHeartsCount, Boolean isLiked,
             Boolean isMine, Boolean isReported) {

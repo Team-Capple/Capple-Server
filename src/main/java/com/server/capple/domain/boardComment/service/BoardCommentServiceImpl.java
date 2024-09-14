@@ -2,9 +2,9 @@ package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.service.BoardService;
+import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
@@ -91,31 +91,23 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                 });
         boolean isLiked = boardCommentHeart.toggleHeart();
         boardComment.setHeartCount(boardCommentHeart.isLiked());
-        if(isLiked && !boardComment.getMember().getId().equals(member.getId())) {
+        if (isLiked && !boardComment.getWriter().getId().equals(member.getId())) {
             notificationService.sendBoardCommentHeartNotification(member.getId(), boardComment.getBoard(), boardComment);
         }
         return new ToggleBoardCommentHeart(boardCommentId, isLiked);
     }
 
-    //rdb
+
     @Override
     public BoardCommentInfos getBoardCommentInfos(Member member, Long boardId) {
-        List<BoardCommentInfo> commentInfos = boardCommentRepository
-                .findBoardCommentByBoardIdOrderByCreatedAt(boardId).stream().map(
-                        comment -> {
-                            Boolean isLiked = boardCommentHeartRepository.findByMemberAndBoardComment(member, comment)
-                                    .isPresent();
-                            Boolean isMine = comment.getMember().getId().equals(member.getId());
-                            return boardCommentMapper.toBoardCommentInfo(comment, isLiked, isMine);
-                        }).toList();
+        List<BoardCommentInfoInterface> commentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId);
 
-        return new BoardCommentInfos(commentInfos);
+        return new BoardCommentInfos(commentInfos.stream().map(commentInfo ->
+                boardCommentMapper.toBoardCommentInfo(commentInfo.getBoardComment(), commentInfo.getIsLike(), commentInfo.getIsMine())).toList());
     }
 
     private void checkPermission(Member member, BoardComment boardComment) {
-        Member loginMember = memberService.findMember(member.getId());
-
-        if (!loginMember.getId().equals(boardComment.getMember().getId()))
+        if (!member.getId().equals(boardComment.getWriter().getId()))
             throw new RestApiException(CommentErrorCode.COMMENT_NOT_FOUND);
     }
 

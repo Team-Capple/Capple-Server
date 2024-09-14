@@ -61,7 +61,7 @@ public class NotificationServiceImpl implements NotificationService {
             .type(BOARD_COMMENT_HEART)
             .board(board)
             .boardComment(boardComment)
-            .build(), boardComment.getMember().getId());
+            .build(), boardComment.getWriter().getId());
         // TODO 알림 데이터베이스 저장
     }
 }

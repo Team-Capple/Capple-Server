@@ -56,7 +56,7 @@ public class BoardServiceImpl implements BoardService {
             boards = boardRepository.findBoardsByBoardType(boardType);
         }
 
-        return boardMapper.toBoardsGetBoardInfos(boards.stream()
+        return new BoardsGetBoardInfos(boards.stream()
                 // TODO: BoardReport 관련 테이블 구현 후 수정 요망
                 .map(board -> {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
@@ -73,7 +73,7 @@ public class BoardServiceImpl implements BoardService {
     public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
         List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
 
-        return boardMapper.toBoardsGetBoardInfos(boardInfos.stream()
+        return new BoardsGetBoardInfos(boardInfos.stream()
                 // TODO: BoardReport 관련 테이블 구현 후 수정 요망
                 .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(),
                         boardInfo.getIsMine(), false))
@@ -85,7 +85,7 @@ public class BoardServiceImpl implements BoardService {
     public BoardsGetBoardInfos searchBoardsByKeyword(Member member, String keyword) {
         List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword);
 
-        return boardMapper.toBoardsGetBoardInfos(boardInfos.stream()
+        return new BoardsGetBoardInfos(boardInfos.stream()
                 // TODO: BoardReport 관련 테이블 구현 후 수정 요망
                 .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine(), false))
                 .toList()
