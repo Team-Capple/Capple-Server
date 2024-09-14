@@ -58,8 +58,8 @@ public class SecurityConfig {
                 .requestMatchers("/reports", "/reports/**").authenticated()
                 .requestMatchers("/boards", "/boards/**").authenticated()
                 .requestMatchers("/board-comments", "/board-comments/**").authenticated()
-                .requestMatchers("/reports/board-comments", "/reports/board-comments/**").authenticated()
-                .requestMatchers("/reports/boards", "/reports/boards/**").authenticated()
+                .requestMatchers("/reports/board-comment", "/reports/board-comment/**").authenticated()
+                .requestMatchers("/reports/board", "/reports/board/**").authenticated()
                 .requestMatchers("/notifications", "/notifications/**").authenticated()
                 .requestMatchers("/dummy","/dummy/**").hasRole(Role.ROLE_ADMIN.getName())
                 .anyRequest().denyAll());
