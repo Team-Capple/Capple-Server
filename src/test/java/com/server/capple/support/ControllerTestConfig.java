@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.mockito.Mockito.when;
 
@@ -122,6 +123,7 @@ public abstract class ControllerTestConfig {
                         .createdAt(LocalDateTime.now())
                         .heartCount(2)
                         .isLiked(TRUE)
+                        .isReport(FALSE)
                         .build());
 
         return new BoardCommentInfos(commentInfos);

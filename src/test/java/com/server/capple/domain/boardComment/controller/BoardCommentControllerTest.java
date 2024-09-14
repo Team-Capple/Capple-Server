@@ -33,7 +33,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 생성 API 테스트")
     public void createBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/board/{boardId}";
+        final String url = "/board-comments/board/{boardId}";
 
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
@@ -59,7 +59,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 수정 API 테스트")
     public void updateBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/{commentId}";
+        final String url = "/board-comments/{commentId}";
 
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
@@ -85,7 +85,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 삭제 API 테스트")
     public void deleteBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/{commentId}";
+        final String url = "/board-comments/{commentId}";
         BoardCommentId response = new BoardCommentId(1L);
 
         doReturn(response).when(boardCommentService).deleteBoardComment(any(Member.class), any(Long.class));
@@ -108,7 +108,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 좋아요/취소 API 테스트")
     public void heartBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/heart/{commentId}";
+        final String url = "/board-comments/heart/{commentId}";
         ToggleBoardCommentHeart response = new ToggleBoardCommentHeart(1L, Boolean.TRUE);
 
         doReturn(response).when(boardCommentService).toggleBoardCommentHeart(any(Member.class), any(Long.class));
@@ -132,7 +132,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 리스트 조회 API 테스트")
     public void getBoardCommentInfosTest() throws Exception {
         //given
-        final String url = "/boardComments/{boardId}";
+        final String url = "/board-comments/{boardId}";
         BoardCommentInfos response = getBoardCommentInfos();
 
         doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class));

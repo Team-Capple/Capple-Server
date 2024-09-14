@@ -32,6 +32,9 @@ public class BoardComment extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private Boolean isReport;
+
     @ColumnDefault("0")
     private Integer heartCount;
 
@@ -39,6 +42,9 @@ public class BoardComment extends BaseEntity {
         this.content = content;
     }
 
+    public void submitReport() { this.isReport = Boolean.TRUE; }
+
+    public void cancelReport() { this.isReport = Boolean.FALSE; }
     public void setHeartCount(boolean isLiked) {
         if (isLiked) {
             this.heartCount++;

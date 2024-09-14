@@ -13,7 +13,7 @@ public class BoardCommentMapper {
                 .member(member)
                 .board(board)
                 .content(comment)
-                .heartCount(0)
+                .isReport(Boolean.FALSE)
                 .build();
     }
 
@@ -26,7 +26,9 @@ public class BoardCommentMapper {
                 .heartCount(boardHeart)
                 .isLiked(isLiked)
                 .isMine(isMine)
+                .isReport(comment.getIsReport())
                 .createdAt(comment.getCreatedAt())
+                .heartCount(0)
                 .build();
     }
 
@@ -39,6 +41,7 @@ public class BoardCommentMapper {
                 .heartCount(comment.getHeartCount())
                 .isLiked(isLiked)
                 .isMine(isMine)
+                .isReport(comment.getIsReport())
                 .createdAt(comment.getCreatedAt())
                 .build();
     }

@@ -26,6 +26,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
+import static java.lang.Boolean.FALSE;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class ServiceTestConfig {
@@ -138,6 +140,7 @@ public abstract class ServiceTestConfig {
                         .member(member)
                         .board(board)
                         .content("게시글 댓글")
+                        .isReport(FALSE)
                         .heartCount(0)
                         .build());
     }

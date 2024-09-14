@@ -31,6 +31,7 @@ public class BoardCommentResponse {
         private Integer heartCount;
         private Boolean isLiked;
         private Boolean isMine;
+        private Boolean isReport;
         private LocalDateTime createdAt;
     }
 
