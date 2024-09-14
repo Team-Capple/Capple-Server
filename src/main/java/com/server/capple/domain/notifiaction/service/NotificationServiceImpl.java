@@ -38,7 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
             .board(board)
             .build();
         apnsService.sendApnsToMembers(boardNotificationBody, board.getWriter().getId());
-        // TODO 알림 데이터베이스 저장
+        // 알림 데이터베이스 저장
         Notification notification = notificationMapper.toNotification(board.getWriter().getId(), boardNotificationBody);
         notificationRepository.save(notification);
     }
