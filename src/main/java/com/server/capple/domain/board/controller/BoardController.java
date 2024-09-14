@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +28,8 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping()
-    private BaseResponse<BoardResponse.BoardCreate> createBoard(
-            @AuthMember Member member,
-            @RequestBody BoardRequest.BoardCreate request
-    ) {
+    private BaseResponse<BoardResponse.BoardCreate> createBoard(@AuthMember Member member,
+                                                                @RequestBody @Valid BoardRequest.BoardCreate request) {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
@@ -67,7 +66,8 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/search")
-    private BaseResponse<BoardResponse.BoardsGetBoardInfos> searchBoardsByKeyword(@AuthMember Member member, @RequestParam(name = "keyword") String keyword) {
+    private BaseResponse<BoardResponse.BoardsGetBoardInfos> searchBoardsByKeyword(@AuthMember Member member,
+                                                                                  @RequestParam(name = "keyword") String keyword) {
         return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword));
     }
 
@@ -77,10 +77,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @DeleteMapping("/{boardId}")
-    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(
-            @AuthMember Member member,
-            @PathVariable(name = "boardId") Long boardId
-    ) {
+    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
     }
 
