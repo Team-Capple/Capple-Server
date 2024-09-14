@@ -1,8 +1,7 @@
 package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.dao.BoardInfoInterface;
-import com.server.capple.domain.board.dto.BoardResponse;
-import com.server.capple.domain.board.dto.BoardResponse.BoardDelete;
+import com.server.capple.domain.board.dto.BoardResponse.BoardId;
 import com.server.capple.domain.board.dto.BoardResponse.BoardsGetBoardInfos;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
@@ -39,14 +38,26 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional
-    public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
+    public BoardId createBoard(Member member, BoardType boardType, String content) {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
 
-        return boardMapper.toBoardCreate(board);
+        return new BoardId(board.getId());
     }
 
-    //redis
+    @Override
+    public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
+        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
+
+        return new BoardsGetBoardInfos(boardInfos.stream()
+                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
+                .toList()
+        );
+    }
+
+    /*
+    redis 성능 테스트 용
+     */
     @Override
     public BoardsGetBoardInfos getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
         List<Board> boards;
@@ -57,26 +68,12 @@ public class BoardServiceImpl implements BoardService {
         }
 
         return new BoardsGetBoardInfos(boards.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
                 .map(board -> {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
                     boolean isMine = board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetBoardInfo(board, heartCount, isLiked, isMine, false);
+                    return boardMapper.toBoardsGetBoardInfo(board, heartCount, isLiked, isMine);
                 })
-                .toList()
-        );
-    }
-
-    //rdb
-    @Override
-    public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
-        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
-
-        return new BoardsGetBoardInfos(boardInfos.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(),
-                        boardInfo.getIsMine(), false))
                 .toList()
         );
     }
@@ -86,21 +83,20 @@ public class BoardServiceImpl implements BoardService {
         List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword);
 
         return new BoardsGetBoardInfos(boardInfos.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine(), false))
+                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
                 .toList()
         );
     }
 
     @Override
     @Transactional
-    public BoardDelete deleteBoard(Member member, Long boardId) {
+    public BoardId deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
         checkPermission(member, board);
 
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
-        return boardMapper.toBoardDelete(board);
+        return new BoardId(board.getId());
     }
 
     @Override

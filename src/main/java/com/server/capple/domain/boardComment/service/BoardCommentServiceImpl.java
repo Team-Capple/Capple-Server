@@ -43,13 +43,12 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     @Override
     @Transactional
     public BoardCommentId createBoardComment(Member member, Long boardId, BoardCommentRequest request) {
-        Member loginMember = memberService.findMember(member.getId());
         Board board = boardService.findBoard(boardId);
 
         BoardComment boardComment = boardCommentRepository.save(
-                boardCommentMapper.toBoardComment(loginMember, board, request.getComment()));
-        notificationService.sendBoardCommentNotification(loginMember.getId(), board, boardComment); // 게시글 댓글 알림
-        boardSubscribeMemberService.createBoardSubscribeMember(loginMember, board); // 알림 리스트 추가
+                boardCommentMapper.toBoardComment(member, board, request.getComment()));
+        notificationService.sendBoardCommentNotification(member.getId(), board, boardComment); // 게시글 댓글 알림
+        boardSubscribeMemberService.createBoardSubscribeMember(member, board); // 알림 리스트 추가
 
         board.increaseCommentCount();
         return new BoardCommentId(boardComment.getId());

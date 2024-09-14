@@ -2,7 +2,9 @@ package com.server.capple.domain.board.controller;
 
 import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.board.dto.BoardRequest;
-import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dto.BoardResponse.BoardId;
+import com.server.capple.domain.board.dto.BoardResponse.BoardsGetBoardInfos;
+import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.service.BoardService;
 import com.server.capple.domain.member.entity.Member;
@@ -28,8 +30,8 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping()
-    private BaseResponse<BoardResponse.BoardCreate> createBoard(@AuthMember Member member,
-                                                                @RequestBody @Valid BoardRequest.BoardCreate request) {
+    private BaseResponse<BoardId> createBoard(@AuthMember Member member,
+                                              @RequestBody @Valid BoardRequest.BoardCreate request) {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
@@ -38,7 +40,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/redis")
-    private BaseResponse<BoardResponse.BoardsGetBoardInfos> getBoardsByBoardTypeWithRedis(
+    private BaseResponse<BoardsGetBoardInfos> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
@@ -52,7 +54,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping()
-    private BaseResponse<BoardResponse.BoardsGetBoardInfos> getBoardsByBoardType(
+    private BaseResponse<BoardsGetBoardInfos> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
@@ -66,8 +68,8 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/search")
-    private BaseResponse<BoardResponse.BoardsGetBoardInfos> searchBoardsByKeyword(@AuthMember Member member,
-                                                                                  @RequestParam(name = "keyword") String keyword) {
+    private BaseResponse<BoardsGetBoardInfos> searchBoardsByKeyword(@AuthMember Member member,
+                                                                    @RequestParam(name = "keyword") String keyword) {
         return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword));
     }
 
@@ -77,14 +79,14 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @DeleteMapping("/{boardId}")
-    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
+    private BaseResponse<BoardId> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
     }
 
     @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
-            "pathvariable 으로 boardId를 주세요.")
+            "pathVariable 으로 boardId를 주세요.")
     @PostMapping("/{boardId}/heart")
-    public BaseResponse<BoardResponse.ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+    public BaseResponse<ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.toggleBoardHeart(member, boardId));
     }
 }

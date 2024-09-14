@@ -11,10 +11,8 @@ import java.util.List;
 public class BoardResponse {
 
     @Getter
-    @Builder
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardCreate {
+    public static class BoardId {
         private Long boardId;
     }
 
@@ -40,14 +38,6 @@ public class BoardResponse {
         private Boolean isMine;
         private Boolean isReported;
         private Boolean isLiked;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardDelete {
-        private Long boardId;
     }
 
     @Getter
