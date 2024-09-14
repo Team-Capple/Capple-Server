@@ -16,11 +16,14 @@ public class AnswerResponse {
     @Builder
     public static class AnswerInfo {
         private Long answerId;
+        private Long writerId;
         private String profileImage;
         private String nickname;
         private String content;
-        private Boolean isMyAnswer;
+        private Boolean isMine;
         private Boolean isReported;
+        private Boolean isLiked;
+        private String writeAt;
     }
 
     @Getter
@@ -44,11 +47,13 @@ public class AnswerResponse {
     public static class MemberAnswerInfo {
         private Long questionId;
         private Long answerId;
+        private Long writerId;
         private String nickname;
         private String profileImage;
         private String content;
         private int heartCount;
         private String writeAt;
+        private Boolean isLiked;
     }
 
     @Getter

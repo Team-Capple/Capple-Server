@@ -36,6 +36,9 @@ public class Question extends BaseEntity {
 
     private LocalDateTime livedAt;
 
+//    @Column(nullable = false)
+//    private Integer commentCount;
+
     //question Status를 바꾸는 함수
     public void setQuestionStatus(QuestionStatus questionStatus) {
         this.questionStatus = questionStatus;
@@ -43,5 +46,13 @@ public class Question extends BaseEntity {
         if (questionStatus.equals(QuestionStatus.LIVE))
             this.livedAt = LocalDateTime.now();
     }
+
+//    public void increaseCommentCount() {
+//        this.commentCount += 1;
+//    }
+//
+//    public void decreaseCommentCount() {
+//        this.commentCount -= 1;
+//    }
 
 }

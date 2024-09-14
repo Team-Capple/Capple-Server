@@ -1,13 +1,11 @@
 package com.server.capple.domain.board.dto;
 
-import com.server.capple.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BoardResponse {
@@ -25,7 +23,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsGetByBoardType {
-        private List<BoardsGetByBoardTypeBoardInfo> boards = new ArrayList<>();
+        private List<BoardsGetByBoardTypeBoardInfo> boards;
     }
 
     @Getter
@@ -39,6 +37,9 @@ public class BoardResponse {
         private Integer heartCount;
         private Integer commentCount;
         private LocalDateTime createAt;
+        private Boolean isMine;
+        private Boolean isReported;
+        private Boolean isLiked;
     }
 
     @Getter
@@ -54,7 +55,7 @@ public class BoardResponse {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class BoardsSearchByKeyword {
-        private List<BoardsSearchByKeywordBoardInfo> boards = new ArrayList<>();
+        private List<BoardsSearchByKeywordBoardInfo> boards;
     }
 
     @Getter
@@ -74,7 +75,7 @@ public class BoardResponse {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BoardToggleHeart {
+    public static class ToggleBoardHeart {
         private Long boardId;
         private Boolean isLiked;
     }
