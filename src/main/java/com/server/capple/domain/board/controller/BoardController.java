@@ -39,7 +39,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/redis")
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRedis(
+    private BaseResponse<BoardResponse.BoardsGetBoardInfos> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
@@ -53,7 +53,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping()
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
+    private BaseResponse<BoardResponse.BoardsGetBoardInfos> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType
             // TODO: 페이징 프론트 이슈로 추후 구현
@@ -61,6 +61,16 @@ public class BoardController {
     ) {
         return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
     }
+
+    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다. 자유게시판에서만 검색이 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/search")
+    private BaseResponse<BoardResponse.BoardsGetBoardInfos> searchBoardsByKeyword(@AuthMember Member member, @RequestParam(name = "keyword") String keyword) {
+        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword));
+    }
+
 
     @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")
     @ApiResponses(value = {
@@ -72,17 +82,6 @@ public class BoardController {
             @PathVariable(name = "boardId") Long boardId
     ) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
-    }
-
-    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-    })
-    @GetMapping("/search")
-    private BaseResponse<BoardResponse.BoardsSearchByKeyword> searchBoardsByKeyword(
-            @RequestParam(name = "keyword") String keyword
-    ) {
-        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(keyword));
     }
 
     @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
