@@ -5,7 +5,6 @@ import com.server.capple.domain.boardReport.dto.BoardReportRequest;
 import com.server.capple.domain.boardReport.dto.BoardReportResponse;
 import com.server.capple.domain.boardReport.service.BoardReportService;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.report.dto.reponse.ReportResponse;
 import com.server.capple.global.common.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

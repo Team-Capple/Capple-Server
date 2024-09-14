@@ -30,7 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardCommentServiceImpl implements BoardCommentService {
-    private final MemberService memberService;
     private final BoardService boardService;
     private final BoardCommentRepository boardCommentRepository;
     private final BoardCommentHeartRedisRepository boardCommentHeartRedisRepository;

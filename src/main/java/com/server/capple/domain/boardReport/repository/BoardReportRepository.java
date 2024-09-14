@@ -12,7 +12,5 @@ public interface BoardReportRepository extends JpaRepository<BoardReport, Long> 
 
     Boolean existsByMemberAndBoard(Member member, Board board);
 
-    Optional<BoardReport> findByMemberAndBoard(Member member, Board board);
-
     List<BoardReport> findByMember(Member member);
 }
