@@ -1,9 +1,9 @@
-create function generate_dummy_data(member_count integer, board_count integer) returns void
+create procedure generate_dummy_data(IN member_count integer, IN board_count integer)
     language plpgsql
 as
 $$
 DECLARE
-    member_id INT;
+member_id INT;
     board_id INT;
     random_content TEXT;
     random_comment_count INT;
@@ -29,17 +29,17 @@ FOR board_id IN 1..board_count LOOP
             random_comment_count := FLOOR(RANDOM() * 100);
 
             -- FREEBOARD와 HOTBOARD를 번갈아가며 설정 (0은 FREEBOARD, 1은 HOTBOARD)
-            IF board_id % 2 = 0 THEN
+            /*IF board_id % 2 = 0 THEN
                 random_board_type := 0;
             ELSE
                 random_board_type := 1;
-            END IF;
+            END IF;*/
 
             -- 보드 데이터 삽입
 INSERT INTO board (member_id, board_type, content, comment_count, created_at, updated_at)
 VALUES (
            FLOOR(RANDOM() * member_count) + 1,
-           random_board_type,
+           0,
            random_content,
            random_comment_count,
            NOW(),
@@ -60,9 +60,12 @@ FOR board_id IN 1..board_count LOOP
                                    NOW(),
                                    NULL
                                );
-                    END IF;
-            END LOOP;
+END IF;
+END LOOP;
 END LOOP;
 
 END;
 $$;
+
+alter procedure generate_dummy_data(integer, integer) owner to capple;
+
