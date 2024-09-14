@@ -14,7 +14,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query("SELECT b AS board, (CASE WHEN bh.member = :member AND bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
             "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM Board b LEFT JOIN BoardHeart bh ON b = bh.board " +
-            "AND :boardType IS NULL OR b.boardType = :boardType ORDER BY b.createdAt DESC")
+            "WHERE :boardType IS NULL OR b.boardType = :boardType ORDER BY b.createdAt DESC")
     List<BoardInfoInterface> findBoardInfosByMemberAndBoardType(Member member, BoardType boardType);
 
     List<Board> findBoardsByBoardType(BoardType boardType);
