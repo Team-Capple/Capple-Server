@@ -14,8 +14,10 @@ import com.server.capple.domain.boardComment.mapper.BoardCommentMapper;
 import com.server.capple.domain.boardComment.repository.BoardCommentHeartRedisRepository;
 import com.server.capple.domain.boardComment.repository.BoardCommentHeartRepository;
 import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
+import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
+import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     private final BoardCommentHeartRepository boardCommentHeartRepository;
     private final BoardCommentMapper boardCommentMapper;
     private final BoardCommentHeartMapper boardCommentHeartMapper;
+    private final NotificationService notificationService;
+    private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
     @Transactional
@@ -44,6 +48,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
         BoardComment boardComment = boardCommentRepository.save(
                 boardCommentMapper.toBoardComment(loginMember, board, request.getComment()));
+        notificationService.sendBoardCommentNotification(loginMember.getId(), board, boardComment); // 게시글 댓글 알림
+        boardSubscribeMemberService.createBoardSubscribeMember(loginMember, board); // 알림 리스트 추가
 
         board.increaseCommentCount();
         return new BoardCommentId(boardComment.getId());
@@ -85,6 +91,9 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                 });
         boolean isLiked = boardCommentHeart.toggleHeart();
         boardComment.setHeartCount(boardCommentHeart.isLiked());
+        if(isLiked && !boardComment.getMember().getId().equals(member.getId())) {
+            notificationService.sendBoardCommentHeartNotification(member.getId(), boardComment.getBoard(), boardComment);
+        }
         return new ToggleBoardCommentHeart(boardCommentId, isLiked);
     }
 
