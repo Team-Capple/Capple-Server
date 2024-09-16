@@ -9,14 +9,15 @@ import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
-import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfo;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfos;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
+import com.server.capple.global.common.SliceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -114,7 +115,7 @@ public abstract class ControllerTestConfig {
         return new BoardCommentRequest("게시글 댓글");
     }
 
-    protected BoardCommentInfos getBoardCommentInfos() {
+    protected SliceResponse<BoardCommentInfo> getSliceBoardCommentInfos() {
         List<BoardCommentInfo> commentInfos =
                 List.of(BoardCommentInfo.builder()
                         .boardCommentId(1L)
@@ -126,7 +127,15 @@ public abstract class ControllerTestConfig {
                         .isReport(FALSE)
                         .build());
 
-        return new BoardCommentInfos(commentInfos);
+
+        return SliceResponse.<BoardCommentInfo>builder()
+                .number(0)
+                .size(10)
+                .content(commentInfos)
+                .numberOfElements(1)
+                .hasPrevious(false)
+                .hasNext(true)
+                .build();
     }
 
     protected AnswerCommentRequest getAnswerCommentRequest() {

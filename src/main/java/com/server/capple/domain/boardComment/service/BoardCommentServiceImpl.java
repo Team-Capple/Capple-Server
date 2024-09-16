@@ -2,10 +2,9 @@ package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.service.BoardService;
-import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardComment.entity.BoardCommentHeart;
@@ -16,15 +15,14 @@ import com.server.capple.domain.boardComment.repository.BoardCommentHeartReposit
 import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -97,11 +95,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
 
     @Override
-    public BoardCommentInfos getBoardCommentInfos(Member member, Long boardId) {
-        List<BoardCommentInfoInterface> commentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId);
-
-        return new BoardCommentInfos(commentInfos.stream().map(commentInfo ->
-                boardCommentMapper.toBoardCommentInfo(commentInfo.getBoardComment(), commentInfo.getIsLike(), commentInfo.getIsMine())).toList());
+    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Pageable pageable) {
+        return boardCommentMapper.toSliceBoardCommentInfo(boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId, pageable));
     }
 
     private void checkPermission(Member member, BoardComment boardComment) {
