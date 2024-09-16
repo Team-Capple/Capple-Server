@@ -1,12 +1,9 @@
 package com.server.capple.domain.boardComment.mapper;
 
 import com.server.capple.domain.board.entity.Board;
-import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.global.common.SliceResponse;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 @Component

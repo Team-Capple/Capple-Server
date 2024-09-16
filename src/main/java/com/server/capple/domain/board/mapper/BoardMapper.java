@@ -1,20 +1,13 @@
 package com.server.capple.domain.board.mapper;
 
-import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
-import com.server.capple.domain.board.repository.BoardHeartRedisRepository;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.global.common.SliceResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class BoardMapper {
-    private final BoardHeartRedisRepository boardHeartRedisRepository;
 
     public Board toBoard(Member member, BoardType boardType, String content) {
         return Board.builder()
