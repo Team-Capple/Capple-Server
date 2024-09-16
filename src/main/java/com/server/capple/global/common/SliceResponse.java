@@ -35,4 +35,19 @@ public class SliceResponse<T> {
         this.hasPrevious = hasPrevious;
         this.hasNext = hasNext;
     }
+
+    /**
+     * P : 데이터베이스에서 반환 받은 데이터 타입<BR>
+     * R : 사용자게에 반환할 데이터 타입
+     */
+    public static <P, R> SliceResponse<R> toSliceResponse(Slice<P> sliceObject, List<R> content) {
+        return SliceResponse.<R>builder()
+            .number(sliceObject.getNumber())
+            .size(sliceObject.getSize())
+            .content(content)
+            .numberOfElements(sliceObject.getNumberOfElements())
+            .hasPrevious(sliceObject.hasPrevious())
+            .hasNext(sliceObject.hasNext())
+            .build();
+    }
 }
