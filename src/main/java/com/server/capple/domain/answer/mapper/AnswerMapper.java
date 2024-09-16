@@ -1,6 +1,5 @@
 package com.server.capple.domain.answer.mapper;
 
-import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
@@ -9,8 +8,6 @@ import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
-import com.server.capple.global.common.SliceResponse;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -61,16 +58,5 @@ public class AnswerMapper {
 
     public MemberAnswerList toMemberAnswerList(List<MemberAnswerInfo> memberAnswerInfos) {
         return new MemberAnswerList(memberAnswerInfos);
-    }
-
-    public SliceResponse<AnswerInfo> toAnswerInfoSliceResponse(Slice<AnswerInfoInterface> answerInfoSliceInterface, List<AnswerInfo> content) {
-        return SliceResponse.<AnswerInfo>builder()
-            .number(answerInfoSliceInterface.getNumber())
-            .size(answerInfoSliceInterface.getSize())
-            .content(content)
-            .numberOfElements(answerInfoSliceInterface.getNumberOfElements())
-            .hasPrevious(answerInfoSliceInterface.hasPrevious())
-            .hasNext(answerInfoSliceInterface.hasNext())
-            .build();
     }
 }

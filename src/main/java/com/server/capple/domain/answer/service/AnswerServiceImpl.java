@@ -97,7 +97,7 @@ public class AnswerServiceImpl implements AnswerService {
     public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Pageable pageable) {
         Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
             -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
-        return answerMapper.toAnswerInfoSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
+        return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                 answerInfoDto.getAnswer(),
                 memberId,
