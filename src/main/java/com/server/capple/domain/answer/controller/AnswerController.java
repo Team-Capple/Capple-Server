@@ -83,7 +83,12 @@ public class AnswerController {
 
     @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.")
     @GetMapping("/heart")
-    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberHeartAnswer(@AuthMember Member member) {
-        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member));
+    public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberHeartAnswer(
+        @AuthMember Member member,
+        @Parameter(description = "조회할 페이지 번호<br>0부터 시작")
+        @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+        @Parameter(description = "조회할 페이지 크기")
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

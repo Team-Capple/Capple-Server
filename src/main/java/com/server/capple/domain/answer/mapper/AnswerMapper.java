@@ -2,9 +2,7 @@ package com.server.capple.domain.answer.mapper;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
-import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
@@ -19,12 +17,6 @@ public class AnswerMapper {
                 .member(member)
                 .question(question)
                 .content(request.getAnswer())
-                .build();
-    }
-
-    public AnswerList toAnswerList(List<AnswerInfo> answerInfoList) {
-        return AnswerList.builder()
-                .answerInfos(answerInfoList)
                 .build();
     }
 
@@ -54,9 +46,5 @@ public class AnswerMapper {
                 .writeAt(answer.getCreatedAt().toString())
                 .isLiked(isLiked)
                 .build();
-    }
-
-    public MemberAnswerList toMemberAnswerList(List<MemberAnswerInfo> memberAnswerInfos) {
-        return new MemberAnswerList(memberAnswerInfos);
     }
 }

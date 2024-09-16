@@ -138,9 +138,9 @@ public class AnswerServiceTest extends ServiceTestConfig {
         answerService.toggleAnswerHeart(member, answer.getId());
 
         //when
-        AnswerResponse.MemberAnswerList memberHeartAnswer = answerService.getMemberHeartAnswer(member);
+        SliceResponse<MemberAnswerInfo> memberHeartAnswer = answerService.getMemberHeartAnswer(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         //then
-        assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getHeartCount(), 1);
+        assertEquals(memberHeartAnswer.getContent().get(0).getHeartCount(), 1);
     }
 }

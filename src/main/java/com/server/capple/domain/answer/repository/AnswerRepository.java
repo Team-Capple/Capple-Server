@@ -11,9 +11,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findById(Long answerId);
+
+    Slice<Answer> findByIdIn(Set<Long> answerIds, Pageable pageable);
 
     boolean existsByQuestionAndMember(Question question, Member member);
 

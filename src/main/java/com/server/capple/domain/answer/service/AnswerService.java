@@ -4,7 +4,6 @@ import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.SliceResponse;
@@ -26,5 +25,5 @@ public interface AnswerService {
 
     SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Pageable pageable);
 
-    MemberAnswerList getMemberHeartAnswer(Member member);
+    SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Pageable pageable);
 }

@@ -161,8 +161,8 @@ public class AnswerControllerTest extends ControllerTestConfig {
     public void getMyPageMemberHeartAnswerTest() throws Exception {
         //given
         final String url = "/answers/heart";
-        AnswerResponse.MemberAnswerList response = getMemberAnswerList();
-        given(answerService.getMemberHeartAnswer(any(Member.class))).willReturn(response);
+        SliceResponse<MemberAnswerInfo> response = getSliceMemberAnswerInfos();
+        given(answerService.getMemberHeartAnswer(any(Member.class), any(PageRequest.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
@@ -175,7 +175,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].heartCount").value(1))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].answerId").value(1));
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(1))
+                .andExpect(jsonPath("$.result.content[0].answerId").value(1));
     }
 }

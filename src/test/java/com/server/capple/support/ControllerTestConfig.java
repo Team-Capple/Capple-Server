@@ -6,7 +6,6 @@ import com.server.capple.config.security.auth.service.JpaUserDetailService;
 import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfo;
@@ -97,19 +96,6 @@ public abstract class ControllerTestConfig {
         return AnswerRequest.builder()
             .answer("나는 와플을 좋아하는 사람이 좋아")
             .build();
-    }
-
-    protected MemberAnswerList getMemberAnswerList() {
-        List<MemberAnswerInfo> memberAnswerInfos = List.of(MemberAnswerInfo.builder()
-            .questionId(answer.getQuestion().getId())
-            .answerId(answer.getId())
-            .writerId(member.getId())
-            .profileImage(answer.getMember().getProfileImage())
-            .content(answer.getContent())
-            .heartCount(1)
-            .build());
-
-        return new MemberAnswerList(memberAnswerInfos);
     }
 
     protected SliceResponse<MemberAnswerInfo> getSliceMemberAnswerInfos() {

@@ -6,7 +6,6 @@ import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
@@ -24,8 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -125,12 +122,14 @@ public class AnswerServiceImpl implements AnswerService {
 
     // 유저가 좋아한 답변 조회
     @Override
-    public MemberAnswerList getMemberHeartAnswer(Member member) {
-        return answerMapper.toMemberAnswerList(
-            answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
-                .stream()
-                .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answerId)))
-                .toList()
+    public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Pageable pageable) {
+        Slice<Answer> answerSlice = answerRepository.findByIdIn(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), pageable);
+        return SliceResponse.toSliceResponse(answerSlice, answerSlice.getContent().stream()
+            .map(answer -> answerMapper.toMemberAnswerInfo(
+                answer,
+                answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
+                answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
+            )).toList()
         );
     }
 
