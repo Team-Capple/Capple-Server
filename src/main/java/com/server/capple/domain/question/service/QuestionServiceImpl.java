@@ -2,6 +2,7 @@ package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.dto.response.QuestionResponse;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
@@ -14,6 +15,7 @@ import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,7 +46,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public SliceResponse<QuestionInfo> getQuestions(Member member, Pageable pageable) {
-        return questionMapper.toSliceQuestionInfo(questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member, pageable));
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member, pageable);
+        return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
+            .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
+            ).toList());
     }
 
     @Override

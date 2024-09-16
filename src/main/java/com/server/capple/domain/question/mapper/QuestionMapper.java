@@ -1,12 +1,9 @@
 package com.server.capple.domain.question.mapper;
 
-import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.dto.request.QuestionRequest.QuestionCreate;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.entity.Question;
-import com.server.capple.global.common.SliceResponse;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,19 +38,6 @@ public class QuestionMapper {
 //                .likeCount(likeCount)
 //                .commentCount(question.getCommentCount())
             .isAnswered(isAnswered)
-            .build();
-    }
-
-    public SliceResponse<QuestionInfo> toSliceQuestionInfo(Slice<QuestionInfoInterface> questionSlice) {
-        return SliceResponse.<QuestionInfo>builder()
-            .number(questionSlice.getNumber())
-            .size(questionSlice.getSize())
-            .content(questionSlice.getContent().stream()
-                .map(questionInfoInterface -> toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-                ).toList())
-            .numberOfElements(questionSlice.getNumberOfElements())
-            .hasPrevious(questionSlice.hasPrevious())
-            .hasNext(questionSlice.hasNext())
             .build();
     }
 }
