@@ -73,7 +73,7 @@
     </appender>
 
     <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./log/qapple-info.log</file>
+        <file>./logs/qapple-info.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>INFO</level>
             <onMatch>ACCEPT</onMatch>
@@ -91,7 +91,7 @@
         </rollingPolicy>
     </appender>
     <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./log/qapple-error.log</file>
+        <file>./logs/qapple-error.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
@@ -109,7 +109,7 @@
         </rollingPolicy>
     </appender>
     <appender name="WARN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./log/qapple-warn.log</file>
+        <file>./logs/qapple-warn.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>WARN</level>
             <onMatch>ACCEPT</onMatch>
@@ -127,7 +127,7 @@
         </rollingPolicy>
     </appender>
     <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./log/qapple-debug.log</file>
+        <file>./logs/qapple-debug.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>DEBUG</level>
             <onMatch>ACCEPT</onMatch>
@@ -145,7 +145,7 @@
         </rollingPolicy>
     </appender>
     <appender name="TRACE_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./log/qapple-trace.log</file>
+        <file>./logs/qapple-trace.log</file>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>TRACE</level>
             <onMatch>ACCEPT</onMatch>
