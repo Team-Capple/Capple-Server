@@ -1,9 +1,7 @@
 package com.server.capple.domain.boardComment.mapper;
 
-import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.member.entity.Member;
@@ -22,7 +20,6 @@ public class BoardCommentMapper {
                 .build();
     }
 
-    //rdb
     public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Boolean isLiked, Boolean isMine) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())

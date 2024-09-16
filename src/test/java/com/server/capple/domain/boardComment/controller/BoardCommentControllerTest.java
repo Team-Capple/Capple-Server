@@ -37,7 +37,6 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void createBoardCommentTest() throws Exception {
         //given
         final String url = "/board-comments/board/{boardId}";
-
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 
@@ -63,7 +62,6 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void updateBoardCommentTest() throws Exception {
         //given
         final String url = "/board-comments/{commentId}";
-
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 

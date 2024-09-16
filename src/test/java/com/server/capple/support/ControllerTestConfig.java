@@ -155,5 +155,4 @@ public abstract class ControllerTestConfig {
 
         return new AnswerCommentInfos(answerCommentInfos);
     }
-
 }

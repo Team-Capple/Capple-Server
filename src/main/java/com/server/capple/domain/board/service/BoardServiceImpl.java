@@ -29,7 +29,6 @@ import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
