@@ -2,6 +2,7 @@ package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.service.BoardService;
+import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
@@ -21,6 +22,7 @@ import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +98,14 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
     @Override
     public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Pageable pageable) {
-        return boardCommentMapper.toSliceBoardCommentInfo(boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId, pageable));
+        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId, pageable);
+        return SliceResponse.toSliceResponse(sliceBoardCommentInfos, sliceBoardCommentInfos.getContent().stream().map(sliceBoardCommentInfo ->
+                        boardCommentMapper.toBoardCommentInfo(
+                                sliceBoardCommentInfo.getBoardComment(),
+                                sliceBoardCommentInfo.getIsLike(),
+                                sliceBoardCommentInfo.getIsMine()))
+                .toList()
+        );
     }
 
     private void checkPermission(Member member, BoardComment boardComment) {

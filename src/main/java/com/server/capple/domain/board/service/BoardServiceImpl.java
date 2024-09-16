@@ -1,5 +1,6 @@
 package com.server.capple.domain.board.service;
 
+import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.dto.BoardResponse.BoardId;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
@@ -18,6 +19,7 @@ import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
     private final NotificationService notificationService;
+    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
@@ -46,12 +49,28 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable) {
-        return boardMapper.toSliceBoardInfo(boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable));
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList()
+        );
     }
 
     @Override
     public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable) {
-        return boardMapper.toSliceBoardInfo(boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable));
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList()
+        );
     }
 
     /*
@@ -59,7 +78,18 @@ public class BoardServiceImpl implements BoardService {
      */
     @Override
     public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable) {
-        return boardMapper.toSliceBoardInfoForRedis(member, boardRepository.findBoardInfosForRedis(member, boardType, pageable));
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                    return boardMapper.toBoardInfo(
+                            sliceBoardInfo.getBoard(),
+                            heartCount,
+                            isLiked,
+                            sliceBoardInfo.getIsMine());
+                })
+                .toList());
     }
 
     @Override

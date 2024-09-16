@@ -32,20 +32,4 @@ public class BoardCommentMapper {
                 .createdAt(comment.getCreatedAt())
                 .build();
     }
-
-    public SliceResponse<BoardCommentInfo> toSliceBoardCommentInfo(Slice<BoardCommentInfoInterface> boardCommentSlice) {
-        return SliceResponse.<BoardCommentInfo>builder()
-                .number(boardCommentSlice.getNumber())
-                .size(boardCommentSlice.getSize())
-                .content(boardCommentSlice.getContent().stream().map(boardCommentInfoInterface ->
-                                toBoardCommentInfo(boardCommentInfoInterface.getBoardComment(),
-                                        boardCommentInfoInterface.getIsLike(),
-                                        boardCommentInfoInterface.getIsMine()))
-                        .toList()
-                )
-                .numberOfElements(boardCommentSlice.getNumberOfElements())
-                .hasPrevious(boardCommentSlice.hasPrevious())
-                .hasNext(boardCommentSlice.hasNext())
-                .build();
-    }
 }

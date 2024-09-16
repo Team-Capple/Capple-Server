@@ -42,23 +42,6 @@ public class BoardMapper {
                 .build();
     }
 
-    public SliceResponse<BoardInfo> toSliceBoardInfoForRedis(Member member, Slice<BoardInfoInterface> boardSlice) {
-        return SliceResponse.<BoardInfo>builder()
-                .number(boardSlice.getNumber())
-                .size(boardSlice.getSize())
-                .content(boardSlice.getContent().stream().map(boardInfoInterface -> {
-                                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(boardInfoInterface.getBoard().getId());
-                                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), boardInfoInterface.getBoard().getId());
-                                    return toBoardInfo(boardInfoInterface.getBoard(), heartCount, isLiked, boardInfoInterface.getIsMine());
-                                })
-                                .toList()
-                )
-                .numberOfElements(boardSlice.getNumberOfElements())
-                .hasPrevious(boardSlice.hasPrevious())
-                .hasNext(boardSlice.hasNext())
-                .build();
-    }
-
     //rdb
     public BoardInfo toBoardInfo(Board board, Boolean isLiked, Boolean isMine) {
         return BoardInfo.builder()
@@ -71,20 +54,6 @@ public class BoardMapper {
                 .isLiked(isLiked)
                 .isMine(isMine)
                 .isReported(board.getIsReport())
-                .build();
-    }
-
-    public SliceResponse<BoardInfo> toSliceBoardInfo(Slice<BoardInfoInterface> boardSlice) {
-        return SliceResponse.<BoardInfo>builder()
-                .number(boardSlice.getNumber())
-                .size(boardSlice.getSize())
-                .content(boardSlice.getContent().stream().map(boardInfoInterface ->
-                        toBoardInfo(boardInfoInterface.getBoard(), boardInfoInterface.getIsLike(), boardInfoInterface.getIsMine()))
-                        .toList()
-                )
-                .numberOfElements(boardSlice.getNumberOfElements())
-                .hasPrevious(boardSlice.hasPrevious())
-                .hasNext(boardSlice.hasNext())
                 .build();
     }
 }
