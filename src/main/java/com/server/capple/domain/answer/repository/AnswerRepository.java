@@ -24,12 +24,11 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
         "FROM Answer a " +
         "LEFT JOIN " +
         "Report r ON r.answer = a " +
-        "WHERE a.question.id = :questionId " +
-        "ORDER BY a.createdAt DESC")
-    Optional<Slice<AnswerInfoInterface>> findByQuestion(
+        "WHERE a.question.id = :questionId")
+    Slice<AnswerInfoInterface> findByQuestion(
         @Param("questionId") Long questionId,
         Pageable pageable);
 
-    @Query("SELECT a FROM Answer a WHERE a.member = :member and a.deletedAt is null ORDER BY a.createdAt DESC")
+    @Query("SELECT a FROM Answer a WHERE a.member = :member and a.deletedAt is null")
     Slice<Answer> findByMember(@Param("member") Member member, Pageable pageable);
 }

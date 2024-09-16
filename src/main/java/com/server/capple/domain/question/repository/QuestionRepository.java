@@ -23,8 +23,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query("SELECT q AS question, (a IS NOT NULL) AS isAnsweredByMember " +
         "FROM Question q LEFT JOIN Answer a ON q = a.question AND a.deletedAt is NULL AND a.member = :member " +
-        "WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE' " +
-        "ORDER BY q.livedAt DESC")
+        "WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
     Slice<QuestionInfoInterface> findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(@Param("member") Member member, Pageable pageable);
 
 }
