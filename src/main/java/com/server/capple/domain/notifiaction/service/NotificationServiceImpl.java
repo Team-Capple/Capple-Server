@@ -38,7 +38,7 @@ public class NotificationServiceImpl implements NotificationService {
             .board(board)
             .build();
         apnsService.sendApnsToMembers(boardNotificationBody, board.getWriter().getId());
-        // TODO 알림 데이터베이스 저장
+        // 알림 데이터베이스 저장
         Notification notification = notificationMapper.toNotification(board.getWriter().getId(), boardNotificationBody);
         notificationRepository.save(notification);
     }
@@ -70,7 +70,7 @@ public class NotificationServiceImpl implements NotificationService {
             .boardComment(boardComment)
             .build();
         apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriberIds);
-        // TODO 알림 데이터베이스 저장
+        // 알림 데이터베이스 저장
         List<Notification> notifications = subscriberIds.stream()
             .map(subscriberId -> notificationMapper.toNotification(subscriberId, boardCommentNotificationBody))
             .toList();
@@ -84,9 +84,9 @@ public class NotificationServiceImpl implements NotificationService {
             .board(board)
             .boardComment(boardComment)
             .build();
-        apnsService.sendApnsToMembers(boardCommentNotificationBody, boardComment.getMember().getId());
-        // TODO 알림 데이터베이스 저장
-        Notification notification = notificationMapper.toNotification(boardComment.getMember().getId(), boardCommentNotificationBody);
+        apnsService.sendApnsToMembers(boardCommentNotificationBody, boardComment.getWriter().getId());
+        // 알림 데이터베이스 저장
+        Notification notification = notificationMapper.toNotification(boardComment.getWriter().getId(), boardCommentNotificationBody);
         notificationRepository.save(notification);
     }
 

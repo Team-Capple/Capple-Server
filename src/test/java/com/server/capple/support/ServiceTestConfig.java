@@ -132,12 +132,14 @@ public abstract class ServiceTestConfig {
                         .writer(member)
                         .content("오늘 밥먹을 사람!")
                         .commentCount(0)
+                        .heartCount(0)
+                        .isReport(FALSE)
                         .build());
     }
     protected BoardComment createBoardComment() {
         return boardCommentRepository.save(
                 BoardComment.builder()
-                        .member(member)
+                        .writer(member)
                         .board(board)
                         .content("게시글 댓글")
                         .isReport(FALSE)

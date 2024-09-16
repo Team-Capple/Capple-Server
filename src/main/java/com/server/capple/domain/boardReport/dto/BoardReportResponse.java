@@ -1,8 +1,6 @@
 package com.server.capple.domain.boardReport.dto;
 
-import com.server.capple.domain.boardReport.entity.BoardReport;
 import com.server.capple.domain.boardReport.entity.BoardReportType;
-import com.server.capple.global.exception.errorCode.BoardReportErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

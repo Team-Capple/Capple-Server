@@ -1,18 +1,13 @@
 package com.server.capple.domain.boardReport.service;
 
-import com.server.capple.domain.board.entity.BoardType;
-import com.server.capple.domain.boardReport.dto.BoardReportRequest;
 import com.server.capple.domain.boardReport.dto.BoardReportResponse;
 import com.server.capple.domain.boardReport.entity.BoardReport;
 import com.server.capple.domain.boardReport.entity.BoardReportType;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.report.entity.Report;
 
 public interface BoardReportService {
 
     BoardReport findBoardReport(Long boardReportId);
-
-    Boolean isReporter(Long reporterId, Long memberId);
 
     BoardReportResponse.BoardReportsGet getMyBoardReports(Member member);
 

@@ -10,25 +10,10 @@ import org.springframework.stereotype.Component;
 public class BoardCommentMapper {
     public BoardComment toBoardComment(Member member, Board board, String comment) {
         return BoardComment.builder()
-                .member(member)
+                .writer(member)
                 .board(board)
                 .content(comment)
                 .isReport(Boolean.FALSE)
-                .build();
-    }
-
-    //redis
-    public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Integer boardHeart, Boolean isLiked, Boolean isMine) {
-        return BoardCommentInfo.builder()
-                .boardCommentId(comment.getId())
-                .writerId(comment.getMember().getId())
-                .content(comment.getContent())
-                .heartCount(boardHeart)
-                .isLiked(isLiked)
-                .isMine(isMine)
-                .isReport(comment.getIsReport())
-                .createdAt(comment.getCreatedAt())
-                .heartCount(0)
                 .build();
     }
 
@@ -36,7 +21,7 @@ public class BoardCommentMapper {
     public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Boolean isLiked, Boolean isMine) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())
-                .writerId(comment.getMember().getId())
+                .writerId(comment.getWriter().getId())
                 .content(comment.getContent())
                 .heartCount(comment.getHeartCount())
                 .isLiked(isLiked)
