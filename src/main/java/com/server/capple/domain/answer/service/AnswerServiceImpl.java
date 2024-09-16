@@ -1,9 +1,10 @@
 package com.server.capple.domain.answer.service;
 
+import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
-import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
@@ -14,10 +15,12 @@ import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.domain.report.repository.ReportRepository;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,24 +94,18 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public AnswerList getAnswerList(Long memberId, Long questionId, String keyword, Pageable pageable) {
-
-        if (keyword == null) {
-            return answerMapper.toAnswerList(
-                    answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
-                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
-                            .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId()), answer.getMember().getId().equals(memberId)))
-                            .toList());
-        } else {
-            return answerMapper.toAnswerList(
-                    answerRepository.findByQuestionAndKeyword(questionId, keyword, pageable).orElseThrow(()
-                                    -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND))
-                            .stream()
-                            .map(answer -> answerMapper.toAnswerInfo(answer, memberId, reportRepository.existsReportByAnswer(answer), answerHeartRedisRepository.isMemberLikedAnswer(memberId, answer.getId()), answer.getMember().getId().equals(memberId)))
-                            .toList());
-        }
-
+    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Pageable pageable) {
+        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, pageable).orElseThrow(()
+            -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        return answerMapper.toAnswerInfoSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
+            answerInfoDto -> answerMapper.toAnswerInfo(
+                answerInfoDto.getAnswer(),
+                memberId,
+                answerInfoDto.getIsReported(),
+                answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
+                answerInfoDto.getAnswer().getMember().getId().equals(memberId)
+            )
+        ).toList());
     }
 
     // 유저가 작성한 답변 조회
@@ -116,9 +113,9 @@ public class AnswerServiceImpl implements AnswerService {
     public MemberAnswerList getMemberAnswer(Member member) {
         List<Answer> answers = answerRepository.findByMember(member).orElse(null);
         return answerMapper.toMemberAnswerList(
-                answers.stream()
-                        .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())))
-                        .toList()
+            answers.stream()
+                .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())))
+                .toList()
         );
     }
 
@@ -126,10 +123,10 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public MemberAnswerList getMemberHeartAnswer(Member member) {
         return answerMapper.toMemberAnswerList(
-                answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
-                        .stream()
-                        .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answerId)))
-                        .toList()
+            answerHeartRedisRepository.getMemberHeartsAnswer(member.getId())
+                .stream()
+                .map(answerId -> answerMapper.toMemberAnswerInfo(findAnswer((answerId)), answerHeartRedisRepository.getAnswerHeartsCount(answerId), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answerId)))
+                .toList()
         );
     }
 
@@ -144,7 +141,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public Answer findAnswer(Long answerId) {
         return answerRepository.findById(answerId).orElseThrow(
-                () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
+            () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
     }
 }
