@@ -4,6 +4,7 @@ import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseResponse;
@@ -71,8 +72,13 @@ public class AnswerController {
 
     @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다.")
     @GetMapping
-    public BaseResponse<AnswerResponse.MemberAnswerList> getMemberAnswer(@AuthMember Member member) {
-        return BaseResponse.onSuccess(answerService.getMemberAnswer(member));
+    public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberAnswer(
+        @AuthMember Member member,
+        @Parameter(description = "조회할 페이지 번호<br>0부터 시작")
+        @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+        @Parameter(description = "조회할 페이지 크기")
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(answerService.getMemberAnswer(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.")

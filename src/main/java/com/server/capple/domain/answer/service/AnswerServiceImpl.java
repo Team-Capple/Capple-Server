@@ -5,6 +5,7 @@ import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
@@ -110,12 +111,15 @@ public class AnswerServiceImpl implements AnswerService {
 
     // 유저가 작성한 답변 조회
     @Override
-    public MemberAnswerList getMemberAnswer(Member member) {
-        List<Answer> answers = answerRepository.findByMember(member).orElse(null);
-        return answerMapper.toMemberAnswerList(
-            answers.stream()
-                .map(answer -> answerMapper.toMemberAnswerInfo(answer, answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()), answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())))
-                .toList()
+    public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Pageable pageable) {
+        Slice<Answer> answerSlice = answerRepository.findByMember(member, pageable);
+        return SliceResponse.toSliceResponse(
+            answerSlice, answerSlice.getContent().stream()
+                .map(answer -> answerMapper.toMemberAnswerInfo(
+                    answer,
+                    answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
+                    answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
+                )).toList()
         );
     }
 

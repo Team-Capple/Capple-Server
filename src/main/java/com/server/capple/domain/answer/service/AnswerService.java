@@ -3,6 +3,7 @@ package com.server.capple.domain.answer.service;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
@@ -23,7 +24,7 @@ public interface AnswerService {
 
     SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Pageable pageable);
 
-    MemberAnswerList getMemberAnswer(Member member);
+    SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Pageable pageable);
 
     MemberAnswerList getMemberHeartAnswer(Member member);
 }
