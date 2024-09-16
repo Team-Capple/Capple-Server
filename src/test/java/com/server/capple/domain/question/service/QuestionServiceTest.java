@@ -56,7 +56,7 @@ public class QuestionServiceTest extends ServiceTestConfig {
     @Transactional
     public void getQuestionsTest() {
         //given & when
-        List<QuestionInfo> questionInfos = questionService.getQuestions(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt"))).getContent();
+        List<QuestionInfo> questionInfos = questionService.getQuestions(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "livedAt"))).getContent();
 
         //then
         assertEquals(questionInfos.size(), 2);

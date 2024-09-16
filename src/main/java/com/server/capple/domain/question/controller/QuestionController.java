@@ -40,7 +40,7 @@ public class QuestionController {
     })
     @GetMapping
     private BaseResponse<SliceResponse<QuestionInfo>> getQuestions(@AuthMember Member member, @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(questionService.getQuestions(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(questionService.getQuestions(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
     }
 
     @Operation(summary = "질문 좋아요/취소 API", description = " 질문 좋아요/취소 API 입니다." +
