@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
-    <property name="INFO_LOG_FILE_NAME_PATTERN" value="./logs/qapple-info-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
-    <property name="ERROR_LOG_FILE_NAME_PATTERN" value="./logs/qapple-error-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
-    <property name="WARN_LOG_FILE_NAME_PATTERN" value="./logs/qapple-warn-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
-    <property name="DEBUG_LOG_FILE_NAME_PATTERN" value="./logs/qapple-debug-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
-    <property name="TRACE_LOG_FILE_NAME_PATTERN" value="./logs/qapple-trace-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
+    <property name="INFO_LOG_FILE_NAME_PATTERN" value="./logs/info/qapple-info-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
+    <property name="ERROR_LOG_FILE_NAME_PATTERN" value="./logs/error/qapple-error-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
+    <property name="WARN_LOG_FILE_NAME_PATTERN" value="./logs/warn/qapple-warn-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
+    <property name="DEBUG_LOG_FILE_NAME_PATTERN" value="./logs/debug/qapple-debug-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
+    <property name="TRACE_LOG_FILE_NAME_PATTERN" value="./logs/trace/qapple-trace-%d{yyyy-MM-dd, Asia/Seoul}.%i.log" />
 
     <property name="INFO_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldGreen(%+5p) ---  %magenta([%t]) %cyan(%logger) - %m%n"/>
     <property name="ERROR_LOG_PATTERN" value="%d{yy-MM-dd} %d{HH:mm:ss.SSS} %boldRed(%+5p)  ---  %magenta([%t]) %cyan(%logger) - %m%n"/>
