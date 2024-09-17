@@ -46,6 +46,17 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
+    public BoardId updateBoard(Member member, Long boardId, BoardType boardType, String content) {
+        Board board = findBoard(boardId);
+        checkPermission(member, board);
+        board.updateBoardType(boardType);
+        board.updateContent(content);
+
+        return new BoardId(board.getId());
+    }
+
+    @Override
     public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
         List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
 

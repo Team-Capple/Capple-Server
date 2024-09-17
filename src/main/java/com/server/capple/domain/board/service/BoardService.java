@@ -21,4 +21,6 @@ public interface BoardService {
     ToggleBoardHeart toggleBoardHeart(Member member, Long boardId);
 
     Board findBoard(Long boardId);
+
+    BoardId updateBoard(Member member, Long boardId, BoardType boardType, String content);
 }
