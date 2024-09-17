@@ -136,6 +136,7 @@ public abstract class ServiceTestConfig {
                         .isReport(FALSE)
                         .build());
     }
+
     protected BoardComment createBoardComment() {
         return boardCommentRepository.save(
                 BoardComment.builder()
@@ -150,8 +151,6 @@ public abstract class ServiceTestConfig {
     protected BoardCommentRequest getBoardCommentRequest() {
         return new BoardCommentRequest("게시글 댓글");
     }
-
-
 
     protected AnswerCommentRequest getAnswerCommentRequest() {
         return AnswerCommentRequest.builder()

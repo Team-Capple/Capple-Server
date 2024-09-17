@@ -1,14 +1,19 @@
 package com.server.capple.domain.boardComment.service;
 
+import com.server.capple.domain.board.dto.BoardResponse;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -107,14 +112,19 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
     @DisplayName("게시판 댓글 리스트 조회 테스트")
     @Transactional
     public void getBoardCommentsTest() {
+        //given
+        PageRequest pageRequest = PageRequest.of(0,10, Sort.by(Sort.Direction.DESC,"createdAt"));
         //when
-        BoardCommentInfos response = boardCommentService.getBoardCommentInfos(member, board.getId());
+        SliceResponse<BoardCommentInfo> response = boardCommentService.getBoardCommentInfos(member, board.getId(), pageRequest);
 
         //then
-        assertEquals(member.getId(), response.getBoardCommentInfos().get(0).getWriterId());
-        assertEquals("게시글 댓글", response.getBoardCommentInfos().get(0).getContent());
-        assertEquals(0, response.getBoardCommentInfos().get(0).getHeartCount());
-        assertEquals(false, response.getBoardCommentInfos().get(0).getIsLiked());
-        assertEquals(true, response.getBoardCommentInfos().get(0).getIsMine());
+        assertEquals(member.getId(), response.getContent().get(0).getWriterId());
+        assertEquals("게시글 댓글", response.getContent().get(0).getContent());
+        assertEquals(0, response.getContent().get(0).getHeartCount());
+        assertEquals(false, response.getContent().get(0).getIsLiked());
+        assertEquals(true, response.getContent().get(0).getIsMine());
+        assertEquals(0, response.getNumber());
+        assertEquals(10, response.getSize());
+        assertEquals(1, response.getNumberOfElements());
     }
 }

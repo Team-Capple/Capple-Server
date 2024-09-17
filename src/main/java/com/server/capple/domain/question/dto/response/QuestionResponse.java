@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class QuestionResponse {
 
@@ -44,13 +43,6 @@ public class QuestionResponse {
     @Builder
     public static class QuestionId {
         private Long questionId;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @Builder
-    public static class QuestionInfos {
-        private List<QuestionInfo> questionInfos;
     }
 
     @Getter
