@@ -2,14 +2,17 @@ package com.server.capple.domain.answer.controller;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -135,8 +138,8 @@ public class AnswerControllerTest extends ControllerTestConfig {
     public void getMyPageMemberAnswerTest() throws Exception {
         //given
         final String url = "/answers";
-        AnswerResponse.MemberAnswerList response = getMemberAnswerList();
-        given(answerService.getMemberAnswer(any(Member.class))).willReturn(response);
+        SliceResponse<MemberAnswerInfo> response = getSliceMemberAnswerInfos();
+        given(answerService.getMemberAnswer(any(Member.class), any(PageRequest.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
@@ -150,7 +153,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
 //                .andExpect(jsonPath("$.result.memberAnswerInfos[0].nickname").value("루시"))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].content").value("나는 무자비한 사람이 좋아"));
+                .andExpect(jsonPath("$.result.content[0].content").value("나는 무자비한 사람이 좋아"));
     }
 
     @Test
@@ -158,8 +161,8 @@ public class AnswerControllerTest extends ControllerTestConfig {
     public void getMyPageMemberHeartAnswerTest() throws Exception {
         //given
         final String url = "/answers/heart";
-        AnswerResponse.MemberAnswerList response = getMemberAnswerList();
-        given(answerService.getMemberHeartAnswer(any(Member.class))).willReturn(response);
+        SliceResponse<MemberAnswerInfo> response = getSliceMemberAnswerInfos();
+        given(answerService.getMemberHeartAnswer(any(Member.class), any(PageRequest.class))).willReturn(response);
 
         //when
         ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
@@ -172,7 +175,7 @@ public class AnswerControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].heartCount").value(1))
-                .andExpect(jsonPath("$.result.memberAnswerInfos[0].answerId").value(1));
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(1))
+                .andExpect(jsonPath("$.result.content[0].answerId").value(1));
     }
 }
