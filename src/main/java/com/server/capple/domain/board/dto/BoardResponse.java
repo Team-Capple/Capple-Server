@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class BoardResponse {
 
@@ -15,20 +14,11 @@ public class BoardResponse {
     public static class BoardId {
         private Long boardId;
     }
-
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BoardsGetBoardInfos {
-        private List<BoardsGetBoardInfo> boards;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardsGetBoardInfo {
+    public static class BoardInfo {
         private Long boardId;
         private Long writerId;
         private String content;

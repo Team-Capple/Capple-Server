@@ -34,10 +34,4 @@ public class BoardCommentResponse {
         private Boolean isReport;
         private LocalDateTime createdAt;
     }
-
-    @Getter
-    @AllArgsConstructor
-    public static class BoardCommentInfos {
-        private List<BoardCommentInfo> boardCommentInfos;
-    }
 }
