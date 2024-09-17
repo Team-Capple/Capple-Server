@@ -17,7 +17,6 @@ public class BoardCommentMapper {
                 .build();
     }
 
-    //rdb
     public BoardCommentInfo toBoardCommentInfo(BoardComment comment, Boolean isLiked, Boolean isMine) {
         return BoardCommentInfo.builder()
                 .boardCommentId(comment.getId())

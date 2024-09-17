@@ -1,7 +1,5 @@
 package com.server.capple.domain.answer.dto;
 
-import java.util.List;
-
 import lombok.*;
 
 public class AnswerResponse {
@@ -27,14 +25,6 @@ public class AnswerResponse {
     }
 
     @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class AnswerList {
-        private List<AnswerInfo> answerInfos;
-    }
-
-    @Getter
     @AllArgsConstructor
     public static class AnswerLike {
         private Long answerId;
@@ -54,11 +44,5 @@ public class AnswerResponse {
         private int heartCount;
         private String writeAt;
         private Boolean isLiked;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class MemberAnswerList {
-        private List<MemberAnswerInfo> memberAnswerInfos;
     }
 }

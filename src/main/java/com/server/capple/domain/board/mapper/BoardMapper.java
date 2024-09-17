@@ -1,6 +1,6 @@
 package com.server.capple.domain.board.mapper;
 
-import com.server.capple.domain.board.dto.BoardResponse.BoardsGetBoardInfo;
+import com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.member.entity.Member;
@@ -21,8 +21,8 @@ public class BoardMapper {
     }
 
     //redis
-    public BoardsGetBoardInfo toBoardsGetBoardInfo(Board board, Integer boardHeartsCount, Boolean isLiked, Boolean isMine) {
-        return BoardsGetBoardInfo.builder()
+    public BoardInfo toBoardInfo(Board board, Integer boardHeartsCount, Boolean isLiked, Boolean isMine) {
+        return BoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
@@ -36,8 +36,8 @@ public class BoardMapper {
     }
 
     //rdb
-    public BoardsGetBoardInfo toBoardsGetBoardInfo(Board board, Boolean isLiked, Boolean isMine) {
-        return BoardsGetBoardInfo.builder()
+    public BoardInfo toBoardInfo(Board board, Boolean isLiked, Boolean isMine) {
+        return BoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
                 .content(board.getContent())
@@ -50,3 +50,4 @@ public class BoardMapper {
                 .build();
     }
 }
+

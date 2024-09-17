@@ -2,14 +2,18 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.tag.service.TagService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -121,9 +125,9 @@ public class AnswerServiceTest extends ServiceTestConfig {
     @Transactional
     public void getMemberAnswerTest() {
         //when
-        AnswerResponse.MemberAnswerList memberAnswer = answerService.getMemberAnswer(member);
+        SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
         //then
-        assertEquals(memberAnswer.getMemberAnswerInfos().get(0).getContent(), "나는 무자비한 사람이 좋아");
+        assertEquals(memberAnswer.getContent().get(0).getContent(), "나는 무자비한 사람이 좋아");
     }
 
     @Test
@@ -134,9 +138,9 @@ public class AnswerServiceTest extends ServiceTestConfig {
         answerService.toggleAnswerHeart(member, answer.getId());
 
         //when
-        AnswerResponse.MemberAnswerList memberHeartAnswer = answerService.getMemberHeartAnswer(member);
+        SliceResponse<MemberAnswerInfo> memberHeartAnswer = answerService.getMemberHeartAnswer(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         //then
-        assertEquals(memberHeartAnswer.getMemberAnswerInfos().get(0).getHeartCount(), 1);
+        assertEquals(memberHeartAnswer.getContent().get(0).getHeartCount(), 1);
     }
 }
