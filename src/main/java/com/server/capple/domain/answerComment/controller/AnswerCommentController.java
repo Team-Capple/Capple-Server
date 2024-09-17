@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "답변 댓글 API", description = "답변 댓글 API입니다.")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/answerComments")
+@RequestMapping("/answer-comments")
 public class AnswerCommentController {
 
     private final AnswerCommentService answerCommentService;

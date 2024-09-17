@@ -2,16 +2,22 @@ package com.server.capple.domain.board.controller;
 
 import com.server.capple.config.security.AuthMember;
 import com.server.capple.domain.board.dto.BoardRequest;
-import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dto.BoardResponse.BoardId;
+import com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
+import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.board.service.BoardService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseResponse;
+import com.server.capple.global.common.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "게시판 API", description = "게시판 관련 API")
@@ -27,10 +33,8 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping()
-    private BaseResponse<BoardResponse.BoardCreate> createBoard(
-            @AuthMember Member member,
-            @RequestBody BoardRequest.BoardCreate request
-    ) {
+    private BaseResponse<BoardId> createBoard(@AuthMember Member member,
+                                              @RequestBody @Valid BoardRequest.BoardCreate request) {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
@@ -39,13 +43,12 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/redis")
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardTypeWithRedis(
+    private BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
-            @RequestParam(name = "boardType", required = false) BoardType boardType
-            // TODO: 페이징 프론트 이슈로 추후 구현
-//            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
-            ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType));
+            @RequestParam(name = "boardType", required = false) BoardType boardType,
+            @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+    ) {
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.")
@@ -53,42 +56,40 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping()
-    private BaseResponse<BoardResponse.BoardsGetByBoardType> getBoardsByBoardType(
+    private BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardType(
             @AuthMember Member member,
-            @RequestParam(name = "boardType", required = false) BoardType boardType
-            // TODO: 페이징 프론트 이슈로 추후 구현
-//            @PageableDefault(sort = "created_at", direction = Sort.Direction.DESC) @Parameter(hidden = true) Pageable pageable
+            @RequestParam(name = "boardType", required = false) BoardType boardType,
+            @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize
     ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
+
+    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다. 자유게시판에서만 검색이 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/search")
+    private BaseResponse<SliceResponse<BoardInfo>> searchBoardsByKeyword(
+            @AuthMember Member member, @RequestParam(name = "keyword") String keyword,
+            @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+            @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+    }
+
 
     @Operation(summary = "게시글 삭제 API", description = "게시글을 삭제합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @DeleteMapping("/{boardId}")
-    private BaseResponse<BoardResponse.BoardDelete> deleteBoard(
-            @AuthMember Member member,
-            @PathVariable(name = "boardId") Long boardId
-    ) {
+    private BaseResponse<BoardId> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
     }
 
-    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "COMMON200", description = "성공"),
-    })
-    @GetMapping("/search")
-    private BaseResponse<BoardResponse.BoardsSearchByKeyword> searchBoardsByKeyword(
-            @RequestParam(name = "keyword") String keyword
-    ) {
-        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(keyword));
-    }
-
     @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
-            "pathvariable 으로 boardId를 주세요.")
+            "pathVariable 으로 boardId를 주세요.")
     @PostMapping("/{boardId}/heart")
-    public BaseResponse<BoardResponse.ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+    public BaseResponse<ToggleBoardHeart> toggleBoardHeart(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.toggleBoardHeart(member, boardId));
     }
 }

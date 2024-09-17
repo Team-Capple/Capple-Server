@@ -47,17 +47,20 @@ public class SecurityConfig {
 //    경로별 인가 //TODO Role 분리 필요
         http
             .authorizeHttpRequests((auth) -> auth
-                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api-docs/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/api-docs/**", "/actuator", "/actuator/**").permitAll()
                 .requestMatchers("/members/sign-in","/members/sign-up", "/members/local-sign-in", "/token/**", "/members/email/check", "/members/nickname/check", "/members/email/certification", "/members/email/certification/check").permitAll()
                 .requestMatchers("/admin/**", "/members/email/whitelist/register").hasRole(Role.ROLE_ADMIN.getName())
                 .requestMatchers("/answers","/answers/**").authenticated()
-                .requestMatchers("/answerComments","/answerComments/**").authenticated()
+                .requestMatchers("/answer-comments","/answer-comments/**").authenticated()
                 .requestMatchers("/members","/members/**").authenticated()
                 .requestMatchers("/tags","/tags/**").authenticated()
                 .requestMatchers("/questions","/questions/**").authenticated()
                 .requestMatchers("/reports", "/reports/**").authenticated()
                 .requestMatchers("/boards", "/boards/**").authenticated()
-                .requestMatchers("/boardComments", "/boardComments/**").authenticated()
+                .requestMatchers("/board-comments", "/board-comments/**").authenticated()
+                .requestMatchers("/reports/board-comment", "/reports/board-comment/**").authenticated()
+                .requestMatchers("/reports/board", "/reports/board/**").authenticated()
+                .requestMatchers("/notifications", "/notifications/**").authenticated()
                 .requestMatchers("/dummy","/dummy/**").hasRole(Role.ROLE_ADMIN.getName())
                 .anyRequest().denyAll());
         http

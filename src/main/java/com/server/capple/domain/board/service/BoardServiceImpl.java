@@ -1,6 +1,7 @@
 package com.server.capple.domain.board.service;
 
-import com.server.capple.domain.board.dto.BoardResponse;
+import com.server.capple.domain.board.dao.BoardInfoInterface;
+import com.server.capple.domain.board.dto.BoardResponse.BoardId;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardHeart;
@@ -13,106 +14,93 @@ import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
     private final NotificationService notificationService;
+    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
-    public BoardResponse.BoardCreate createBoard(Member member, BoardType boardType, String content) {
-        Board board;
-        if (content != null) {
-            board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
-        } else {
-            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
-        }
+    @Transactional
+    public BoardId createBoard(Member member, BoardType boardType, String content) {
+        Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
-        return boardMapper.toBoardCreate(board);
+
+        return new BoardId(board.getId());
     }
 
-    //redis
     @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
-        List<Board> boards;
-        if (boardType == null) {
-            boards = boardRepository.findAll();
-        } else if (boardType == BoardType.FREEBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
-        } else if (boardType == BoardType.HOTBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
-        } else {
-            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
-        }
-        return boardMapper.toBoardsGetByBoardType(boards.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(board -> {
-                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
-                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
-                    boolean isMine =  board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, heartCount, isLiked, isMine, false);
-                })
-                .toList()
-        );
-    }
+    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
 
-    //rdb
-    @Override
-    public BoardResponse.BoardsGetByBoardType getBoardsByBoardType(Member member, BoardType boardType) {
-        List<Board> boards;
-        if (boardType == null) {
-            boards = boardRepository.findAll();
-        } else if (boardType == BoardType.FREEBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.FREEBOARD);
-        } else if (boardType == BoardType.HOTBOARD) {
-            boards = boardRepository.findBoardsByBoardType(BoardType.HOTBOARD);
-        } else {
-            throw new RestApiException(BoardErrorCode.BOARD_BAD_REQUEST);
-        }
-        return boardMapper.toBoardsGetByBoardType(boards.stream()
-                // TODO: BoardReport 관련 테이블 구현 후 수정 요망
-                .map(board -> {
-                    boolean isLiked = boardHeartRepository.findByMemberAndBoard(member,board).isPresent();
-                    boolean isMine =  board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetByBoardTypeBoardInfo(board, isLiked, isMine,false);
-                })
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
                 .toList()
         );
     }
 
     @Override
-    public BoardResponse.BoardDelete deleteBoard(Member member, Long boardId) {
+    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList()
+        );
+    }
+
+    /*
+    redis 성능 테스트 용
+     */
+    @Override
+    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                    return boardMapper.toBoardInfo(
+                            sliceBoardInfo.getBoard(),
+                            heartCount,
+                            isLiked,
+                            sliceBoardInfo.getIsMine());
+                })
+                .toList());
+    }
+
+    @Override
+    @Transactional
+    public BoardId deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
-        if (board.getWriter().getId() != member.getId()) {
-            throw new RestApiException(BoardErrorCode.BOARD_NO_AUTHORIZATION);
-        }
+        checkPermission(member, board);
 
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
-        return boardMapper.toBoardDelete(board);
-    }
-
-    @Override
-    public BoardResponse.BoardsSearchByKeyword searchBoardsByKeyword(String keyword) {
-        List<Board> boards = boardRepository.findBoardsByKeyword(keyword);
-        return boardMapper.toBoardsSearchByKeyword(boards.stream()
-                .map(board -> boardMapper.toBoardsSearchByKeywordBoardInfo(board, board.getHeartCount()))
-                .toList());
+        return new BoardId(board.getId());
     }
 
     @Override
@@ -126,15 +114,22 @@ public class BoardServiceImpl implements BoardService {
                     BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
                     return boardHeartRepository.save(newHeart);
                 });
+
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
+
         if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
         return new ToggleBoardHeart(boardId, isLiked);
+    }
+
+    private void checkPermission(Member member, Board board) {
+        if (!member.getId().equals(board.getWriter().getId()))
+            throw new RestApiException(BoardErrorCode.BOARD_NO_AUTHORIZATION);
     }
 
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 }

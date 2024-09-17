@@ -6,31 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class BoardResponse {
 
     @Getter
-    @Builder
     @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardCreate {
+    public static class BoardId {
         private Long boardId;
     }
-
     @Getter
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class BoardsGetByBoardType {
-        private List<BoardsGetByBoardTypeBoardInfo> boards;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardsGetByBoardTypeBoardInfo {
+    public static class BoardInfo {
         private Long boardId;
         private Long writerId;
         private String content;
@@ -40,35 +28,6 @@ public class BoardResponse {
         private Boolean isMine;
         private Boolean isReported;
         private Boolean isLiked;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardDelete {
-        private Long boardId;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardsSearchByKeyword {
-        private List<BoardsSearchByKeywordBoardInfo> boards;
-    }
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class BoardsSearchByKeywordBoardInfo {
-        private Long boardId;
-        private Long writerId;
-        private String content;
-        private Integer heartCount;
-        private Integer commentCount;
-        private LocalDateTime createAt;
     }
 
     @Getter

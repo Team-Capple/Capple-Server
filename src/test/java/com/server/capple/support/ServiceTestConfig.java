@@ -26,6 +26,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
+import static java.lang.Boolean.FALSE;
+
 @SpringBootTest
 @ActiveProfiles("test")
 public abstract class ServiceTestConfig {
@@ -130,14 +132,18 @@ public abstract class ServiceTestConfig {
                         .writer(member)
                         .content("오늘 밥먹을 사람!")
                         .commentCount(0)
+                        .heartCount(0)
+                        .isReport(FALSE)
                         .build());
     }
+
     protected BoardComment createBoardComment() {
         return boardCommentRepository.save(
                 BoardComment.builder()
-                        .member(member)
+                        .writer(member)
                         .board(board)
                         .content("게시글 댓글")
+                        .isReport(FALSE)
                         .heartCount(0)
                         .build());
     }
@@ -145,8 +151,6 @@ public abstract class ServiceTestConfig {
     protected BoardCommentRequest getBoardCommentRequest() {
         return new BoardCommentRequest("게시글 댓글");
     }
-
-
 
     protected AnswerCommentRequest getAnswerCommentRequest() {
         return AnswerCommentRequest.builder()

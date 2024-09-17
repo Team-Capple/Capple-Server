@@ -3,12 +3,15 @@ package com.server.capple.domain.boardComment.controller;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.service.BoardCommentService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.server.capple.domain.boardComment.dto.BoardCommentResponse.*;
@@ -33,8 +36,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 생성 API 테스트")
     public void createBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/board/{boardId}";
-
+        final String url = "/board-comments/board/{boardId}";
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 
@@ -59,8 +61,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 수정 API 테스트")
     public void updateBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/{commentId}";
-
+        final String url = "/board-comments/{commentId}";
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 
@@ -85,7 +86,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 삭제 API 테스트")
     public void deleteBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/{commentId}";
+        final String url = "/board-comments/{commentId}";
         BoardCommentId response = new BoardCommentId(1L);
 
         doReturn(response).when(boardCommentService).deleteBoardComment(any(Member.class), any(Long.class));
@@ -108,7 +109,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 좋아요/취소 API 테스트")
     public void heartBoardCommentTest() throws Exception {
         //given
-        final String url = "/boardComments/heart/{commentId}";
+        final String url = "/board-comments/heart/{commentId}";
         ToggleBoardCommentHeart response = new ToggleBoardCommentHeart(1L, Boolean.TRUE);
 
         doReturn(response).when(boardCommentService).toggleBoardCommentHeart(any(Member.class), any(Long.class));
@@ -132,10 +133,10 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     @DisplayName("게시글 댓글 리스트 조회 API 테스트")
     public void getBoardCommentInfosTest() throws Exception {
         //given
-        final String url = "/boardComments/{boardId}";
-        BoardCommentInfos response = getBoardCommentInfos();
+        final String url = "/board-comments/{boardId}";
+        SliceResponse<BoardCommentInfo> response = getSliceBoardCommentInfos();
 
-        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class));
+        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class), any(PageRequest.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url, 1L)
@@ -148,10 +149,12 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].boardCommentId").value(1L))
-//                .andExpect(jsonPath("$.result.boardCommentInfos[0].writer").value("루시"))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].content").value("댓글"))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].heartCount").value(2L))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].isLiked").value(true));
+                .andExpect(jsonPath("$.result.number").value(0))
+                .andExpect(jsonPath("$.result.size").value(10))
+                .andExpect(jsonPath("$.result.numberOfElements").value(1))
+                .andExpect(jsonPath("$.result.content[0].boardCommentId").value(1L))
+                .andExpect(jsonPath("$.result.content[0].content").value("댓글"))
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(2L))
+                .andExpect(jsonPath("$.result.content[0].isLiked").value(true));
     }
 }
