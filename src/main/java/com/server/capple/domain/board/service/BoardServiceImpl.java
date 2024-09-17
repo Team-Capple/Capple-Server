@@ -2,7 +2,6 @@ package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.dto.BoardResponse.BoardId;
-import com.server.capple.domain.board.dto.BoardResponse.BoardsGetBoardInfos;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardHeart;
@@ -15,13 +14,16 @@ import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
 @Service
 @RequiredArgsConstructor
@@ -29,11 +31,11 @@ import java.util.List;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
     private final NotificationService notificationService;
+    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
 
     @Override
@@ -46,11 +48,27 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
-        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
+    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
 
-        return new BoardsGetBoardInfos(boardInfos.stream()
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList()
+        );
+    }
+
+    @Override
+    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
+
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
                 .toList()
         );
     }
@@ -59,33 +77,19 @@ public class BoardServiceImpl implements BoardService {
     redis 성능 테스트 용
      */
     @Override
-    public BoardsGetBoardInfos getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
-        List<Board> boards;
-        if (boardType == null) {
-            boards = boardRepository.findAll();
-        } else {
-            boards = boardRepository.findBoardsByBoardType(boardType);
-        }
+    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable) {
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
 
-        return new BoardsGetBoardInfos(boards.stream()
-                .map(board -> {
-                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
-                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
-                    boolean isMine = board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetBoardInfo(board, heartCount, isLiked, isMine);
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                    return boardMapper.toBoardInfo(
+                            sliceBoardInfo.getBoard(),
+                            heartCount,
+                            isLiked,
+                            sliceBoardInfo.getIsMine());
                 })
-                .toList()
-        );
-    }
-
-    @Override
-    public BoardsGetBoardInfos searchBoardsByKeyword(Member member, String keyword) {
-        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword);
-
-        return new BoardsGetBoardInfos(boardInfos.stream()
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
-                .toList()
-        );
+                .toList());
     }
 
     @Override
