@@ -39,22 +39,22 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     }
 
     @Transactional
-    public QuestionId setLiveQuestion() {
+    public Question setLiveQuestion() {
         Question newQuestion = adminQuestionRepository.findFirstByQuestionStatusOrderByIdAsc(QuestionStatus.PENDING)
                 .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_PENDING_NOT_FOUND));
 
         newQuestion.setQuestionStatus(QuestionStatus.LIVE);
 
-        return new QuestionId(newQuestion.getId());
+        return newQuestion;
 
     }
 
     @Transactional
-    public QuestionId closeLiveQuestion() {
+    public Question closeLiveQuestion() {
         Question question = adminQuestionRepository.findFirstByQuestionStatusOrderByIdAsc(QuestionStatus.LIVE)
                 .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_LIVE_NOT_FOUND));
         question.setQuestionStatus(QuestionStatus.OLD);
 
-        return new QuestionId(question.getId());
+        return question;
     }
 }

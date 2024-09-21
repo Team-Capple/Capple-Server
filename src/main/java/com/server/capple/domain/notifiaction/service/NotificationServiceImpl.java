@@ -2,6 +2,7 @@ package com.server.capple.domain.notifiaction.service;
 
 import com.server.capple.config.apns.dto.ApnsClientRequest.BoardCommentNotificationBody;
 import com.server.capple.config.apns.dto.ApnsClientRequest.BoardNotificationBody;
+import com.server.capple.config.apns.dto.ApnsClientRequest.QuestionNotificationBody;
 import com.server.capple.config.apns.service.ApnsService;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
@@ -11,6 +12,8 @@ import com.server.capple.domain.notifiaction.dto.NotificationResponse.Notificati
 import com.server.capple.domain.notifiaction.entity.Notification;
 import com.server.capple.domain.notifiaction.mapper.NotificationMapper;
 import com.server.capple.domain.notifiaction.repository.NotificationRepository;
+import com.server.capple.domain.question.entity.Question;
+import com.server.capple.global.common.SliceResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
             .build();
         apnsService.sendApnsToMembers(boardNotificationBody, board.getWriter().getId());
         // 알림 데이터베이스 저장
-        Notification notification = notificationMapper.toNotification(board.getWriter().getId(), boardNotificationBody);
+        Notification notification = notificationMapper.toNotification(board.getWriter().getId(), board, BOARD_HEART);
         notificationRepository.save(notification);
     }
 
@@ -59,20 +62,20 @@ public class NotificationServiceImpl implements NotificationService {
                         .boardComment(boardComment)
                         .build();
                     apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriberId);
-                    notificationRepository.save(notificationMapper.toNotification(subscriberId, boardCommentNotificationBody));
+                    notificationRepository.save(notificationMapper.toNotification(subscriberId, board, boardComment, BOARD_COMMENT));
                 }
             })
             .filter(id -> !id.equals(board.getWriter().getId()))
             .toList();
         BoardCommentNotificationBody boardCommentNotificationBody = BoardCommentNotificationBody.builder()
-            .type(BAORD_COMMENT_DUPLCATE)
+            .type(BOARD_COMMENT_DUPLICATE)
             .board(board)
             .boardComment(boardComment)
             .build();
         apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriberIds);
         // 알림 데이터베이스 저장
         List<Notification> notifications = subscriberIds.stream()
-            .map(subscriberId -> notificationMapper.toNotification(subscriberId, boardCommentNotificationBody))
+            .map(subscriberId -> notificationMapper.toNotification(subscriberId, board, boardComment, BOARD_COMMENT_DUPLICATE))
             .toList();
         notificationRepository.saveAll(notifications);
     }
@@ -86,13 +89,36 @@ public class NotificationServiceImpl implements NotificationService {
             .build();
         apnsService.sendApnsToMembers(boardCommentNotificationBody, boardComment.getWriter().getId());
         // 알림 데이터베이스 저장
-        Notification notification = notificationMapper.toNotification(boardComment.getWriter().getId(), boardCommentNotificationBody);
+        Notification notification = notificationMapper.toNotification(boardComment.getWriter().getId(), board, boardComment, BOARD_COMMENT_HEART);
         notificationRepository.save(notification);
     }
 
     @Override
-    public Slice<NotificationInfo> getNotifications(Member member, Pageable pageable) {
-        return notificationRepository.findByMemberId(member.getId(), pageable, NotificationInfo.class);
+    public void sendLiveQuestionOpenNotification(Question question) {
+        QuestionNotificationBody questionNotificationBody = QuestionNotificationBody.builder()
+            .type(TODAY_QUESTION_PUBLISHED)
+            .question(question)
+            .build();
+        apnsService.sendApnsToAllMembers(questionNotificationBody);
+        Notification notification = notificationMapper.toNotification(question, TODAY_QUESTION_PUBLISHED);
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public void sendLiveQuestionCloseNotification(Question question) {
+        QuestionNotificationBody questionNotificationBody = QuestionNotificationBody.builder()
+            .type(TODAY_QUESTION_CLOSED)
+            .question(question)
+            .build();
+        apnsService.sendApnsToAllMembers(questionNotificationBody);
+        Notification notification = notificationMapper.toNotification(question, TODAY_QUESTION_CLOSED);
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public SliceResponse<NotificationInfo> getNotifications(Member member, Pageable pageable) {
+        Slice<Notification> notificationRDBInfos = notificationRepository.findByMemberId(member.getId(), pageable);
+        return notificationMapper.toNotificationInfoSlice(notificationRDBInfos);
     }
 
     @Override

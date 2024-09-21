@@ -99,4 +99,9 @@ public class ApnsServiceImpl implements ApnsService {
     public <T> Boolean sendApnsToMembers(T request, List<Long> memberIdList) {
         return sendApns(request, deviceTokenRedisRepository.getDeviceTokens(memberIdList));
     }
+
+    @Override
+    public <T> Boolean sendApnsToAllMembers(T request) {
+        return sendApns(request, deviceTokenRedisRepository.getAllDeviceTokens());
+    }
 }
