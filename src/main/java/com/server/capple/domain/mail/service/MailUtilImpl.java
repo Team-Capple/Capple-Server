@@ -42,7 +42,7 @@ public class MailUtilImpl implements MailUtil {
         final Integer certCodeLength = 5;
         String certCode = "";
         for (int i = 0; i < certCodeLength; i++) {
-            Long idx = Math.round(Math.random() * candidateChars.length());
+            Long idx = (long) (Math.random() * candidateChars.length());
             certCode += candidateChars.charAt(idx.intValue());
         }
         return certCode;
