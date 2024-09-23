@@ -147,7 +147,6 @@ public class ApnsClientRequest {
             this.aps = Aps.builder().threadId("question")
                 .alert(Aps.Alert.builder()
                     .title(type.getTitle())
-                    .subtitle(type.getContent().replace("\n", " "))
                     .body(question.getContent())
                     .build())
                 .build();

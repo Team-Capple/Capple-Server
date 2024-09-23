@@ -89,7 +89,6 @@ public class NotificationMapper {
     private NotificationInfo toQuestionNotificationInfo(Notification notification) {
         return NotificationInfo.builder()
             .title(notification.getType().getTitle())
-            .subtitle(notification.getType().getContent())
             .content(notification.getNotificationLog().getBody())
             .questionId(notification.getNotificationLog().getQuestionId().toString())
             .createdAt(notification.getCreatedAt())
