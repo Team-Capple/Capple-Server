@@ -5,13 +5,18 @@ import com.server.capple.global.exception.errorCode.MailErrorCode;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.util.concurrent.CompletableFuture;
+
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MailUtilImpl implements MailUtil {
@@ -20,10 +25,11 @@ public class MailUtilImpl implements MailUtil {
     @Value("${mail.white-list-cert-code}")
     private String whiteListCertCode;
 
+    @Async
     @Override
-    public String sendMailAddressCertificationMail(String receiver, Boolean isWhiteList) {
+    public CompletableFuture<String> sendMailAddressCertificationMail(String receiver, Boolean isWhiteList) {
         String certCode = generateCertCode();
-        if(isWhiteList) certCode = whiteListCertCode;
+        if (isWhiteList) certCode = whiteListCertCode;
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
@@ -31,8 +37,9 @@ public class MailUtilImpl implements MailUtil {
             mimeMessageHelper.setSubject("[Capple] 회원가입 인증코드 안내");
             mimeMessageHelper.setText(setCertMailContext(certCode), true);
             javaMailSender.send(mimeMessage);
-            return certCode;
+            return CompletableFuture.completedFuture(certCode);
         } catch (MessagingException e) {
+            log.error(MailErrorCode.MULTI_PART_CRAETION_FAILED.getMessage());
             throw new RestApiException(MailErrorCode.MULTI_PART_CRAETION_FAILED);
         }
     }
@@ -42,7 +49,7 @@ public class MailUtilImpl implements MailUtil {
         final Integer certCodeLength = 5;
         String certCode = "";
         for (int i = 0; i < certCodeLength; i++) {
-            Long idx = Math.round(Math.random() * candidateChars.length());
+            Long idx = (long) (Math.random() * candidateChars.length());
             certCode += candidateChars.charAt(idx.intValue());
         }
         return certCode;
