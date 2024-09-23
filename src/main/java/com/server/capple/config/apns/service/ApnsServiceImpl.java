@@ -58,7 +58,7 @@ public class ApnsServiceImpl implements ApnsService {
 
         deviceToken.parallelStream()
             .forEach(token -> {
-                if (token.isBlank()) return;
+                if (token == null || token.isBlank() || token.equals("string")) return;
                 tmpWebClient
                     .method(HttpMethod.POST)
                     .uri(token)

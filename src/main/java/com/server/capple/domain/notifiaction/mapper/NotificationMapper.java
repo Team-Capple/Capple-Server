@@ -4,6 +4,7 @@ import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.notifiaction.dto.NotificationResponse.NotificationInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
+import com.server.capple.domain.notifiaction.entity.NotificationLog;
 import com.server.capple.domain.notifiaction.entity.NotificationType;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.SliceResponse;
@@ -14,27 +15,41 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class NotificationMapper {
-    public Notification toNotification(Long memberId, Board board, NotificationType type) {
+    public Notification toNotification(Long memberId, NotificationLog notificationLog, NotificationType type) {
         return Notification.builder()
             .memberId(memberId)
-            .board(board)
+            .notificationLog(notificationLog)
             .type(type)
             .build();
     }
 
-    public Notification toNotification(Long memberId, Board board, BoardComment boardComment, NotificationType type) {
+    public Notification toNotification(NotificationLog notificationLog, NotificationType type) {
         return Notification.builder()
-            .memberId(memberId)
-            .board(board)
-            .boardComment(boardComment)
+            .notificationLog(notificationLog)
             .type(type)
             .build();
     }
 
-    public Notification toNotification(Question question, NotificationType type) {
-        return Notification.builder()
-            .question(question)
-            .type(type)
+    public NotificationLog toNotificationLog(Board board) {
+        return NotificationLog.builder()
+            .body(board.getContent())
+            .boardId(board.getId())
+            .build();
+    }
+
+    public NotificationLog toNotificationLog(Board board, BoardComment boardComment) {
+        return NotificationLog.builder()
+            .subtitle(boardComment.getContent())
+            .body(board.getContent())
+            .boardId(board.getId())
+            .boardCommentId(boardComment.getId())
+            .build();
+    }
+
+    public NotificationLog toNotificationLog(Question question) {
+        return NotificationLog.builder()
+            .body(question.getContent())
+            .questionId(question.getId())
             .build();
     }
 
@@ -54,8 +69,8 @@ public class NotificationMapper {
     private NotificationInfo toBoardNotificationInfo(Notification notification) {
         return NotificationInfo.builder()
             .title(notification.getType().getTitle())
-            .content(notification.getBoard().getContent())
-            .boardId(notification.getBoard().getId().toString())
+            .content(notification.getNotificationLog().getBody())
+            .boardId(notification.getNotificationLog().getBoardId().toString())
             .createdAt(notification.getCreatedAt())
             .build();
     }
@@ -63,10 +78,10 @@ public class NotificationMapper {
     private NotificationInfo toBoardCommentNotificationInfo(Notification notification) {
         return NotificationInfo.builder()
             .title(notification.getType().getTitle())
-            .subtitle(notification.getBoardComment().getContent())
-            .content(notification.getBoard().getContent())
-            .boardId(notification.getBoard().getId().toString())
-            .boardCommentId(notification.getBoardComment().getId().toString())
+            .subtitle(notification.getNotificationLog().getSubtitle())
+            .content(notification.getNotificationLog().getBody())
+            .boardId(notification.getNotificationLog().getBoardId().toString())
+            .boardCommentId(notification.getNotificationLog().getBoardCommentId().toString())
             .createdAt(notification.getCreatedAt())
             .build();
     }
@@ -75,8 +90,8 @@ public class NotificationMapper {
         return NotificationInfo.builder()
             .title(notification.getType().getTitle())
             .subtitle(notification.getType().getContent())
-            .content(notification.getQuestion().getContent())
-            .questionId(notification.getQuestion().getId().toString())
+            .content(notification.getNotificationLog().getBody())
+            .questionId(notification.getNotificationLog().getQuestionId().toString())
             .createdAt(notification.getCreatedAt())
             .build();
     }
