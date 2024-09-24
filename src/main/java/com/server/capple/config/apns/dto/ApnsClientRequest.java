@@ -102,8 +102,7 @@ public class ApnsClientRequest {
             this.aps = Aps.builder().threadId("board-" + board.getId())
                 .alert(Aps.Alert.builder()
                     .title(type.getTitle())
-                    .subtitle(boardComment.getContent())
-                    .body(board.getContent())
+                    .body(boardComment.getContent())
                     .build())
                 .build();
             this.boardId = board.getId().toString();

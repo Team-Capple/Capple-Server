@@ -39,8 +39,7 @@ public class NotificationMapper {
 
     public NotificationLog toNotificationLog(Board board, BoardComment boardComment) {
         return NotificationLog.builder()
-            .subtitle(boardComment.getContent())
-            .body(board.getContent())
+            .body(boardComment.getContent())
             .boardId(board.getId())
             .boardCommentId(boardComment.getId())
             .build();
@@ -78,7 +77,6 @@ public class NotificationMapper {
     private NotificationInfo toBoardCommentNotificationInfo(Notification notification) {
         return NotificationInfo.builder()
             .title(notification.getType().getTitle())
-            .subtitle(notification.getNotificationLog().getSubtitle())
             .content(notification.getNotificationLog().getBody())
             .boardId(notification.getNotificationLog().getBoardId().toString())
             .boardCommentId(notification.getNotificationLog().getBoardCommentId().toString())
