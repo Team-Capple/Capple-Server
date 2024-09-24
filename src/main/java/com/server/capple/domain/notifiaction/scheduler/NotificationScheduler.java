@@ -15,7 +15,7 @@ public class NotificationScheduler {
     private final NotificationService notificationService;
     private final long NOTIFICATION_CACHE_WEEK = 1L;
 
-    @Scheduled(cron = "0 0 * * * *") //매 0분에
+    @Scheduled(cron = "0 0 * * * *") // 정각마다
     public void deleteNotifications() {
         LocalDateTime targetTime = LocalDateTime.now().minusWeeks(NOTIFICATION_CACHE_WEEK);
         notificationService.deleteNotificationsByCreatedAtBefore(targetTime);

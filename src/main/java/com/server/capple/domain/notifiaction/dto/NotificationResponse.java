@@ -17,6 +17,7 @@ public class NotificationResponse {
         private String subtitle;
         private String content;
         private String boardId;
+        private String questionId;
         private String boardCommentId;
         private LocalDateTime createdAt;
     }
