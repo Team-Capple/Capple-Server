@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.notifiaction.entity.NotificationType;
+import com.server.capple.domain.question.entity.Question;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -101,12 +102,54 @@ public class ApnsClientRequest {
             this.aps = Aps.builder().threadId("board-" + board.getId())
                 .alert(Aps.Alert.builder()
                     .title(type.getTitle())
-                    .subtitle(boardComment.getContent())
-                    .body(board.getContent())
+                    .body(boardComment.getContent())
                     .build())
                 .build();
             this.boardId = board.getId().toString();
             this.boardCommentId = boardComment.getId().toString();
+        }
+
+        @ToString
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class Aps {
+            private Alert alert;
+            private Integer badge;
+            @Schema(defaultValue = "default")
+            private String sound; // Library/Sounds 폴더 내의 파일 이름
+            @JsonProperty("thread-id")
+            private String threadId;
+
+            @ToString
+            @Getter
+            @Builder
+            @AllArgsConstructor
+            @NoArgsConstructor
+            public static class Alert {
+                private String title;
+                private String subtitle;
+                private String body;
+            }
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class QuestionNotificationBody {
+        private Aps aps;
+        private String questionId;
+        @Builder
+        public QuestionNotificationBody(NotificationType type, Question question) {
+            this.aps = Aps.builder().threadId("question")
+                .alert(Aps.Alert.builder()
+                    .title(type.getTitle())
+                    .body(question.getContent())
+                    .build())
+                .build();
+            this.questionId = question.getId().toString();
         }
 
         @ToString

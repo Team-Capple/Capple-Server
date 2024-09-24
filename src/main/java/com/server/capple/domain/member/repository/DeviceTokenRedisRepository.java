@@ -30,6 +30,10 @@ public class DeviceTokenRedisRepository {
         return valueOperations.multiGet(keys.stream().map(key -> DEVICE_TOKEN_KEY + key.toString()).toList());
     }
 
+    public List<String> getAllDeviceTokens() {
+        return valueOperations.multiGet(redisTemplate.keys(DEVICE_TOKEN_KEY + "*"));
+    }
+
     public void deleteDeviceToken(Long memberId) {
         redisTemplate.delete(DEVICE_TOKEN_KEY + memberId.toString());
     }

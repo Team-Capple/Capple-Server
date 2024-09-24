@@ -7,8 +7,10 @@ import com.server.capple.domain.mail.vo.MailDomain;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.MailErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
@@ -19,9 +21,12 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public Boolean sendMailAddressCertificationMail(String email, Boolean isWhiteList) {
-        String certCode = mailUtil.sendMailAddressCertificationMail(email, isWhiteList);
-        String emailJwt = jwtService.createJwtFromEmail(email);
-        return mailRedisRepository.save(emailJwt, certCode);
+        mailUtil.sendMailAddressCertificationMail(email, isWhiteList).thenAccept(certCode -> {
+            String emailJwt = jwtService.createJwtFromEmail(email);
+            mailRedisRepository.save(emailJwt, certCode);
+            log.info("메일 발송 완료 : {}", email);
+        });
+        return true;
     }
 
     @Override

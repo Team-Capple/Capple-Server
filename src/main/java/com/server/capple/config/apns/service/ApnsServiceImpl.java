@@ -58,7 +58,7 @@ public class ApnsServiceImpl implements ApnsService {
 
         deviceToken.parallelStream()
             .forEach(token -> {
-                if (token.isBlank()) return;
+                if (token == null || token.isBlank() || token.equals("string")) return;
                 tmpWebClient
                     .method(HttpMethod.POST)
                     .uri(token)
@@ -98,5 +98,10 @@ public class ApnsServiceImpl implements ApnsService {
     @Override
     public <T> Boolean sendApnsToMembers(T request, List<Long> memberIdList) {
         return sendApns(request, deviceTokenRedisRepository.getDeviceTokens(memberIdList));
+    }
+
+    @Override
+    public <T> Boolean sendApnsToAllMembers(T request) {
+        return sendApns(request, deviceTokenRedisRepository.getAllDeviceTokens());
     }
 }
