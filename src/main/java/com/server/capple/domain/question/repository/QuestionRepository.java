@@ -3,6 +3,7 @@ package com.server.capple.domain.question.repository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.entity.Question;
+import com.server.capple.domain.question.entity.QuestionStatus;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -12,6 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+    Optional<Question> findFirstByQuestionStatusOrderByIdAsc(QuestionStatus questionStatus);
 
     @Query("SELECT q FROM Question q WHERE q.id = :questionId")
     Optional<Question> findById(@Param("questionId") Long questionId);
