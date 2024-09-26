@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.StringReader;
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -72,6 +73,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
             .withType(QuestionInsertDto.class)
             .build()
             .parse();
+        questionInsertDtoList.sort(Comparator.comparing(QuestionInsertDto::getQuestionId));
         List<Question> questions = questionInsertDtoList.stream()
             .map(questionMapper::toQuestionInsertDto)
             .toList();
