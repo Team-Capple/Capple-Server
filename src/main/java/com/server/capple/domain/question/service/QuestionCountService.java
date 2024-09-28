@@ -14,13 +14,13 @@ import java.util.concurrent.CompletableFuture;
 public class QuestionCountService {
     private final QuestionRepository questionRepository;
 
-    @Cacheable(value = "boardCount", cacheManager = "noExpireCacheManager")
+    @Cacheable(value = "questionCount", cacheManager = "noExpireCacheManager")
     public Integer getLiveOrOldQuestionCount() {
         return questionRepository.getLiveOrOldQuestionCount();
     }
 
     @Async
-    @CachePut(value = "boardCount", cacheManager = "noExpireCacheManager")
+    @CachePut(value = "questionCount", cacheManager = "noExpireCacheManager")
     public CompletableFuture<Integer> updateLiveOrOldQuestionCount() {
         return CompletableFuture.completedFuture(questionRepository.getLiveOrOldQuestionCount());
     }

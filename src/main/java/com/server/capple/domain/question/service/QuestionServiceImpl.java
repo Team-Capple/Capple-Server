@@ -27,6 +27,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final AnswerRepository answerRepository;
     private final QuestionMapper questionMapper;
     private final QuestionHeartRedisRepository questionHeartRepository;
+    private final QuestionCountService questionCountService;
 
     @Override
     public Question findQuestion(Long questionId) {
@@ -49,7 +50,7 @@ public class QuestionServiceImpl implements QuestionService {
         Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member, pageable);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-            ).toList(), null);
+            ).toList(), questionCountService.getLiveOrOldQuestionCount());
     }
 
     @Override
