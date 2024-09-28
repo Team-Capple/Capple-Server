@@ -24,4 +24,6 @@ public interface BoardService {
     ToggleBoardHeart toggleBoardHeart(Member member, Long boardId);
 
     Board findBoard(Long boardId);
+
+    void createMaterializedViewIfNotExists();
 }

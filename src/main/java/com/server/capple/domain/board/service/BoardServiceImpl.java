@@ -17,6 +17,8 @@ import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -29,6 +31,7 @@ import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
+    private final String boardCountMaterializedViewName = "board_count";
 
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
@@ -37,6 +40,9 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationService notificationService;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+
+    @PersistenceContext
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -52,11 +58,11 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
-                        boardMapper.toBoardInfo(
-                                sliceBoardInfo.getBoard(),
-                                sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
-                .toList()
+                boardMapper.toBoardInfo(
+                    sliceBoardInfo.getBoard(),
+                    sliceBoardInfo.getIsLike(),
+                    sliceBoardInfo.getIsMine()))
+            .toList()
         );
     }
 
@@ -65,11 +71,11 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
-                        boardMapper.toBoardInfo(
-                                sliceBoardInfo.getBoard(),
-                                sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
-                .toList()
+                boardMapper.toBoardInfo(
+                    sliceBoardInfo.getBoard(),
+                    sliceBoardInfo.getIsLike(),
+                    sliceBoardInfo.getIsMine()))
+            .toList()
         );
     }
 
@@ -81,15 +87,15 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
-                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
-                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
-                    return boardMapper.toBoardInfo(
-                            sliceBoardInfo.getBoard(),
-                            heartCount,
-                            isLiked,
-                            sliceBoardInfo.getIsMine());
-                })
-                .toList());
+                int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                return boardMapper.toBoardInfo(
+                    sliceBoardInfo.getBoard(),
+                    heartCount,
+                    isLiked,
+                    sliceBoardInfo.getIsMine());
+            })
+            .toList());
     }
 
     @Override
@@ -110,10 +116,10 @@ public class BoardServiceImpl implements BoardService {
         // 좋아요 눌렀는지 확인
         //boardHeart에 없다면 새로 저장
         BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-                .orElseGet(() -> {
-                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                    return boardHeartRepository.save(newHeart);
-                });
+            .orElseGet(() -> {
+                BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                return boardHeartRepository.save(newHeart);
+            });
 
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
@@ -130,6 +136,22 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+    }
+
+    @Transactional
+    public void createMaterializedViewIfNotExists() {
+        if (entityManager.createNativeQuery("SELECT matviewname " +
+                "FROM pg_matviews " +
+                "WHERE matviewname = '" + boardCountMaterializedViewName + "'")
+            .getResultList()
+            .isEmpty()) {
+            entityManager.createNativeQuery("CREATE MATERIALIZED VIEW :mat_view_name AS " +
+                    "SELECT count(*) AS board_count " +
+                    "FROM board b " +
+                    "WHERE b.deleted_at IS NULL")
+                .setParameter("mat_view_name", boardCountMaterializedViewName)
+                .executeUpdate();
+        }
     }
 }
