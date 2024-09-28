@@ -17,13 +17,13 @@ import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
@@ -31,8 +31,6 @@ import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
-    private final String boardCountMaterializedViewName = "board_count";
-
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
@@ -40,16 +38,15 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationService notificationService;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
-
-    @PersistenceContext
-    private final EntityManager entityManager;
+    private final BoardCountService boardCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
     public BoardId createBoard(Member member, BoardType boardType, String content) {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
-
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
         return new BoardId(board.getId());
     }
 
@@ -104,6 +101,8 @@ public class BoardServiceImpl implements BoardService {
         Board board = findBoard(boardId);
         checkPermission(member, board);
 
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
+
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
         return new BoardId(board.getId());
@@ -139,19 +138,11 @@ public class BoardServiceImpl implements BoardService {
             .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
-    @Transactional
-    public void createMaterializedViewIfNotExists() {
-        if (entityManager.createNativeQuery("SELECT matviewname " +
-                "FROM pg_matviews " +
-                "WHERE matviewname = '" + boardCountMaterializedViewName + "'")
-            .getResultList()
-            .isEmpty()) {
-            entityManager.createNativeQuery("CREATE MATERIALIZED VIEW :mat_view_name AS " +
-                    "SELECT count(*) AS board_count " +
-                    "FROM board b " +
-                    "WHERE b.deleted_at IS NULL")
-                .setParameter("mat_view_name", boardCountMaterializedViewName)
-                .executeUpdate();
-        }
+    static class BoardCreatedEvent {
+    }
+
+    @TransactionalEventListener(BoardCreatedEvent.class)
+    public void handleBoardCreatedEvent() {
+        boardCountService.updateBoardCount();
     }
 }

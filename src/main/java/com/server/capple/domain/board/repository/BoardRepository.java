@@ -37,4 +37,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
             "WHERE :boardType IS NULL OR b.boardType = :boardType ORDER BY b.createdAt DESC")
     Slice<BoardInfoInterface> findBoardInfosForRedis(Member member, BoardType boardType, Pageable pageable);
 
+    @Query("SELECT COUNT(b) FROM Board b")
+    Integer getBoardCount();
 }
