@@ -53,7 +53,7 @@ public class NotificationMapper {
     }
 
     public SliceResponse<NotificationInfo> toNotificationInfoSlice(Slice<Notification> notification) {
-        return SliceResponse.toSliceResponse(notification, notification.stream().map(this::toNotificationInfo).toList());
+        return SliceResponse.toSliceResponse(notification, notification.stream().map(this::toNotificationInfo).toList(), null);
     }
 
     private NotificationInfo toNotificationInfo(Notification notification) {

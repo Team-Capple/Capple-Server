@@ -104,7 +104,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                                 sliceBoardCommentInfo.getBoardComment(),
                                 sliceBoardCommentInfo.getIsLike(),
                                 sliceBoardCommentInfo.getIsMine()))
-                .toList()
+                .toList(), null
         );
     }
 

@@ -49,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
         Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member, pageable);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-            ).toList());
+            ).toList(), null);
     }
 
     @Override

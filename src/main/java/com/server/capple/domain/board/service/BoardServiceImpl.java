@@ -55,11 +55,12 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
-                boardMapper.toBoardInfo(
-                    sliceBoardInfo.getBoard(),
-                    sliceBoardInfo.getIsLike(),
-                    sliceBoardInfo.getIsMine()))
-            .toList()
+                    boardMapper.toBoardInfo(
+                        sliceBoardInfo.getBoard(),
+                        sliceBoardInfo.getIsLike(),
+                        sliceBoardInfo.getIsMine()))
+                .toList(),
+            boardCountService.getBoardCount()
         );
     }
 
@@ -72,7 +73,7 @@ public class BoardServiceImpl implements BoardService {
                     sliceBoardInfo.getBoard(),
                     sliceBoardInfo.getIsLike(),
                     sliceBoardInfo.getIsMine()))
-            .toList()
+            .toList(), null
         );
     }
 
@@ -84,15 +85,16 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
-                int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
-                boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
-                return boardMapper.toBoardInfo(
-                    sliceBoardInfo.getBoard(),
-                    heartCount,
-                    isLiked,
-                    sliceBoardInfo.getIsMine());
-            })
-            .toList());
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                    return boardMapper.toBoardInfo(
+                        sliceBoardInfo.getBoard(),
+                        heartCount,
+                        isLiked,
+                        sliceBoardInfo.getIsMine());
+                })
+                .toList(),
+            boardCountService.getBoardCount());
     }
 
     @Override
