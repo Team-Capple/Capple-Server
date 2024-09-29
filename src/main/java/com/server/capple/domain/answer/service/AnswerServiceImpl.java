@@ -24,6 +24,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -86,14 +88,15 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
-
+        answerRepository.findById(answerId).orElseThrow(() -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
         Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
         return new AnswerLike(answerId, isLiked);
     }
 
     @Override
-    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Pageable pageable) {
-        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, pageable);
+    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
+        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, thresholdDate, pageable);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                 answerInfoDto.getAnswer(),
@@ -107,8 +110,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     // 유저가 작성한 답변 조회
     @Override
-    public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Pageable pageable) {
-        Slice<Answer> answerSlice = answerRepository.findByMember(member, pageable);
+    public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
+        Slice<Answer> answerSlice = answerRepository.findByMemberAndCreatedAtBefore(member, thresholdDate, pageable);
         return SliceResponse.toSliceResponse(
             answerSlice, answerSlice.getContent().stream()
                 .map(answer -> answerMapper.toMemberAnswerInfo(
@@ -121,8 +125,9 @@ public class AnswerServiceImpl implements AnswerService {
 
     // 유저가 좋아한 답변 조회
     @Override
-    public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Pageable pageable) {
-        Slice<Answer> answerSlice = answerRepository.findByIdIn(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), pageable);
+    public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
+        Slice<Answer> answerSlice = answerRepository.findByIdInAndCreatedAtBefore(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), thresholdDate, pageable);
         return SliceResponse.toSliceResponse(answerSlice, answerSlice.getContent().stream()
             .map(answer -> answerMapper.toMemberAnswerInfo(
                 answer,
