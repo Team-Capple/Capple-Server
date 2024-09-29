@@ -26,6 +26,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -97,8 +99,9 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
 
     @Override
-    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Pageable pageable) {
-        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId, pageable);
+    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardIdAndCreatedAtBefore(member, boardId, thresholdDate, pageable);
         return SliceResponse.toSliceResponse(sliceBoardCommentInfos, sliceBoardCommentInfos.getContent().stream().map(sliceBoardCommentInfo ->
                         boardCommentMapper.toBoardCommentInfo(
                                 sliceBoardCommentInfo.getBoardComment(),

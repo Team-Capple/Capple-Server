@@ -8,7 +8,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
     @Query("SELECT bc AS boardComment, " +
@@ -16,6 +16,6 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
             "(CASE WHEN bc.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM BoardComment bc " +
             "LEFT JOIN BoardCommentHeart bch ON bc = bch.boardComment AND bch.member = :member " +
-            "WHERE bc.board.id = :boardId ORDER BY bc.createdAt DESC")
-    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardId(Member member, Long boardId, Pageable pageable);
+            "WHERE bc.createdAt <= :thresholdDate AND bc.board.id = :boardId")
+    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardIdAndCreatedAtBefore(Member member, Long boardId, LocalDateTime thresholdDate, Pageable pageable);
 }

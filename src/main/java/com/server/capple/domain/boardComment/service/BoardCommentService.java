@@ -9,11 +9,13 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.SliceResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 public interface BoardCommentService {
     BoardCommentId createBoardComment(Member member, Long boardId, BoardCommentRequest request);
     BoardCommentId updateBoardComment(Member member, Long commentId,BoardCommentRequest request);
     BoardCommentId deleteBoardComment(Member member, Long commentId);
     ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId);
-    SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Pageable pageable);
+    SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, LocalDateTime thresholdDate, Pageable pageable);
     BoardComment findBoardComment(Long commentId);
 }

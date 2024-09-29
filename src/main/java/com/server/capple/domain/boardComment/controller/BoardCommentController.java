@@ -11,12 +11,15 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseResponse;
 import com.server.capple.global.common.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Tag(name = "게시글 댓글 API", description = "게시글 댓글 API입니다.")
 @RestController
@@ -56,9 +59,11 @@ public class BoardCommentController {
     @Operation(summary = "게시글 댓글 리스트 조회 API", description = " 게시글 댓글 리스트 조회 API 입니다. pathVariable 으로 boardId를 주세요.")
     @GetMapping("/{boardId}")
     public BaseResponse<SliceResponse<BoardCommentInfo>> getBoardCommentInfos(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId,
+                                                                              @Parameter(description = "조회 기준 시각")
+                                                                              @RequestParam(required = false) LocalDateTime thresholdDate,
                                                                               @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
                                                                               @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId, PageRequest.of(pageNumber,pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId, thresholdDate, PageRequest.of(pageNumber,pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
 }
