@@ -134,8 +134,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public SliceResponse<NotificationInfo> getNotifications(Member member, Pageable pageable) {
-        Slice<Notification> notificationRDBInfos = notificationRepository.findByMemberId(member.getId(), pageable);
+    public SliceResponse<NotificationInfo> getNotifications(Member member, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+        Slice<Notification> notificationRDBInfos = notificationRepository.findByMemberId(member.getId(), thresholdDate, pageable);
         return notificationMapper.toNotificationInfoSlice(notificationRDBInfos);
     }
 
