@@ -23,6 +23,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
 @Service
@@ -48,8 +50,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
+    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardTypeAndCreatedAtBefore(member, boardType, thresholdDate, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
@@ -61,8 +64,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
+    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeywordAndCreatedAtBefore(member, keyword, thresholdDate, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
@@ -77,8 +81,9 @@ public class BoardServiceImpl implements BoardService {
     redis 성능 테스트 용
      */
     @Override
-    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
+    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedisAndCreatedAtBefore(member, boardType, thresholdDate, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());

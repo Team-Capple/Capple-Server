@@ -9,15 +9,17 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.SliceResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 
 public interface BoardService {
     BoardId createBoard(Member member, BoardType boardType, String content);
 
-    SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable);
+    SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, LocalDateTime thresholdDate, Pageable pageable);
 
-    SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable);
+    SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, LocalDateTime thresholdDate, Pageable pageable);
 
-    SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable);
+    SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, LocalDateTime thresholdDate, Pageable pageable);
 
     BoardId deleteBoard(Member member, Long boardId);
 
