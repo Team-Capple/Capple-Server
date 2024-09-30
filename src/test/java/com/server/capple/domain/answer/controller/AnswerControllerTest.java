@@ -16,9 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
-
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -141,10 +140,10 @@ public class AnswerControllerTest extends ControllerTestConfig {
         //given
         final String url = "/answers";
         SliceResponse<MemberAnswerInfo> response = getSliceMemberAnswerInfos();
-        given(answerService.getMemberAnswer(any(Member.class), any(LocalDateTime.class), any(PageRequest.class))).willReturn(response);
+        given(answerService.getMemberAnswer(any(Member.class), isNull(), any(PageRequest.class))).willReturn(response);
 
         //when
-        ResultActions resultActions = mockMvc.perform(get(url).param("thresholdDate", LocalDateTime.now().toString()).accept(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
         );
 
@@ -164,10 +163,10 @@ public class AnswerControllerTest extends ControllerTestConfig {
         //given
         final String url = "/answers/heart";
         SliceResponse<MemberAnswerInfo> response = getSliceMemberAnswerInfos();
-        given(answerService.getMemberHeartAnswer(any(Member.class), any(LocalDateTime.class), any(PageRequest.class))).willReturn(response);
+        given(answerService.getMemberHeartAnswer(any(Member.class), isNull(), any(PageRequest.class))).willReturn(response);
 
         //when
-        ResultActions resultActions = mockMvc.perform(get(url).param("thresholdDate", LocalDateTime.now().toString()).accept(MediaType.APPLICATION_JSON)
+        ResultActions resultActions = mockMvc.perform(get(url).accept(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + jwt)
         );
 

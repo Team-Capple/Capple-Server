@@ -26,8 +26,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -99,15 +97,16 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
 
     @Override
-    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = thresholdDate == null ? LocalDateTime.now() : thresholdDate;
-        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardIdAndCreatedAtBefore(member, boardId, thresholdDate, pageable);
+    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardIdAndIdIsLessThanEqual(member, boardId, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardCommentInfoInterface(lastIndex, sliceBoardCommentInfos);
         return SliceResponse.toSliceResponse(sliceBoardCommentInfos, sliceBoardCommentInfos.getContent().stream().map(sliceBoardCommentInfo ->
                         boardCommentMapper.toBoardCommentInfo(
                                 sliceBoardCommentInfo.getBoardComment(),
                                 sliceBoardCommentInfo.getIsLike(),
                                 sliceBoardCommentInfo.getIsMine()))
-                .toList()
+                .toList(), lastIndex.toString()
         );
     }
 
@@ -120,5 +119,13 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     public BoardComment findBoardComment(Long commentId) {
         return boardCommentRepository.findById(commentId).orElseThrow(
                 () -> new RestApiException(CommentErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private Long getLastIndex(Long lastIndex) {
+        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
+    }
+
+    private Long getLastIndexFromBoardCommentInfoInterface(Long lastIndex, Slice<BoardCommentInfoInterface> sliceBoardCommentInfos) {
+        return lastIndex == Long.MAX_VALUE ? sliceBoardCommentInfos.stream().map(BoardCommentInfoInterface::getBoardComment).map(BoardComment::getId).max(Long::compareTo).get() : lastIndex;
     }
 }

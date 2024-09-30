@@ -24,8 +24,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -94,9 +92,10 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
-        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, thresholdDate, pageable);
+    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswerInfoInterface(lastIndex, answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                 answerInfoDto.getAnswer(),
@@ -105,35 +104,37 @@ public class AnswerServiceImpl implements AnswerService {
                 answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
                 answerInfoDto.getAnswer().getMember().getId().equals(memberId)
             )
-        ).toList());
+        ).toList(), lastIndex.toString());
     }
 
     // 유저가 작성한 답변 조회
     @Override
-    public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
-        Slice<Answer> answerSlice = answerRepository.findByMemberAndCreatedAtBefore(member, thresholdDate, pageable);
+    public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<Answer> answerSlice = answerRepository.findByMemberAndIdIsLessThanEqual(member, lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(lastIndex, answerSlice);
         return SliceResponse.toSliceResponse(
             answerSlice, answerSlice.getContent().stream()
                 .map(answer -> answerMapper.toMemberAnswerInfo(
                     answer,
                     answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
                     answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
-                )).toList()
+                )).toList(), lastIndex.toString()
         );
     }
 
-    // 유저가 좋아한 답변 조회
+    // 유저가 좋아한 답변 조회 //TODO 좋아요니까 좋아요한 순으로 정렬해야할거같은데 Answer의 createAt으로 하고 있음
     @Override
-    public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
-        Slice<Answer> answerSlice = answerRepository.findByIdInAndCreatedAtBefore(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), thresholdDate, pageable);
+    public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<Answer> answerSlice = answerRepository.findByIdInAndIdIsLessThanEqual(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(lastIndex, answerSlice);
         return SliceResponse.toSliceResponse(answerSlice, answerSlice.getContent().stream()
             .map(answer -> answerMapper.toMemberAnswerInfo(
                 answer,
                 answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
                 answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
-            )).toList()
+            )).toList(), lastIndex.toString()
         );
     }
 
@@ -150,5 +151,17 @@ public class AnswerServiceImpl implements AnswerService {
         return answerRepository.findById(answerId).orElseThrow(
             () -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND)
         );
+    }
+
+    private Long getLastIndex(Long lastIndex) {
+        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
+    }
+
+    private Long getLastIndexFromAnswerInfoInterface(Long lastIndex, Slice<AnswerInfoInterface> answerInfoSliceInterface) {
+        return lastIndex == Long.MAX_VALUE ? answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+    }
+
+    private Long getLastIndexFromAnswer(Long lastIndex, Slice<Answer> answerSlice) {
+        return lastIndex == Long.MAX_VALUE ? answerSlice.stream().map(Answer::getId).max(Long::compareTo).get() : lastIndex;
     }
 }

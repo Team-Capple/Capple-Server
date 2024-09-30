@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-
 @Tag(name = "알림 API", description = "알림 API입니다.")
 @RestController
 @RequiredArgsConstructor
@@ -30,9 +28,9 @@ public class NotificationController {
     @GetMapping
     public BaseResponse<SliceResponse<NotificationInfo>> getNotifications(
         @AuthMember Member member,
-        @Parameter(description = "조회 기준 시각")
-        @RequestParam(required = false) LocalDateTime thresholdDate,
+        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @RequestParam(required = false) Long threshold,
         @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(notificationService.getNotifications(member, thresholdDate, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(notificationService.getNotifications(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

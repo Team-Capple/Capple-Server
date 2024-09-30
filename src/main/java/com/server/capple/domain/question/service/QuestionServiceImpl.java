@@ -48,11 +48,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = (thresholdDate == null) ? LocalDateTime.now() : thresholdDate;
+        thresholdDate = getThresholdDate(thresholdDate);
         Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByLivedAtBefore(member, thresholdDate, pageable);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-            ).toList());
+            ).toList(), thresholdDate.toString());
     }
 
     @Override
@@ -61,5 +61,9 @@ public class QuestionServiceImpl implements QuestionService {
 
         Boolean isLiked = questionHeartRepository.toggleBoardHeart(member.getId(), question.getId());
         return new QuestionResponse.QuestionToggleHeart(questionId, isLiked);
+    }
+
+    private LocalDateTime getThresholdDate(LocalDateTime thresholdDate) {
+        return thresholdDate == null ? LocalDateTime.now() : thresholdDate;
     }
 }

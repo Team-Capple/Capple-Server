@@ -10,14 +10,13 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findById(Long answerId);
 
-    Slice<Answer> findByIdInAndCreatedAtBefore(Set<Long> answerIds, LocalDateTime thresholdDate, Pageable pageable);
+    Slice<Answer> findByIdInAndIdIsLessThanEqual(Set<Long> answerIds, Long lastIndex, Pageable pageable);
 
     boolean existsByQuestionAndMember(Question question, Member member);
 
@@ -25,11 +24,8 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
         "FROM Answer a " +
         "LEFT JOIN " +
         "Report r ON r.answer = a " +
-        "WHERE a.createdAt <= :thresholdDate AND a.question.id = :questionId")
-    Slice<AnswerInfoInterface> findByQuestion(
-        @Param("questionId") Long questionId,
-        LocalDateTime thresholdDate,
-        Pageable pageable);
+        "WHERE a.id <= :lastIndex AND a.question.id = :questionId")
+    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, Long lastIndex, Pageable pageable);
 
-    Slice<Answer> findByMemberAndCreatedAtBefore(@Param("member") Member member, LocalDateTime thresholdDate, Pageable pageable);
+    Slice<Answer> findByMemberAndIdIsLessThanEqual(@Param("member") Member member, Long lastIndex, Pageable pageable);
 }

@@ -52,8 +52,8 @@ public class NotificationMapper {
             .build();
     }
 
-    public SliceResponse<NotificationInfo> toNotificationInfoSlice(Slice<Notification> notification) {
-        return SliceResponse.toSliceResponse(notification, notification.stream().map(this::toNotificationInfo).toList());
+    public SliceResponse<NotificationInfo> toNotificationInfoSlice(Slice<Notification> notification, Long lastIndex) {
+        return SliceResponse.toSliceResponse(notification, notification.stream().map(this::toNotificationInfo).toList(), lastIndex.toString());
     }
 
     private NotificationInfo toNotificationInfo(Notification notification) {

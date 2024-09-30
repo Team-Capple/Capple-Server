@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 public interface QuestionService {
     Question findQuestion(Long questionId);
+
     QuestionSummary getMainQuestion(Member member);
 
     SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable);

@@ -11,13 +11,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.ResultActions;
-
-import java.time.LocalDateTime;
 
 import static com.server.capple.domain.boardComment.dto.BoardCommentResponse.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -138,11 +136,10 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
         final String url = "/board-comments/{boardId}";
         SliceResponse<BoardCommentInfo> response = getSliceBoardCommentInfos();
 
-        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class), any(LocalDateTime.class), any(PageRequest.class));
+        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class), isNull(), any(PageRequest.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url, 1L)
-                .param("thresholdDate", LocalDateTime.now().toString())
                 .contentType(APPLICATION_JSON_VALUE)
                 .header("Authorization", "Bearer " + jwt));
 
