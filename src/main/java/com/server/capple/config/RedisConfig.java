@@ -27,7 +27,6 @@ public class RedisConfig {
     private int database;
 
     @Bean
-    @Primary
     public RedisConnectionFactory redisConnectionFactory() {
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(host, port);
         connectionFactory.setDatabase(database);
@@ -43,6 +42,15 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return redisTemplate;
+    }
+
+    @Bean
+    @Primary
+    public CacheManager noExpireCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+            .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+            .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+        return RedisCacheManager.RedisCacheManagerBuilder.fromConnectionFactory(redisConnectionFactory).cacheDefaults(redisCacheConfiguration).build();
     }
 
     @Bean

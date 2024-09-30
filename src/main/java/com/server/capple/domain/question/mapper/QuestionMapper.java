@@ -1,9 +1,11 @@
 package com.server.capple.domain.question.mapper;
 
+import com.server.capple.domain.question.dto.internal.QuestionDto.QuestionInsertDto;
 import com.server.capple.domain.question.dto.request.QuestionRequest.QuestionCreate;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.entity.Question;
+import com.server.capple.domain.question.entity.QuestionStatus;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,6 +40,13 @@ public class QuestionMapper {
 //                .likeCount(likeCount)
 //                .commentCount(question.getCommentCount())
             .isAnswered(isAnswered)
+            .build();
+    }
+
+    public Question toQuestionInsertDto(QuestionInsertDto questionInsertDto) {
+        return Question.builder()
+            .questionStatus(QuestionStatus.PENDING)
+            .content(questionInsertDto.getQuestionContent().trim())
             .build();
     }
 }
