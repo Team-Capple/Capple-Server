@@ -28,5 +28,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         "WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
     Slice<QuestionInfoInterface> findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(@Param("member") Member member, Pageable pageable);
 
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
+    Integer getLiveOrOldQuestionCount();
 }
 

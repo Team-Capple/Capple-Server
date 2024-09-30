@@ -18,10 +18,12 @@ import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
@@ -29,7 +31,6 @@ import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
-
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
@@ -37,13 +38,15 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationService notificationService;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+    private final BoardCountService boardCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
     public BoardId createBoard(Member member, BoardType boardType, String content) {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
-
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
         return new BoardId(board.getId());
     }
 
@@ -52,11 +55,12 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
-                        boardMapper.toBoardInfo(
-                                sliceBoardInfo.getBoard(),
-                                sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
-                .toList()
+                    boardMapper.toBoardInfo(
+                        sliceBoardInfo.getBoard(),
+                        sliceBoardInfo.getIsLike(),
+                        sliceBoardInfo.getIsMine()))
+                .toList(),
+            boardCountService.getBoardCount()
         );
     }
 
@@ -65,11 +69,11 @@ public class BoardServiceImpl implements BoardService {
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
 
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
-                        boardMapper.toBoardInfo(
-                                sliceBoardInfo.getBoard(),
-                                sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
-                .toList()
+                boardMapper.toBoardInfo(
+                    sliceBoardInfo.getBoard(),
+                    sliceBoardInfo.getIsLike(),
+                    sliceBoardInfo.getIsMine()))
+            .toList(), null
         );
     }
 
@@ -84,12 +88,13 @@ public class BoardServiceImpl implements BoardService {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
                     return boardMapper.toBoardInfo(
-                            sliceBoardInfo.getBoard(),
-                            heartCount,
-                            isLiked,
-                            sliceBoardInfo.getIsMine());
+                        sliceBoardInfo.getBoard(),
+                        heartCount,
+                        isLiked,
+                        sliceBoardInfo.getIsMine());
                 })
-                .toList());
+                .toList(),
+            boardCountService.getBoardCount());
     }
 
     @Override
@@ -97,6 +102,8 @@ public class BoardServiceImpl implements BoardService {
     public BoardId deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
         checkPermission(member, board);
+
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
 
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
@@ -110,10 +117,10 @@ public class BoardServiceImpl implements BoardService {
         // 좋아요 눌렀는지 확인
         //boardHeart에 없다면 새로 저장
         BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-                .orElseGet(() -> {
-                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                    return boardHeartRepository.save(newHeart);
-                });
+            .orElseGet(() -> {
+                BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                return boardHeartRepository.save(newHeart);
+            });
 
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
@@ -130,6 +137,14 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+    }
+
+    static class BoardCreatedEvent {
+    }
+
+    @TransactionalEventListener(BoardCreatedEvent.class)
+    public void handleBoardCreatedEvent() {
+        boardCountService.updateBoardCount();
     }
 }

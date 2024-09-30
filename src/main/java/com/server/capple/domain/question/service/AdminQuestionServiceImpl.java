@@ -12,9 +12,11 @@ import com.server.capple.domain.question.repository.QuestionRepository;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.io.StringReader;
 import java.util.Comparator;
@@ -28,11 +30,13 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionService questionService;
     private final QuestionMapper questionMapper;
+    private final QuestionCountService questionCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public QuestionId createQuestion(QuestionCreate request) {
         Question question = questionRepository.save(questionMapper.toQuestion(request));
-
+        applicationEventPublisher.publishEvent(new QuestionStatusChangedEvent());
         return new QuestionId(question.getId());
     }
 
@@ -42,7 +46,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
         Question question = questionService.findQuestion(questionId);
 
         question.delete();
-
+        applicationEventPublisher.publishEvent(new QuestionStatusChangedEvent());
         return new QuestionId(question.getId());
 
     }
@@ -53,7 +57,7 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
             .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_PENDING_NOT_FOUND));
 
         newQuestion.setQuestionStatus(QuestionStatus.LIVE);
-
+        applicationEventPublisher.publishEvent(new QuestionStatusChangedEvent());
         return newQuestion;
 
     }
@@ -63,10 +67,10 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
         Question question = questionRepository.findFirstByQuestionStatusOrderByIdAsc(QuestionStatus.LIVE)
             .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_LIVE_NOT_FOUND));
         question.setQuestionStatus(QuestionStatus.OLD);
-
+        applicationEventPublisher.publishEvent(new QuestionStatusChangedEvent());
         return question;
     }
-
+  
     @Override
     public Long uploadQuestionByCsv(String text) {
         List<QuestionInsertDto> questionInsertDtoList = new CsvToBeanBuilder(new CSVReader(new StringReader(text)))
@@ -80,5 +84,13 @@ public class AdminQuestionServiceImpl implements AdminQuestionService {
         Long savedQuestionCount = (long) questionRepository.saveAll(questions).size();
         log.info("{} 개의 질문이 새롭게 추가되었습니다.", savedQuestionCount);
         return savedQuestionCount;
+    }
+
+    static class QuestionStatusChangedEvent {
+    }
+
+    @TransactionalEventListener(QuestionStatusChangedEvent.class)
+    public void handleQuestionCreatedEvent() {
+        questionCountService.updateLiveOrOldQuestionCount();
     }
 }

@@ -102,7 +102,7 @@ public class AnswerServiceImpl implements AnswerService {
                 answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
                 answerInfoDto.getAnswer().getMember().getId().equals(memberId)
             )
-        ).toList());
+        ).toList(), null);
     }
 
     // 유저가 작성한 답변 조회
@@ -115,7 +115,7 @@ public class AnswerServiceImpl implements AnswerService {
                     answer,
                     answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
                     answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
-                )).toList()
+                )).toList(), null
         );
     }
 
@@ -128,7 +128,7 @@ public class AnswerServiceImpl implements AnswerService {
                 answer,
                 answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
                 answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
-            )).toList()
+            )).toList(), null
         );
     }
 
