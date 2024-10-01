@@ -164,11 +164,15 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     private Long getLastIndexFromAnswerInfoInterface(Long lastIndex, Slice<AnswerInfoInterface> answerInfoSliceInterface) {
-        return (!answerInfoSliceInterface.getContent().isEmpty() && lastIndex == Long.MAX_VALUE) ? answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+        if(answerInfoSliceInterface.hasContent() && lastIndex == Long.MAX_VALUE)
+            return answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get();
+        return lastIndex;
     }
 
     private Long getLastIndexFromAnswer(Long lastIndex, Slice<Answer> answerSlice) {
-        return (!answerSlice.getContent().isEmpty() && lastIndex == Long.MAX_VALUE) ? answerSlice.stream().map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+        if (answerSlice.hasContent() && lastIndex == Long.MAX_VALUE)
+            return answerSlice.stream().map(Answer::getId).max(Long::compareTo).get();
+        return lastIndex;
     }
 
     @Getter

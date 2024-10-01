@@ -126,6 +126,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     }
 
     private Long getLastIndexFromBoardCommentInfoInterface(Long lastIndex, Slice<BoardCommentInfoInterface> sliceBoardCommentInfos) {
-        return (!sliceBoardCommentInfos.isEmpty() && lastIndex == Long.MAX_VALUE) ? sliceBoardCommentInfos.stream().map(BoardCommentInfoInterface::getBoardComment).map(BoardComment::getId).max(Long::compareTo).get() : lastIndex;
+        if(sliceBoardCommentInfos.hasContent() && lastIndex == Long.MAX_VALUE)
+            return sliceBoardCommentInfos.stream().map(BoardCommentInfoInterface::getBoardComment).map(BoardComment::getId).max(Long::compareTo).get();
+        return lastIndex;
     }
 }
