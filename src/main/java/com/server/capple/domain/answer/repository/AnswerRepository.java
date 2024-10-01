@@ -28,4 +28,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, Long lastIndex, Pageable pageable);
 
     Slice<Answer> findByMemberAndIdIsLessThanEqual(@Param("member") Member member, Long lastIndex, Pageable pageable);
+
+    @Query("SELECT COUNT(a) FROM Answer a WHERE a.question.id = :questionId")
+    Integer getAnswerCountByQuestionId(Long questionId);
 }

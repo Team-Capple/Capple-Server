@@ -18,11 +18,16 @@ import com.server.capple.domain.report.repository.ReportRepository;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AnswerErrorCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +39,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerMapper answerMapper;
     private final MemberService memberService;
     private final AnswerHeartRedisRepository answerHeartRedisRepository;
+    private final AnswerCountService answerCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     @Override
@@ -49,7 +56,7 @@ public class AnswerServiceImpl implements AnswerService {
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
 //        answer.getQuestion().increaseCommentCount();
-
+        applicationEventPublisher.publishEvent(new QuestionAnswerCountChangedEvent(questionId));
         return new AnswerResponse.AnswerId(answer.getId());
     }
 
@@ -71,13 +78,12 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public AnswerResponse.AnswerId deleteAnswer(Member loginMember, Long answerId) {
         Answer answer = findAnswer(answerId);
+        applicationEventPublisher.publishEvent(new QuestionAnswerCountChangedEvent(answer.getQuestion().getId()));
 
         checkPermission(loginMember, answer);
 //        answer.getQuestion().decreaseCommentCount();
 
-
         answer.delete();
-
         return new AnswerResponse.AnswerId(answerId);
     }
 
@@ -104,7 +110,7 @@ public class AnswerServiceImpl implements AnswerService {
                 answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
                 answerInfoDto.getAnswer().getMember().getId().equals(memberId)
             )
-        ).toList(), lastIndex.toString(), null);
+        ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }
 
     // 유저가 작성한 답변 조회
@@ -163,5 +169,16 @@ public class AnswerServiceImpl implements AnswerService {
 
     private Long getLastIndexFromAnswer(Long lastIndex, Slice<Answer> answerSlice) {
         return (!answerSlice.getContent().isEmpty() && lastIndex == Long.MAX_VALUE) ? answerSlice.stream().map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    static class QuestionAnswerCountChangedEvent {
+        private Long questionId;
+    }
+
+    @TransactionalEventListener(classes = QuestionAnswerCountChangedEvent.class, phase = TransactionPhase.AFTER_COMPLETION)
+    public void handleQuestionCreatedEvent(QuestionAnswerCountChangedEvent event) {
+        answerCountService.updateQuestionAnswerCount(event.getQuestionId());
     }
 }
