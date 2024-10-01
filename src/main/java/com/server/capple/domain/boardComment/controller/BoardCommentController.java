@@ -61,7 +61,7 @@ public class BoardCommentController {
                                                                               @RequestParam(required = false) Long threshold,
                                                                               @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
                                                                               @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId, threshold, PageRequest.of(pageNumber,pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(boardCommentService.getBoardCommentInfos(member,boardId, threshold, PageRequest.of(pageNumber,pageSize, Sort.by(Sort.Direction.ASC, "createdAt"))));
     }
 
 }
