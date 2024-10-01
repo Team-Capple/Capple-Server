@@ -39,7 +39,7 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
-    @Operation(summary = "게시글 수정 API", description = "게시글을 생성합니다.")
+    @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
