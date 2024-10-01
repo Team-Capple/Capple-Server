@@ -25,7 +25,7 @@ public class BoardResponse {
         private String content;
         private Integer heartCount;
         private Integer commentCount;
-        private LocalDateTime createAt;
+        private LocalDateTime createdAt;
         private Boolean isMine;
         private Boolean isReported;
         private Boolean isLiked;
