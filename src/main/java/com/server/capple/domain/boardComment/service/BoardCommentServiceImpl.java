@@ -100,7 +100,6 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Long lastIndex, Pageable pageable) {
         lastIndex = getLastIndex(lastIndex);
         Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardIdAndIdIsLessThanEqual(member, boardId, lastIndex, pageable);
-        lastIndex = getLastIndexFromBoardCommentInfoInterface(lastIndex, sliceBoardCommentInfos);
         return SliceResponse.toSliceResponse(sliceBoardCommentInfos, sliceBoardCommentInfos.getContent().stream().map(sliceBoardCommentInfo ->
                         boardCommentMapper.toBoardCommentInfo(
                                 sliceBoardCommentInfo.getBoardComment(),
