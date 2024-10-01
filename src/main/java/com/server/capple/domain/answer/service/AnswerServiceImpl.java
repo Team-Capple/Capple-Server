@@ -158,10 +158,10 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     private Long getLastIndexFromAnswerInfoInterface(Long lastIndex, Slice<AnswerInfoInterface> answerInfoSliceInterface) {
-        return lastIndex == Long.MAX_VALUE ? answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+        return (!answerInfoSliceInterface.getContent().isEmpty() && lastIndex == Long.MAX_VALUE) ? answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get() : lastIndex;
     }
 
     private Long getLastIndexFromAnswer(Long lastIndex, Slice<Answer> answerSlice) {
-        return lastIndex == Long.MAX_VALUE ? answerSlice.stream().map(Answer::getId).max(Long::compareTo).get() : lastIndex;
+        return (!answerSlice.getContent().isEmpty() && lastIndex == Long.MAX_VALUE) ? answerSlice.stream().map(Answer::getId).max(Long::compareTo).get() : lastIndex;
     }
 }

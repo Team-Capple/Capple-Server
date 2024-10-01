@@ -152,6 +152,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Long getLastIndexFromNotification(Long lastIndex, Slice<Notification> notifications) {
-        return lastIndex == Long.MAX_VALUE ? notifications.stream().map(Notification::getId).max(Long::compareTo).get() : lastIndex;
+        return (!notifications.isEmpty() && lastIndex == Long.MAX_VALUE) ? notifications.stream().map(Notification::getId).max(Long::compareTo).get() : lastIndex;
     }
 }
