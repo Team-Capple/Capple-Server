@@ -19,9 +19,13 @@ public interface BoardService {
 
     SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Long lastIndex, Pageable pageable);
 
+    BoardInfo getBoard(Member member, Long boardId);
+
     BoardId deleteBoard(Member member, Long boardId);
 
     ToggleBoardHeart toggleBoardHeart(Member member, Long boardId);
 
     Board findBoard(Long boardId);
+
+    BoardId updateBoard(Member member, Long boardId, String content);
 }

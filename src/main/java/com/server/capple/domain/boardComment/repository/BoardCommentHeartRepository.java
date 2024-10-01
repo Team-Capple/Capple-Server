@@ -9,5 +9,4 @@ import java.util.Optional;
 
 public interface BoardCommentHeartRepository extends JpaRepository<BoardCommentHeart,Long> {
     Optional<BoardCommentHeart> findByMemberAndBoardComment(Member member, BoardComment boardComment);
-
 }

@@ -34,9 +34,19 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @PostMapping()
-    private BaseResponse<BoardId> createBoard(@AuthMember Member member,
+    public BaseResponse<BoardId> createBoard(@AuthMember Member member,
                                               @RequestBody @Valid BoardRequest.BoardCreate request) {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
+    }
+
+    @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @PostMapping("/update")
+    private BaseResponse<BoardId> updateBoard(@AuthMember Member member,
+                                              @RequestBody @Valid BoardRequest.BoardUpdate request) {
+        return BaseResponse.onSuccess(boardService.updateBoard(member, request.getBoardId(), request.getContent()));
     }
 
     @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
@@ -44,7 +54,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/redis")
-    private BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardTypeWithRedis(
+    public BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType,
             @Parameter(description = "Pull to Refresh 후 마지막 index")
@@ -59,7 +69,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping()
-    private BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardType(
+    public BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType,
             @Parameter(description = "Pull to Refresh 후 마지막 index")
@@ -74,7 +84,7 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/search")
-    private BaseResponse<SliceResponse<BoardInfo>> searchBoardsByKeyword(
+    public BaseResponse<SliceResponse<BoardInfo>> searchBoardsByKeyword(
             @AuthMember Member member, @RequestParam(name = "keyword") String keyword,
             @Parameter(description = "Pull to Refresh 후 마지막 index")
             @RequestParam(required = false) Long threshold,
@@ -89,9 +99,19 @@ public class BoardController {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @DeleteMapping("/{boardId}")
-    private BaseResponse<BoardId> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
+    public BaseResponse<BoardId> deleteBoard(@AuthMember Member member, @PathVariable(name = "boardId") Long boardId) {
         return BaseResponse.onSuccess(boardService.deleteBoard(member, boardId));
     }
+
+    @Operation(summary = "게시글 단건 조회 API", description = "게시글을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @GetMapping("/{boardId}")
+    public BaseResponse<BoardInfo> getBoard(@AuthMember Member member, @PathVariable(value = "boardId") Long boardId) {
+        return BaseResponse.onSuccess(boardService.getBoard(member, boardId));
+    }
+
 
     @Operation(summary = "게시글 좋아요/취소 API", description = " 게시글 좋아요/취소 API 입니다." +
             "pathVariable 으로 boardId를 주세요.")

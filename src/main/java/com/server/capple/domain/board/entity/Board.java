@@ -1,5 +1,7 @@
 package com.server.capple.domain.board.entity;
 
+import com.server.capple.domain.answer.dto.AnswerRequest;
+import com.server.capple.domain.board.dto.BoardRequest;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
@@ -57,5 +59,12 @@ public class Board extends BaseEntity {
 
     public void decreaseCommentCount() {
         this.commentCount--;
+    }
+
+    public void updateBoardType(BoardType boardType) {
+        this.boardType = boardType;
+    }
+    public void updateContent(String content) {
+        this.content = content;
     }
 }

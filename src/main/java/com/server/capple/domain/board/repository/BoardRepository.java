@@ -28,6 +28,14 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Slice<BoardInfoInterface> findBoardInfosByMemberAndKeywordAndIdIsLessThanEqual(Member member, String keyword, Long lastIndex, Pageable pageable);
 
 
+    @Query("SELECT b AS board, " +
+            "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "FROM Board b " +
+            "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
+            "WHERE b.id = :boardId")
+    BoardInfoInterface findBoardByMember(Member member, Long boardId);
+
     //redis 성능 테스트용
     @Query("SELECT DISTINCT b AS board, " +
             "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
