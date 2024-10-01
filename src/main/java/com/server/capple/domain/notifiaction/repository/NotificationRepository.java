@@ -13,12 +13,15 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "n " +
         "from Notification n " +
         "where " +
+        "n.id <= :lastIndex AND " +
+        "(" +
         "n.memberId = :memberId " +
         "OR " +
         "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_PUBLISHED " +
         "OR " +
-        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED"
+        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED" +
+        ")"
     )
-    Slice<Notification> findByMemberId(Long memberId, Pageable pageable);
+    Slice<Notification> findByMemberId(Long memberId, Long lastIndex, Pageable pageable);
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
 }

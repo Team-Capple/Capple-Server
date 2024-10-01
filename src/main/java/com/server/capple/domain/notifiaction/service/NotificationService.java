@@ -16,6 +16,6 @@ public interface NotificationService {
     void sendBoardCommentHeartNotification(Long actorId, Board board, BoardComment boardComment);
     void sendLiveQuestionOpenNotification(Question question);
     void sendLiveQuestionCloseNotification(Question question);
-    SliceResponse<NotificationResponse.NotificationInfo> getNotifications(Member member, Pageable pageable);
+    SliceResponse<NotificationResponse.NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable);
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
 }

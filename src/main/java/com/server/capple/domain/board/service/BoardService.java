@@ -13,11 +13,11 @@ import org.springframework.data.domain.Pageable;
 public interface BoardService {
     BoardId createBoard(Member member, BoardType boardType, String content);
 
-    SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable);
+    SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Long lastIndex, Pageable pageable);
 
-    SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable);
+    SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Long lastIndex, Pageable pageable);
 
-    SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable);
+    SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Long lastIndex, Pageable pageable);
 
     BoardId deleteBoard(Member member, Long boardId);
 

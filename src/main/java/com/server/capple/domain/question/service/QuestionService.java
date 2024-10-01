@@ -8,11 +8,14 @@ import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.SliceResponse;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 public interface QuestionService {
     Question findQuestion(Long questionId);
+
     QuestionSummary getMainQuestion(Member member);
 
-    SliceResponse<QuestionInfo> getQuestions(Member member, Pageable pageable);
+    SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable);
 
     QuestionResponse.QuestionToggleHeart toggleQuestionHeart(Member member, Long questionId);
 }

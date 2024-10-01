@@ -10,6 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
@@ -25,10 +26,9 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query("SELECT q AS question, (a IS NOT NULL) AS isAnsweredByMember " +
         "FROM Question q LEFT JOIN Answer a ON q = a.question AND a.deletedAt is NULL AND a.member = :member " +
-        "WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
-    Slice<QuestionInfoInterface> findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(@Param("member") Member member, Pageable pageable);
+        "WHERE (q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE') AND q.livedAt <= :thresholdDate")
+    Slice<QuestionInfoInterface> findAllByLivedAtBefore(@Param("member") Member member, @Param("thresholdDate") LocalDateTime thresholdDate, Pageable pageable);
 
     @Query("SELECT COUNT(q) FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
     Integer getLiveOrOldQuestionCount();
 }
-

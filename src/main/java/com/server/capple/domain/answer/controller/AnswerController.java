@@ -41,11 +41,13 @@ public class AnswerController {
         @AuthMember Member member,
         @Parameter(description = "질문 식별자")
         @PathVariable(value = "questionId") Long questionId,
+        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @RequestParam(required = false) Long threshold,
         @Parameter(description = "조회할 페이지 번호<br>0부터 시작")
         @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
@@ -74,21 +76,25 @@ public class AnswerController {
     @GetMapping
     public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberAnswer(
         @AuthMember Member member,
+        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @RequestParam(required = false) Long threshold,
         @Parameter(description = "조회할 페이지 번호<br>0부터 시작")
         @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getMemberAnswer(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getMemberAnswer(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.")
     @GetMapping("/heart")
     public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberHeartAnswer(
         @AuthMember Member member,
+        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @RequestParam(required = false) Long threshold,
         @Parameter(description = "조회할 페이지 번호<br>0부터 시작")
         @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

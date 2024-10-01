@@ -14,6 +14,6 @@ public interface BoardCommentService {
     BoardCommentId updateBoardComment(Member member, Long commentId,BoardCommentRequest request);
     BoardCommentId deleteBoardComment(Member member, Long commentId);
     ToggleBoardCommentHeart toggleBoardCommentHeart(Member member, Long commentId);
-    SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Pageable pageable);
+    SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Long lastIndex, Pageable pageable);
     BoardComment findBoardComment(Long commentId);
 }

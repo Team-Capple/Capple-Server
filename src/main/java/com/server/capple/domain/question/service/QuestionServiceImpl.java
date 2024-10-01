@@ -19,6 +19,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,11 +48,12 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public SliceResponse<QuestionInfo> getQuestions(Member member, Pageable pageable) {
-        Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member, pageable);
+    public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable) {
+        thresholdDate = getThresholdDate(thresholdDate);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByLivedAtBefore(member, thresholdDate, pageable);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-            ).toList(), questionCountService.getLiveOrOldQuestionCount());
+            ).toList(), thresholdDate.toString(), questionCountService.getLiveOrOldQuestionCount());
     }
 
     @Override
@@ -59,5 +62,9 @@ public class QuestionServiceImpl implements QuestionService {
 
         Boolean isLiked = questionHeartRepository.toggleBoardHeart(member.getId(), question.getId());
         return new QuestionResponse.QuestionToggleHeart(questionId, isLiked);
+    }
+
+    private LocalDateTime getThresholdDate(LocalDateTime thresholdDate) {
+        return thresholdDate == null ? LocalDateTime.now() : thresholdDate;
     }
 }

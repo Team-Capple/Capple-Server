@@ -125,7 +125,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
     @Transactional
     public void getMemberAnswerTest() {
         //when
-        SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
+        SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
         //then
         assertEquals(memberAnswer.getContent().get(0).getContent(), "나는 무자비한 사람이 좋아");
     }
@@ -138,7 +138,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
         answerService.toggleAnswerHeart(member, answer.getId());
 
         //when
-        SliceResponse<MemberAnswerInfo> memberHeartAnswer = answerService.getMemberHeartAnswer(member, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
+        SliceResponse<MemberAnswerInfo> memberHeartAnswer = answerService.getMemberHeartAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         //then
         assertEquals(memberHeartAnswer.getContent().get(0).getHeartCount(), 1);
