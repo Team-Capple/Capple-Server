@@ -51,6 +51,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
+    public BoardId updateBoard(Member member, Long boardId, String content) {
+        Board board = findBoard(boardId);
+        checkPermission(member, board);
+        board.updateContent(content);
+
+        return new BoardId(board.getId());
+    }
+
     public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Long lastIndex, Pageable pageable) {
         lastIndex = getLastIndex(lastIndex);
         Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardTypeAndIdIsLessThanEqual(member, boardType, lastIndex, pageable);

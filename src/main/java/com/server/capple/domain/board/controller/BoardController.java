@@ -39,6 +39,16 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.createBoard(member, request.getBoardType(), request.getContent()));
     }
 
+    @Operation(summary = "게시글 수정 API", description = "게시글을 수정합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "COMMON200", description = "성공"),
+    })
+    @PostMapping("/update")
+    private BaseResponse<BoardId> updateBoard(@AuthMember Member member,
+                                              @RequestBody @Valid BoardRequest.BoardUpdate request) {
+        return BaseResponse.onSuccess(boardService.updateBoard(member, request.getBoardId(), request.getContent()));
+    }
+
     @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
