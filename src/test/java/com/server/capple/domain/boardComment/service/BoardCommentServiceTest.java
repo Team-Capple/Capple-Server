@@ -115,7 +115,7 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         //given
         PageRequest pageRequest = PageRequest.of(0,10, Sort.by(Sort.Direction.DESC,"createdAt"));
         //when
-        SliceResponse<BoardCommentInfo> response = boardCommentService.getBoardCommentInfos(member, board.getId(), pageRequest);
+        SliceResponse<BoardCommentInfo> response = boardCommentService.getBoardCommentInfos(member, board.getId(), null, pageRequest);
 
         //then
         assertEquals(member.getId(), response.getContent().get(0).getWriterId());

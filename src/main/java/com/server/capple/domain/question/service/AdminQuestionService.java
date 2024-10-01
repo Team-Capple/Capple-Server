@@ -12,5 +12,6 @@ public interface AdminQuestionService {
 
     Question setLiveQuestion();
     Question closeLiveQuestion();
+    Long uploadQuestionByCsv(String text);
 
 }

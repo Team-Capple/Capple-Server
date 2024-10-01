@@ -21,6 +21,7 @@ public class BoardResponse {
     public static class BoardInfo {
         private Long boardId;
         private Long writerId;
+        private String writerNickname;
         private String content;
         private Integer heartCount;
         private Integer commentCount;

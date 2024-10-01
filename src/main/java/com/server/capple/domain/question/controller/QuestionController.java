@@ -9,6 +9,7 @@ import com.server.capple.domain.question.service.QuestionService;
 import com.server.capple.global.common.BaseResponse;
 import com.server.capple.global.common.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Tag(name = "질문 API", description = "질문 관련 API")
 @RestController
@@ -39,8 +42,14 @@ public class QuestionController {
         @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping
-    private BaseResponse<SliceResponse<QuestionInfo>> getQuestions(@AuthMember Member member, @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(questionService.getQuestions(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
+    private BaseResponse<SliceResponse<QuestionInfo>> getQuestions(
+        @AuthMember Member member,
+        @Parameter(description = "최근의 Pull to Refresh 시각")
+        @RequestParam(required = false) LocalDateTime threshold,
+        @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+        ) {
+        return BaseResponse.onSuccess(questionService.getQuestions(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
     }
 
     @Operation(summary = "질문 좋아요/취소 API", description = " 질문 좋아요/취소 API 입니다." +

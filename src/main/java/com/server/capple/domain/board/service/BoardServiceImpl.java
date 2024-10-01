@@ -18,10 +18,12 @@ import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
@@ -29,7 +31,6 @@ import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
-
     private final BoardRepository boardRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
@@ -37,39 +38,43 @@ public class BoardServiceImpl implements BoardService {
     private final NotificationService notificationService;
     private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+    private final BoardCountService boardCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
     public BoardId createBoard(Member member, BoardType boardType, String content) {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
-
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
         return new BoardId(board.getId());
     }
 
     @Override
-    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType, pageable);
-
+    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardTypeAndIdIsLessThanEqual(member, boardType, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
                                 sliceBoardInfo.getBoard(),
                                 sliceBoardInfo.getIsLike(),
                                 sliceBoardInfo.getIsMine()))
-                .toList()
+                .toList(), lastIndex.toString(), boardCountService.getBoardCount()
         );
     }
 
     @Override
-    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword, pageable);
-
+    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeywordAndIdIsLessThanEqual(member, keyword, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
                                 sliceBoardInfo.getBoard(),
                                 sliceBoardInfo.getIsLike(),
                                 sliceBoardInfo.getIsMine()))
-                .toList()
+                .toList(), lastIndex.toString(), null
         );
     }
 
@@ -77,19 +82,20 @@ public class BoardServiceImpl implements BoardService {
     redis 성능 테스트 용
      */
     @Override
-    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Pageable pageable) {
-        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedis(member, boardType, pageable);
-
+    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedisAndIdIsLessThanEqual(member, boardType, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
                     return boardMapper.toBoardInfo(
-                            sliceBoardInfo.getBoard(),
-                            heartCount,
-                            isLiked,
-                            sliceBoardInfo.getIsMine());
+                        sliceBoardInfo.getBoard(),
+                        heartCount,
+                        isLiked,
+                        sliceBoardInfo.getIsMine());
                 })
-                .toList());
+                .toList(), lastIndex.toString(), boardCountService.getBoardCount());
     }
 
     @Override
@@ -97,6 +103,8 @@ public class BoardServiceImpl implements BoardService {
     public BoardId deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
         checkPermission(member, board);
+
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
 
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
@@ -110,10 +118,10 @@ public class BoardServiceImpl implements BoardService {
         // 좋아요 눌렀는지 확인
         //boardHeart에 없다면 새로 저장
         BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-                .orElseGet(() -> {
-                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                    return boardHeartRepository.save(newHeart);
-                });
+            .orElseGet(() -> {
+                BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                return boardHeartRepository.save(newHeart);
+            });
 
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
@@ -130,6 +138,24 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+    }
+
+    static class BoardCreatedEvent {
+    }
+
+    @TransactionalEventListener(BoardCreatedEvent.class)
+    public void handleBoardCreatedEvent() {
+        boardCountService.updateBoardCount();
+    }
+
+    private Long getLastIndex(Long lastIndex) {
+        lastIndex = lastIndex == null ? Long.MAX_VALUE : lastIndex;
+        return lastIndex;
+    }
+
+    private Long getLastIndexFromBoardInfoInterface(Long lastIndex, Slice<BoardInfoInterface> sliceBoardInfos) {
+        lastIndex = lastIndex == Long.MAX_VALUE ? sliceBoardInfos.stream().map(BoardInfoInterface::getBoard).map(Board::getId).max(Long::compareTo).get() : lastIndex;
+        return lastIndex;
     }
 }

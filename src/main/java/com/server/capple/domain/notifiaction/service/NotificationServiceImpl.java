@@ -134,14 +134,24 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public SliceResponse<NotificationInfo> getNotifications(Member member, Pageable pageable) {
-        Slice<Notification> notificationRDBInfos = notificationRepository.findByMemberId(member.getId(), pageable);
-        return notificationMapper.toNotificationInfoSlice(notificationRDBInfos);
+    public SliceResponse<NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<Notification> notifications = notificationRepository.findByMemberId(member.getId(), lastIndex, pageable);
+        lastIndex = getLastIndexFromNotification(lastIndex, notifications);
+        return notificationMapper.toNotificationInfoSlice(notifications, lastIndex);
     }
 
     @Override
     @Transactional
     public void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime) {
         notificationRepository.deleteNotificationsByCreatedAtBefore(targetTime);
+    }
+
+    private long getLastIndex(Long lastIndex) {
+        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
+    }
+
+    private Long getLastIndexFromNotification(Long lastIndex, Slice<Notification> notifications) {
+        return lastIndex == Long.MAX_VALUE ? notifications.stream().map(Notification::getId).max(Long::compareTo).get() : lastIndex;
     }
 }

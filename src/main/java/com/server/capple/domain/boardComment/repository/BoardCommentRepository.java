@@ -8,14 +8,12 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
     @Query("SELECT bc AS boardComment, " +
             "(CASE WHEN bch.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
             "(CASE WHEN bc.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM BoardComment bc " +
             "LEFT JOIN BoardCommentHeart bch ON bc = bch.boardComment AND bch.member = :member " +
-            "WHERE bc.board.id = :boardId ORDER BY bc.createdAt DESC")
-    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardId(Member member, Long boardId, Pageable pageable);
+            "WHERE bc.board.id = :boardId AND bc.id <= :lastIndex")
+    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardIdAndIdIsLessThanEqual(Member member, Long boardId, Long lastIndex, Pageable pageable);
 }
