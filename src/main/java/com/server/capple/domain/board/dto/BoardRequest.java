@@ -29,6 +29,5 @@ public class BoardRequest {
         private Long boardId;
         @NotEmpty
         private String content;
-        private BoardType boardType;
     }
 }

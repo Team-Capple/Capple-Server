@@ -22,5 +22,5 @@ public interface BoardService {
 
     Board findBoard(Long boardId);
 
-    BoardId updateBoard(Member member, Long boardId, BoardType boardType, String content);
+    BoardId updateBoard(Member member, Long boardId, String content);
 }

@@ -42,7 +42,7 @@ public class BoardController {
     @PostMapping("/update")
     private BaseResponse<BoardId> updateBoard(@AuthMember Member member,
                                               @RequestBody @Valid BoardRequest.BoardUpdate request) {
-        return BaseResponse.onSuccess(boardService.updateBoard(member, request.getBoardId(), request.getBoardType(), request.getContent()));
+        return BaseResponse.onSuccess(boardService.updateBoard(member, request.getBoardId(), request.getContent()));
     }
 
     @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
