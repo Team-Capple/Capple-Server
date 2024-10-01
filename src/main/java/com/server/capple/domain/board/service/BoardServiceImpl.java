@@ -90,13 +90,25 @@ public class BoardServiceImpl implements BoardService {
                     int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
                     return boardMapper.toBoardInfo(
-                        sliceBoardInfo.getBoard(),
-                        heartCount,
-                        isLiked,
-                        sliceBoardInfo.getIsMine());
+                            sliceBoardInfo.getBoard(),
+                            heartCount,
+                            isLiked,
+                            sliceBoardInfo.getIsMine());
                 })
                 .toList(), lastIndex.toString(), boardCountService.getBoardCount());
     }
+
+    @Override
+    public BoardInfo getBoard(Member member, Long boardId) {
+        BoardInfoInterface boardInfo = boardRepository.findBoardByMember(member, boardId);
+
+        return boardMapper.toBoardInfo(
+                boardInfo.getBoard(),
+                boardInfo.getIsLike(),
+                boardInfo.getIsMine()
+        );
+    }
+
 
     @Override
     @Transactional
@@ -118,10 +130,10 @@ public class BoardServiceImpl implements BoardService {
         // 좋아요 눌렀는지 확인
         //boardHeart에 없다면 새로 저장
         BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-            .orElseGet(() -> {
-                BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                return boardHeartRepository.save(newHeart);
-            });
+                .orElseGet(() -> {
+                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                    return boardHeartRepository.save(newHeart);
+                });
 
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
@@ -138,7 +150,7 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
     }
 
     static class BoardCreatedEvent {
