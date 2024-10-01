@@ -4,28 +4,37 @@ import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
 import com.server.capple.domain.member.entity.Member;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    @Query("SELECT b AS board, " +
-            "(CASE WHEN bh.member = :member AND bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
+    @Query("SELECT DISTINCT b AS board, " +
+            "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
             "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM Board b " +
-            "LEFT JOIN BoardHeart bh ON b = bh.board " +
-            "WHERE :boardType IS NULL OR b.boardType = :boardType ORDER BY b.createdAt DESC")
-    List<BoardInfoInterface> findBoardInfosByMemberAndBoardType(Member member, BoardType boardType);
+            "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
+            "WHERE (:boardType IS NULL OR b.boardType = :boardType) AND b.id <= :lastIndex")
+    Slice<BoardInfoInterface> findBoardInfosByMemberAndBoardTypeAndIdIsLessThanEqual(Member member, BoardType boardType, Long lastIndex, Pageable pageable);
 
-    @Query("SELECT b AS board, " +
-            "(CASE WHEN bh.member = :member AND bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
+    @Query("SELECT DISTINCT b AS board, " +
+            "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
             "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM Board b " +
-            "LEFT JOIN BoardHeart bh ON b = bh.board " +
-            "WHERE b.content LIKE %:keyword% AND b.boardType = 0 ORDER BY b.createdAt DESC") //FREETYPE = 0
-    List<BoardInfoInterface> findBoardInfosByMemberAndKeyword(Member member, String keyword);
+            "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
+            "WHERE b.id <= :lastIndex AND b.content LIKE %:keyword% AND b.boardType = 0") //FREETYPE = 0
+    Slice<BoardInfoInterface> findBoardInfosByMemberAndKeywordAndIdIsLessThanEqual(Member member, String keyword, Long lastIndex, Pageable pageable);
 
-    List<Board> findBoardsByBoardType(BoardType boardType);
+
+    //redis 성능 테스트용
+    @Query("SELECT DISTINCT b AS board, " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "FROM Board b " +
+            "WHERE (:boardType IS NULL OR b.boardType = :boardType) AND b.id <= :lastIndex")
+    Slice<BoardInfoInterface> findBoardInfosForRedisAndIdIsLessThanEqual(Member member, BoardType boardType, Long lastIndex, Pageable pageable);
+
+    @Query("SELECT COUNT(b) FROM Board b")
+    Integer getBoardCount();
 }

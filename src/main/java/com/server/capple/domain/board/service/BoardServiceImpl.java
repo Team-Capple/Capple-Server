@@ -2,7 +2,6 @@ package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.dao.BoardInfoInterface;
 import com.server.capple.domain.board.dto.BoardResponse.BoardId;
-import com.server.capple.domain.board.dto.BoardResponse.BoardsGetBoardInfos;
 import com.server.capple.domain.board.dto.BoardResponse.ToggleBoardHeart;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardHeart;
@@ -15,33 +14,39 @@ import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.BoardErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.List;
+import static com.server.capple.domain.board.dto.BoardResponse.BoardInfo;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
-
     private final BoardRepository boardRepository;
-    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardMapper boardMapper;
     private final BoardHeartRepository boardHeartRepository;
     private final BoardHeartMapper boardHeartMapper;
     private final NotificationService notificationService;
+    private final BoardHeartRedisRepository boardHeartRedisRepository;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+    private final BoardCountService boardCountService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @Transactional
     public BoardId createBoard(Member member, BoardType boardType, String content) {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
-
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
         return new BoardId(board.getId());
     }
 
@@ -55,13 +60,30 @@ public class BoardServiceImpl implements BoardService {
         return new BoardId(board.getId());
     }
 
-    @Override
-    public BoardsGetBoardInfos getBoardsByBoardType(Member member, BoardType boardType) {
-        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndBoardType(member, boardType);
+    public SliceResponse<BoardInfo> getBoardsByBoardType(Member member, BoardType boardType, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndBoardTypeAndIdIsLessThanEqual(member, boardType, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList(), lastIndex.toString(), boardCountService.getBoardCount()
+        );
+    }
 
-        return new BoardsGetBoardInfos(boardInfos.stream()
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
-                .toList()
+    @Override
+    public SliceResponse<BoardInfo> searchBoardsByKeyword(Member member, String keyword, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosByMemberAndKeywordAndIdIsLessThanEqual(member, keyword, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
+                        boardMapper.toBoardInfo(
+                                sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getIsLike(),
+                                sliceBoardInfo.getIsMine()))
+                .toList(), lastIndex.toString(), null
         );
     }
 
@@ -69,33 +91,20 @@ public class BoardServiceImpl implements BoardService {
     redis 성능 테스트 용
      */
     @Override
-    public BoardsGetBoardInfos getBoardsByBoardTypeWithRedis(Member member, BoardType boardType) {
-        List<Board> boards;
-        if (boardType == null) {
-            boards = boardRepository.findAll();
-        } else {
-            boards = boardRepository.findBoardsByBoardType(boardType);
-        }
-
-        return new BoardsGetBoardInfos(boards.stream()
-                .map(board -> {
-                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(board.getId());
-                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), board.getId());
-                    boolean isMine = board.getWriter().getId().equals(member.getId());
-                    return boardMapper.toBoardsGetBoardInfo(board, heartCount, isLiked, isMine);
+    public SliceResponse<BoardInfo> getBoardsByBoardTypeWithRedis(Member member, BoardType boardType, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardInfoInterface> sliceBoardInfos = boardRepository.findBoardInfosForRedisAndIdIsLessThanEqual(member, boardType, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardInfoInterface(lastIndex, sliceBoardInfos);
+        return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo -> {
+                    int heartCount = boardHeartRedisRepository.getBoardHeartsCount(sliceBoardInfo.getBoard().getId());
+                    boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
+                    return boardMapper.toBoardInfo(
+                        sliceBoardInfo.getBoard(),
+                        heartCount,
+                        isLiked,
+                        sliceBoardInfo.getIsMine());
                 })
-                .toList()
-        );
-    }
-
-    @Override
-    public BoardsGetBoardInfos searchBoardsByKeyword(Member member, String keyword) {
-        List<BoardInfoInterface> boardInfos = boardRepository.findBoardInfosByMemberAndKeyword(member, keyword);
-
-        return new BoardsGetBoardInfos(boardInfos.stream()
-                .map(boardInfo -> boardMapper.toBoardsGetBoardInfo(boardInfo.getBoard(), boardInfo.getIsLike(), boardInfo.getIsMine()))
-                .toList()
-        );
+                .toList(), lastIndex.toString(), boardCountService.getBoardCount());
     }
 
     @Override
@@ -103,6 +112,8 @@ public class BoardServiceImpl implements BoardService {
     public BoardId deleteBoard(Member member, Long boardId) {
         Board board = findBoard(boardId);
         checkPermission(member, board);
+
+        applicationEventPublisher.publishEvent(new BoardCreatedEvent());
 
         board.delete();
         boardSubscribeMemberService.deleteBoardSubscribeMemberByBoardId(boardId);
@@ -116,10 +127,10 @@ public class BoardServiceImpl implements BoardService {
         // 좋아요 눌렀는지 확인
         //boardHeart에 없다면 새로 저장
         BoardHeart boardHeart = boardHeartRepository.findByMemberAndBoard(member, board)
-                .orElseGet(() -> {
-                    BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
-                    return boardHeartRepository.save(newHeart);
-                });
+            .orElseGet(() -> {
+                BoardHeart newHeart = boardHeartMapper.toBoardHeart(board, member);
+                return boardHeartRepository.save(newHeart);
+            });
 
         boolean isLiked = boardHeart.toggleHeart();
         board.setHeartCount(boardHeart.isLiked());
@@ -136,6 +147,24 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board findBoard(Long boardId) {
         return boardRepository.findById(boardId)
-                .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+            .orElseThrow(() -> new RestApiException(BoardErrorCode.BOARD_NOT_FOUND));
+    }
+
+    static class BoardCreatedEvent {
+    }
+
+    @TransactionalEventListener(BoardCreatedEvent.class)
+    public void handleBoardCreatedEvent() {
+        boardCountService.updateBoardCount();
+    }
+
+    private Long getLastIndex(Long lastIndex) {
+        lastIndex = lastIndex == null ? Long.MAX_VALUE : lastIndex;
+        return lastIndex;
+    }
+
+    private Long getLastIndexFromBoardInfoInterface(Long lastIndex, Slice<BoardInfoInterface> sliceBoardInfos) {
+        lastIndex = lastIndex == Long.MAX_VALUE ? sliceBoardInfos.stream().map(BoardInfoInterface::getBoard).map(Board::getId).max(Long::compareTo).get() : lastIndex;
+        return lastIndex;
     }
 }

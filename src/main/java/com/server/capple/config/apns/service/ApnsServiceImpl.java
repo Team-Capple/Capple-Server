@@ -58,7 +58,7 @@ public class ApnsServiceImpl implements ApnsService {
 
         deviceToken.parallelStream()
             .forEach(token -> {
-                if (token.isBlank()) return;
+                if (token == null || token.isBlank() || token.equals("string")) return;
                 tmpWebClient
                     .method(HttpMethod.POST)
                     .uri(token)
@@ -73,7 +73,7 @@ public class ApnsServiceImpl implements ApnsService {
                             .retrieve()
                             .bodyToMono(Void.class)
                             .subscribe();
-                        log.info("APNs 전송 거절 발생");
+                        log.error("APNs 전송 거절 발생");
                     })
                     .doOnError(e -> { // 에러 발생 시 보조 채널로 재시도
                         tmpSubWebClient
@@ -83,7 +83,7 @@ public class ApnsServiceImpl implements ApnsService {
                             .retrieve()
                             .bodyToMono(Void.class)
                             .subscribe();
-                        log.error("APNs 전송 중 오류 발생", e);
+                        log.warn("APNs 전송 중 오류 발생", e);
                     })
                     .subscribe();
             });
@@ -98,5 +98,10 @@ public class ApnsServiceImpl implements ApnsService {
     @Override
     public <T> Boolean sendApnsToMembers(T request, List<Long> memberIdList) {
         return sendApns(request, deviceTokenRedisRepository.getDeviceTokens(memberIdList));
+    }
+
+    @Override
+    public <T> Boolean sendApnsToAllMembers(T request) {
+        return sendApns(request, deviceTokenRedisRepository.getAllDeviceTokens());
     }
 }

@@ -2,12 +2,12 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
-import com.server.capple.domain.answer.dto.AnswerResponse.AnswerList;
-import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerList;
+import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.global.common.SliceResponse;
 import org.springframework.data.domain.Pageable;
-
 
 public interface AnswerService {
     AnswerResponse.AnswerId createAnswer(Member member, Long questionId, AnswerRequest request);
@@ -20,9 +20,9 @@ public interface AnswerService {
 
     AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId);
 
-    AnswerList getAnswerList(Long memberId, Long questionId, String keyword, Pageable pageable);
+    SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable);
 
-    MemberAnswerList getMemberAnswer(Member member);
+    SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Long lastIndex, Pageable pageable);
 
-    MemberAnswerList getMemberHeartAnswer(Member member);
+    SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Long lastIndex, Pageable pageable);
 }

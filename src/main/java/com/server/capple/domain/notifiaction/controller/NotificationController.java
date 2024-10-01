@@ -7,6 +7,7 @@ import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.common.BaseResponse;
 import com.server.capple.global.common.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +26,11 @@ public class NotificationController {
 
     @Operation(summary = "알림 리스트 조회 API", description = "API를 호출한 사용자가 받은 알림 리스트를 조회합니다. 알림은 최신순으로 정렬되어 반환됩니다.")
     @GetMapping
-    public BaseResponse<SliceResponse<NotificationInfo>> getNotifications(@AuthMember Member member, @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(new SliceResponse<>(notificationService.getNotifications(member, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt")))));
+    public BaseResponse<SliceResponse<NotificationInfo>> getNotifications(
+        @AuthMember Member member,
+        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @RequestParam(required = false) Long threshold,
+        @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(notificationService.getNotifications(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

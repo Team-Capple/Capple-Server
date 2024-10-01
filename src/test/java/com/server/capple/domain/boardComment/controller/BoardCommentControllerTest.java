@@ -3,16 +3,19 @@ package com.server.capple.domain.boardComment.controller;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.service.BoardCommentService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.server.capple.domain.boardComment.dto.BoardCommentResponse.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -34,7 +37,6 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void createBoardCommentTest() throws Exception {
         //given
         final String url = "/board-comments/board/{boardId}";
-
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 
@@ -60,7 +62,6 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void updateBoardCommentTest() throws Exception {
         //given
         final String url = "/board-comments/{commentId}";
-
         BoardCommentRequest request = getBoardCommentRequest();
         BoardCommentId response = new BoardCommentId(1L);
 
@@ -133,9 +134,9 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
     public void getBoardCommentInfosTest() throws Exception {
         //given
         final String url = "/board-comments/{boardId}";
-        BoardCommentInfos response = getBoardCommentInfos();
+        SliceResponse<BoardCommentInfo> response = getSliceBoardCommentInfos();
 
-        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class));
+        doReturn(response).when(boardCommentService).getBoardCommentInfos(any(Member.class), any(Long.class), isNull(), any(PageRequest.class));
 
         //when
         ResultActions resultActions = this.mockMvc.perform(get(url, 1L)
@@ -148,10 +149,12 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].boardCommentId").value(1L))
-//                .andExpect(jsonPath("$.result.boardCommentInfos[0].writer").value("루시"))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].content").value("댓글"))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].heartCount").value(2L))
-                .andExpect(jsonPath("$.result.boardCommentInfos[0].isLiked").value(true));
+                .andExpect(jsonPath("$.result.number").value(0))
+                .andExpect(jsonPath("$.result.size").value(10))
+                .andExpect(jsonPath("$.result.numberOfElements").value(1))
+                .andExpect(jsonPath("$.result.content[0].boardCommentId").value(1L))
+                .andExpect(jsonPath("$.result.content[0].content").value("댓글"))
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(2L))
+                .andExpect(jsonPath("$.result.content[0].isLiked").value(true));
     }
 }

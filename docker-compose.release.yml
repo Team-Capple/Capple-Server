@@ -6,5 +6,7 @@ services:
     image: ${SPRING_IMAGE}
     ports:
       - ${SPRING_OUTER_PORT}:${SPRING_INNER_PORT}
+    volumes:
+      - ${LOCAL_SPRING_LOG_PATH}:/app/logs
     environment:
       - SPRING_PROFILES_ACTIVE=release

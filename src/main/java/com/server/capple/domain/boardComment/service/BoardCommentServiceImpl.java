@@ -5,7 +5,7 @@ import com.server.capple.domain.board.service.BoardService;
 import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentId;
-import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfos;
+import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.ToggleBoardCommentHeart;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardComment.entity.BoardCommentHeart;
@@ -16,15 +16,15 @@ import com.server.capple.domain.boardComment.repository.BoardCommentHeartReposit
 import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -97,11 +97,17 @@ public class BoardCommentServiceImpl implements BoardCommentService {
 
 
     @Override
-    public BoardCommentInfos getBoardCommentInfos(Member member, Long boardId) {
-        List<BoardCommentInfoInterface> commentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardId(member, boardId);
-
-        return new BoardCommentInfos(commentInfos.stream().map(commentInfo ->
-                boardCommentMapper.toBoardCommentInfo(commentInfo.getBoardComment(), commentInfo.getIsLike(), commentInfo.getIsMine())).toList());
+    public SliceResponse<BoardCommentInfo> getBoardCommentInfos(Member member, Long boardId, Long lastIndex, Pageable pageable) {
+        lastIndex = getLastIndex(lastIndex);
+        Slice<BoardCommentInfoInterface> sliceBoardCommentInfos = boardCommentRepository.findBoardCommentInfosByMemberAndBoardIdAndIdIsLessThanEqual(member, boardId, lastIndex, pageable);
+        lastIndex = getLastIndexFromBoardCommentInfoInterface(lastIndex, sliceBoardCommentInfos);
+        return SliceResponse.toSliceResponse(sliceBoardCommentInfos, sliceBoardCommentInfos.getContent().stream().map(sliceBoardCommentInfo ->
+                        boardCommentMapper.toBoardCommentInfo(
+                                sliceBoardCommentInfo.getBoardComment(),
+                                sliceBoardCommentInfo.getIsLike(),
+                                sliceBoardCommentInfo.getIsMine()))
+                .toList(), lastIndex.toString(), null
+        );
     }
 
     private void checkPermission(Member member, BoardComment boardComment) {
@@ -113,5 +119,13 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     public BoardComment findBoardComment(Long commentId) {
         return boardCommentRepository.findById(commentId).orElseThrow(
                 () -> new RestApiException(CommentErrorCode.COMMENT_NOT_FOUND));
+    }
+
+    private Long getLastIndex(Long lastIndex) {
+        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
+    }
+
+    private Long getLastIndexFromBoardCommentInfoInterface(Long lastIndex, Slice<BoardCommentInfoInterface> sliceBoardCommentInfos) {
+        return lastIndex == Long.MAX_VALUE ? sliceBoardCommentInfos.stream().map(BoardCommentInfoInterface::getBoardComment).map(BoardComment::getId).max(Long::compareTo).get() : lastIndex;
     }
 }
