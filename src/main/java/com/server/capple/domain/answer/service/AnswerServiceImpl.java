@@ -104,11 +104,9 @@ public class AnswerServiceImpl implements AnswerService {
         lastIndex = getLastIndexFromAnswerInfoInterface(lastIndex, answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
-                answerInfoDto.getAnswer(),
+                answerInfoDto,
                 memberId,
-                answerInfoDto.getIsReported(),
-                answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
-                answerInfoDto.getAnswer().getMember().getId().equals(memberId)
+                answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId())
             )
         ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }

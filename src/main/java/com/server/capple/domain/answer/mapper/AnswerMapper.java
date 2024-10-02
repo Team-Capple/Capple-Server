@@ -1,5 +1,6 @@
 package com.server.capple.domain.answer.mapper;
 
+import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
@@ -7,8 +8,6 @@ import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class AnswerMapper {
@@ -20,17 +19,17 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(Answer answer, Long memberId, Boolean isReported, Boolean isLiked, Boolean isMine) {
+    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked) {
         return AnswerInfo.builder()
-                .answerId(answer.getId())
-                .writerId(answer.getMember().getId())
-                .profileImage(answer.getMember().getProfileImage())
-                .nickname(answer.getMember().getNickname())
-                .content(answer.getContent())
-                .isMine(isMine)
-                .isReported(isReported)
+                .answerId(answerInfoDto.getAnswer().getId())
+                .writerId(answerInfoDto.getWriterId())
+                .profileImage(answerInfoDto.getWriterProfileImage())
+                .nickname(answerInfoDto.getWriterNickname())
+                .content(answerInfoDto.getAnswer().getContent())
+                .isMine(answerInfoDto.getWriterId().equals(memberId))
+                .isReported(answerInfoDto.getIsReported())
                 .isLiked(isLiked)
-                .writeAt(answer.getCreatedAt().toString())
+                .writeAt(answerInfoDto.getAnswer().getCreatedAt().toString())
                 .build();
     }
 
