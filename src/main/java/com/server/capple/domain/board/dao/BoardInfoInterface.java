@@ -6,4 +6,5 @@ public interface BoardInfoInterface {
     Board getBoard();
     Boolean getIsLike();
     Boolean getIsMine();
+    String getWriterNickname();
 }

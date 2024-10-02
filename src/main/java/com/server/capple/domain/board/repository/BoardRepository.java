@@ -13,7 +13,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT DISTINCT b AS board, " +
             "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
-            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine, " +
+            "b.writer.nickname AS writerNickname " +
             "FROM Board b " +
             "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
             "WHERE (:boardType IS NULL OR b.boardType = :boardType) AND (b.id < :lastIndex OR :lastIndex IS NULL)")
@@ -21,7 +22,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT DISTINCT b AS board, " +
             "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
-            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine, " +
+            "b.writer.nickname AS writerNickname " +
             "FROM Board b " +
             "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
             "WHERE (b.id < :lastIndex OR :lastIndex IS NULL) AND b.content LIKE %:keyword% AND b.boardType = 0") //FREETYPE = 0
@@ -30,7 +32,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query("SELECT b AS board, " +
             "(CASE WHEN bh.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
-            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine, " +
+            "b.writer.nickname AS writerNickname " +
             "FROM Board b " +
             "LEFT JOIN BoardHeart bh ON b = bh.board AND bh.member = :member " +
             "WHERE b.id = :boardId")
@@ -38,7 +41,8 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     //redis 성능 테스트용
     @Query("SELECT DISTINCT b AS board, " +
-            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "(CASE WHEN b.writer = :member THEN TRUE ELSE FALSE END) AS isMine, " +
+            "b.writer.nickname AS writerNickname " +
             "FROM Board b " +
             "WHERE (:boardType IS NULL OR b.boardType = :boardType) AND (b.id < :lastIndex OR :lastIndex IS NULL)")
     Slice<BoardInfoInterface> findBoardInfosForRedisAndIdIsLessThan(Member member, BoardType boardType, Long lastIndex, Pageable pageable);
