@@ -49,7 +49,7 @@ public class BoardController {
         return BaseResponse.onSuccess(boardService.updateBoard(member, request.getBoardId(), request.getContent()));
     }
 
-    @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.")
+    @Operation(summary = "카테고리별 게시글 조회 with REDIS API(프론트 사용 X, 성능 테스트 용)", description = "카테고리별 게시글을 조회합니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -57,14 +57,14 @@ public class BoardController {
     public BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardTypeWithRedis(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType,
-            @Parameter(description = "Pull to Refresh 후 마지막 index")
-            @RequestParam(required = false) Long threshold,
-            @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+            @Parameter(description = "이전 조회의 마지막 index")
+            @RequestParam(required = false, name = "threshold") Long lastIndex,
+            @RequestParam(defaultValue = "1000", required = false) Integer pageSize
     ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardTypeWithRedis(member, boardType, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
-    @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.")
+    @Operation(summary = "카테고리별 게시글 조회", description = "카테고리별 게시글을 조회합니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -72,25 +72,24 @@ public class BoardController {
     public BaseResponse<SliceResponse<BoardInfo>> getBoardsByBoardType(
             @AuthMember Member member,
             @RequestParam(name = "boardType", required = false) BoardType boardType,
-            @Parameter(description = "Pull to Refresh 후 마지막 index")
-            @RequestParam(required = false) Long threshold,
-            @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+            @Parameter(description = "이전 조회의 마지막 index")
+            @RequestParam(required = false, name = "threshold") Long lastIndex,
+            @RequestParam(defaultValue = "1000", required = false) Integer pageSize
     ) {
-        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(boardService.getBoardsByBoardType(member, boardType, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
-    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다. 자유게시판에서만 검색이 가능합니다.")
+    @Operation(summary = "게시글 검색 API", description = "게시글을 검색합니다. 자유게시판에서만 검색이 가능합니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
     @GetMapping("/search")
     public BaseResponse<SliceResponse<BoardInfo>> searchBoardsByKeyword(
             @AuthMember Member member, @RequestParam(name = "keyword") String keyword,
-            @Parameter(description = "Pull to Refresh 후 마지막 index")
-            @RequestParam(required = false) Long threshold,
-            @RequestParam(defaultValue = "0", required = false) Integer pageNumber,
+            @Parameter(description = "이전 조회의 마지막 index")
+            @RequestParam(required = false, name = "threshold") Long lastIndex,
             @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(boardService.searchBoardsByKeyword(member, keyword, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
 

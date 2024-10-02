@@ -108,11 +108,9 @@ public abstract class ControllerTestConfig {
             .build());
 
         return SliceResponse.<MemberAnswerInfo>builder()
-            .number(0)
             .size(1000)
             .content(memberAnswerInfos)
             .numberOfElements(1)
-            .hasPrevious(FALSE)
             .hasNext(FALSE)
             .build();
     }
@@ -135,11 +133,9 @@ public abstract class ControllerTestConfig {
 
 
         return SliceResponse.<BoardCommentInfo>builder()
-                .number(0)
                 .size(10)
                 .content(commentInfos)
                 .numberOfElements(1)
-                .hasPrevious(false)
                 .hasNext(true)
                 .build();
     }

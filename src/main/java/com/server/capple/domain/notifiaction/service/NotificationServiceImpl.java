@@ -135,9 +135,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public SliceResponse<NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable) {
-        lastIndex = getLastIndex(lastIndex);
         Slice<Notification> notifications = notificationRepository.findByMemberId(member.getId(), lastIndex, pageable);
-        lastIndex = getLastIndexFromNotification(lastIndex, notifications);
+        lastIndex = getLastIndexFromNotification(notifications);
         return notificationMapper.toNotificationInfoSlice(notifications, lastIndex);
     }
 
@@ -147,13 +146,9 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.deleteNotificationsByCreatedAtBefore(targetTime);
     }
 
-    private long getLastIndex(Long lastIndex) {
-        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
-    }
-
-    private Long getLastIndexFromNotification(Long lastIndex, Slice<Notification> notifications) {
-        if(notifications.hasContent() && lastIndex == Long.MAX_VALUE)
-            return notifications.stream().map(Notification::getId).max(Long::compareTo).get();
-        return lastIndex;
+    private Long getLastIndexFromNotification(Slice<Notification> notifications) {
+        if(notifications.hasContent())
+            return notifications.stream().map(Notification::getId).min(Long::compareTo).get();
+        return -1L;
     }
 }

@@ -14,6 +14,6 @@ public interface BoardCommentRepository extends JpaRepository<BoardComment, Long
             "(CASE WHEN bc.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
             "FROM BoardComment bc " +
             "LEFT JOIN BoardCommentHeart bch ON bc = bch.boardComment AND bch.member = :member " +
-            "WHERE bc.board.id = :boardId AND bc.id <= :lastIndex")
-    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardIdAndIdIsLessThanEqual(Member member, Long boardId, Long lastIndex, Pageable pageable);
+            "WHERE bc.board.id = :boardId AND (bc.id > :lastIndex OR :lastIndex IS NULL)")
+    Slice<BoardCommentInfoInterface> findBoardCommentInfosByMemberAndBoardIdAndIdIsGreaterThan(Member member, Long boardId, Long lastIndex, Pageable pageable);
 }
