@@ -99,9 +99,8 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
-        lastIndex = getLastIndex(lastIndex);
         Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, pageable);
-        lastIndex = getLastIndexFromAnswerInfoInterface(lastIndex, answerInfoSliceInterface);
+        lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                 answerInfoDto.getAnswer(),
@@ -116,9 +115,8 @@ public class AnswerServiceImpl implements AnswerService {
     // 유저가 작성한 답변 조회
     @Override
     public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Long lastIndex, Pageable pageable) {
-        lastIndex = getLastIndex(lastIndex);
-        Slice<Answer> answerSlice = answerRepository.findByMemberAndIdIsLessThanEqual(member, lastIndex, pageable);
-        lastIndex = getLastIndexFromAnswer(lastIndex, answerSlice);
+        Slice<Answer> answerSlice = answerRepository.findByMemberAndIdIsLessThan(member, lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(answerSlice);
         return SliceResponse.toSliceResponse(
             answerSlice, answerSlice.getContent().stream()
                 .map(answer -> answerMapper.toMemberAnswerInfo(
@@ -132,9 +130,8 @@ public class AnswerServiceImpl implements AnswerService {
     // 유저가 좋아한 답변 조회 //TODO 좋아요니까 좋아요한 순으로 정렬해야할거같은데 Answer의 createAt으로 하고 있음
     @Override
     public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Long lastIndex, Pageable pageable) {
-        lastIndex = getLastIndex(lastIndex);
-        Slice<Answer> answerSlice = answerRepository.findByIdInAndIdIsLessThanEqual(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
-        lastIndex = getLastIndexFromAnswer(lastIndex, answerSlice);
+        Slice<Answer> answerSlice = answerRepository.findByIdInAndIdIsLessThan(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(answerSlice);
         return SliceResponse.toSliceResponse(answerSlice, answerSlice.getContent().stream()
             .map(answer -> answerMapper.toMemberAnswerInfo(
                 answer,
@@ -159,20 +156,16 @@ public class AnswerServiceImpl implements AnswerService {
         );
     }
 
-    private Long getLastIndex(Long lastIndex) {
-        return lastIndex == null ? Long.MAX_VALUE : lastIndex;
+    private Long getLastIndexFromAnswerInfoInterface(Slice<AnswerInfoInterface> answerInfoSliceInterface) {
+        if(answerInfoSliceInterface.hasContent())
+            return answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).min(Long::compareTo).get();
+        return -1L;
     }
 
-    private Long getLastIndexFromAnswerInfoInterface(Long lastIndex, Slice<AnswerInfoInterface> answerInfoSliceInterface) {
-        if(answerInfoSliceInterface.hasContent() && lastIndex == Long.MAX_VALUE)
-            return answerInfoSliceInterface.stream().map(AnswerInfoInterface::getAnswer).map(Answer::getId).max(Long::compareTo).get();
-        return lastIndex;
-    }
-
-    private Long getLastIndexFromAnswer(Long lastIndex, Slice<Answer> answerSlice) {
-        if (answerSlice.hasContent() && lastIndex == Long.MAX_VALUE)
-            return answerSlice.stream().map(Answer::getId).max(Long::compareTo).get();
-        return lastIndex;
+    private Long getLastIndexFromAnswer(Slice<Answer> answerSlice) {
+        if (answerSlice.hasContent())
+            return answerSlice.stream().map(Answer::getId).min(Long::compareTo).get();
+        return -1L;
     }
 
     @Getter

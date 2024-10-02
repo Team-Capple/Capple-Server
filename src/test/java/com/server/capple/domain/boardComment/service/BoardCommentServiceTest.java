@@ -123,7 +123,6 @@ public class BoardCommentServiceTest extends ServiceTestConfig {
         assertEquals(0, response.getContent().get(0).getHeartCount());
         assertEquals(false, response.getContent().get(0).getIsLiked());
         assertEquals(true, response.getContent().get(0).getIsMine());
-        assertEquals(0, response.getNumber());
         assertEquals(10, response.getSize());
         assertEquals(1, response.getNumberOfElements());
     }
