@@ -21,11 +21,11 @@ public class BoardMapper {
     }
 
     //redis
-    public BoardInfo toBoardInfo(Board board, Integer boardHeartsCount, Boolean isLiked, Boolean isMine) {
+    public BoardInfo toBoardInfo(Board board, String writerNickname, Integer boardHeartsCount, Boolean isLiked, Boolean isMine) {
         return BoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
-                .writerNickname(board.getWriter().getNickname())
+                .writerNickname(writerNickname)
                 .content(board.getContent())
                 .heartCount(boardHeartsCount)
                 .commentCount(board.getCommentCount())
@@ -37,11 +37,11 @@ public class BoardMapper {
     }
 
     //rdb
-    public BoardInfo toBoardInfo(Board board, Boolean isLiked, Boolean isMine) {
+    public BoardInfo toBoardInfo(Board board, String writerNickname, Boolean isLiked, Boolean isMine) {
         return BoardInfo.builder()
                 .boardId(board.getId())
                 .writerId(board.getWriter().getId())
-                .writerNickname(board.getWriter().getNickname())
+                .writerNickname(writerNickname)
                 .content(board.getContent())
                 .heartCount(board.getHeartCount())
                 .commentCount(board.getCommentCount())

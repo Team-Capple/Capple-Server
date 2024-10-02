@@ -67,6 +67,7 @@ public class BoardServiceImpl implements BoardService {
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
                                 sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getWriterNickname(),
                                 sliceBoardInfo.getIsLike(),
                                 sliceBoardInfo.getIsMine()))
                 .toList(), lastIndex.toString(), boardCountService.getBoardCount()
@@ -81,6 +82,7 @@ public class BoardServiceImpl implements BoardService {
         return SliceResponse.toSliceResponse(sliceBoardInfos, sliceBoardInfos.getContent().stream().map(sliceBoardInfo ->
                         boardMapper.toBoardInfo(
                                 sliceBoardInfo.getBoard(),
+                                sliceBoardInfo.getWriterNickname(),
                                 sliceBoardInfo.getIsLike(),
                                 sliceBoardInfo.getIsMine()))
                 .toList(), lastIndex.toString(), null
@@ -100,6 +102,7 @@ public class BoardServiceImpl implements BoardService {
                     boolean isLiked = boardHeartRedisRepository.isMemberLikedBoard(member.getId(), sliceBoardInfo.getBoard().getId());
                     return boardMapper.toBoardInfo(
                             sliceBoardInfo.getBoard(),
+                            sliceBoardInfo.getWriterNickname(),
                             heartCount,
                             isLiked,
                             sliceBoardInfo.getIsMine());
@@ -113,6 +116,7 @@ public class BoardServiceImpl implements BoardService {
 
         return boardMapper.toBoardInfo(
                 boardInfo.getBoard(),
+                boardInfo.getWriterNickname(),
                 boardInfo.getIsLike(),
                 boardInfo.getIsMine()
         );
