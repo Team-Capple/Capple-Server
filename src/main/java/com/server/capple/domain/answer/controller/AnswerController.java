@@ -35,17 +35,17 @@ public class AnswerController {
     }
 
     @Operation(summary = "질문에 대한 답변 조회 API", description = "특정 질문에 대한 답변리스트를 조회하는 API입니다."
-        + "pathVariable으로 questionId를 주세요.")
+        + "pathVariable으로 questionId를 주세요.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @GetMapping("/question/{questionId}")
     public BaseResponse<SliceResponse<AnswerInfo>> getAnswerList(
         @AuthMember Member member,
         @Parameter(description = "질문 식별자")
         @PathVariable(value = "questionId") Long questionId,
         @Parameter(description = "이전 조회의 마지막 index")
-        @RequestParam(required = false) Long threshold,
+        @RequestParam(required = false, name = "threshold") Long lastIndex,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +
@@ -70,25 +70,25 @@ public class AnswerController {
         return BaseResponse.onSuccess(answerService.toggleAnswerHeart(member, answerId));
     }
 
-    @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다.")
+    @Operation(summary = "작성한 답변 조회 API", description = " 작성한 답변 조회 API 입니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @GetMapping
     public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberAnswer(
         @AuthMember Member member,
         @Parameter(description = "이전 조회의 마지막 index")
-        @RequestParam(required = false) Long threshold,
+        @RequestParam(required = false, name = "threshold") Long lastIndex,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getMemberAnswer(member, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getMemberAnswer(member, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
-    @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.")
+    @Operation(summary = "좋아한 답변 조회 API", description = " 좋아한 답변 조회 API 입니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @GetMapping("/heart")
     public BaseResponse<SliceResponse<MemberAnswerInfo>> getMemberHeartAnswer(
         @AuthMember Member member,
         @Parameter(description = "이전 조회의 마지막 index")
-        @RequestParam(required = false) Long threshold,
+        @RequestParam(required = false, name = "threshold") Long lastIndex,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getMemberHeartAnswer(member, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

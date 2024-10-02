@@ -37,7 +37,7 @@ public class QuestionController {
         return BaseResponse.onSuccess(questionService.getMainQuestion(member));
     }
 
-    @Operation(summary = "모든 질문 조회 API", description = "모든 질문을 조회합니다.")
+    @Operation(summary = "모든 질문 조회 API", description = "모든 질문을 조회합니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "COMMON200", description = "성공"),
     })
@@ -45,10 +45,10 @@ public class QuestionController {
     private BaseResponse<SliceResponse<QuestionInfo>> getQuestions(
         @AuthMember Member member,
         @Parameter(description = "이전 조회의 마지막 데이터의 시각")
-        @RequestParam(required = false) LocalDateTime threshold,
+        @RequestParam(required = false, name = "threshold") LocalDateTime lastDateTime,
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize
         ) {
-        return BaseResponse.onSuccess(questionService.getQuestions(member, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
+        return BaseResponse.onSuccess(questionService.getQuestions(member, lastDateTime, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
     }
 
     @Operation(summary = "질문 좋아요/취소 API", description = " 질문 좋아요/취소 API 입니다." +

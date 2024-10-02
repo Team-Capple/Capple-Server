@@ -48,13 +48,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable) {
-        thresholdDate = getThresholdDate(thresholdDate);
-        Slice<QuestionInfoInterface> questionSlice = questionRepository.findQuestionsByLivedAtBefore(member, thresholdDate, pageable);
-        thresholdDate = getThresholdDateFromQuestionInfoInterface(questionSlice);
+    public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable) {
+        lastDateTime = getThresholdDate(lastDateTime);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findQuestionsByLivedAtBefore(member, lastDateTime, pageable);
+        lastDateTime = getThresholdDateFromQuestionInfoInterface(questionSlice);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
-            ).toList(), thresholdDate.toString(), questionCountService.getLiveOrOldQuestionCount());
+            ).toList(), lastDateTime.toString(), questionCountService.getLiveOrOldQuestionCount());
     }
 
     @Override

@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationController {
     private final NotificationService notificationService;
 
-    @Operation(summary = "알림 리스트 조회 API", description = "API를 호출한 사용자가 받은 알림 리스트를 조회합니다. 알림은 최신순으로 정렬되어 반환됩니다.")
+    @Operation(summary = "알림 리스트 조회 API", description = "API를 호출한 사용자가 받은 알림 리스트를 조회합니다. 알림은 최신순으로 정렬되어 반환됩니다.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @GetMapping
     public BaseResponse<SliceResponse<NotificationInfo>> getNotifications(
         @AuthMember Member member,
         @Parameter(description = "이전 조회의 마지막 index")
-        @RequestParam(required = false) Long threshold,
+        @RequestParam(required = false, name = "threshold") Long lastIndex,
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(notificationService.getNotifications(member, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(notificationService.getNotifications(member, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }
