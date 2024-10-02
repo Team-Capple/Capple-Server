@@ -6,5 +6,8 @@ public class AnswerRDBDao {
     public interface AnswerInfoInterface {
         public Answer getAnswer();
         public Boolean getIsReported();
+        public Long getWriterId();
+        public String getWriterProfileImage();
+        public String getWriterNickname();
     }
 }

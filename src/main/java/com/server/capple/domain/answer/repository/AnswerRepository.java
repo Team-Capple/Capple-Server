@@ -21,7 +21,11 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     boolean existsByQuestionAndMember(Question question, Member member);
 
-    @Query("SELECT a AS answer, (r IS NOT NULL) AS isReported " +
+    @Query("SELECT a AS answer, " +
+        "(r IS NOT NULL) AS isReported, " +
+        "a.member.id AS writerId, " +
+        "a.member.profileImage AS writerProfileImage, " +
+        "a.member.nickname AS writerNickname "+
         "FROM Answer a " +
         "LEFT JOIN " +
         "Report r ON r.answer = a " +
