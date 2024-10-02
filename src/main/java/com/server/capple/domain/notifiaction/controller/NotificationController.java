@@ -28,9 +28,9 @@ public class NotificationController {
     @GetMapping
     public BaseResponse<SliceResponse<NotificationInfo>> getNotifications(
         @AuthMember Member member,
-        @Parameter(description = "Pull to Refresh 후 마지막 index")
+        @Parameter(description = "이전 조회의 마지막 index")
         @RequestParam(required = false) Long threshold,
-        @RequestParam(defaultValue = "0", required = false) Integer pageNumber, @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(notificationService.getNotifications(member, threshold, PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(notificationService.getNotifications(member, threshold, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 }

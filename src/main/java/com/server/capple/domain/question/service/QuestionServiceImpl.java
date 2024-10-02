@@ -50,7 +50,8 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime thresholdDate, Pageable pageable) {
         thresholdDate = getThresholdDate(thresholdDate);
-        Slice<QuestionInfoInterface> questionSlice = questionRepository.findAllByLivedAtBefore(member, thresholdDate, pageable);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findQuestionsByLivedAtBefore(member, thresholdDate, pageable);
+        thresholdDate = getThresholdDateFromQuestionInfoInterface(questionSlice);
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
             ).toList(), thresholdDate.toString(), questionCountService.getLiveOrOldQuestionCount());
@@ -66,5 +67,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     private LocalDateTime getThresholdDate(LocalDateTime thresholdDate) {
         return thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+    }
+
+    private LocalDateTime getThresholdDateFromQuestionInfoInterface(Slice<QuestionInfoInterface> questionSlice) {
+        if(questionSlice.hasContent())
+            return questionSlice.stream().map(QuestionInfoInterface::getQuestion).map(Question::getLivedAt).min(LocalDateTime::compareTo).get();
+        return LocalDateTime.parse("0000-01-01T00:00:00");
     }
 }

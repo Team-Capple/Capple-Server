@@ -13,7 +13,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "n " +
         "from Notification n " +
         "where " +
-        "n.id <= :lastIndex AND " +
+        "(n.id < :lastIndex OR :lastIndex IS NULL) AND " +
         "(" +
         "n.memberId = :memberId " +
         "OR " +

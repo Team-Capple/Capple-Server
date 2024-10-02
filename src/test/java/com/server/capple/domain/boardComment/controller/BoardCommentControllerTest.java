@@ -149,7 +149,6 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("COMMON200"))
                 .andExpect(jsonPath("$.message").value("요청에 성공하였습니다."))
-                .andExpect(jsonPath("$.result.number").value(0))
                 .andExpect(jsonPath("$.result.size").value(10))
                 .andExpect(jsonPath("$.result.numberOfElements").value(1))
                 .andExpect(jsonPath("$.result.content[0].boardCommentId").value(1L))

@@ -11,31 +11,25 @@ import java.util.List;
 @NoArgsConstructor
 public class SliceResponse<T> {
     Integer total;
-    int number;
     int size;
     List<T> content;
     int numberOfElements;
     String threshold;
-    boolean hasPrevious;
     boolean hasNext;
 
     public SliceResponse(Slice<T> sliceObject) {
-        number = sliceObject.getNumber();
         size = sliceObject.getSize();
         content = sliceObject.getContent();
         numberOfElements = sliceObject.getNumberOfElements();
-        hasPrevious = sliceObject.hasPrevious();
         hasNext = sliceObject.hasNext();
     }
 
     @Builder
-    public SliceResponse(int number, int size, List<T> content, int numberOfElements, String threshold, boolean hasPrevious, boolean hasNext, Integer total) {
-        this.number = number;
+    public SliceResponse(int size, List<T> content, int numberOfElements, String threshold, boolean hasNext, Integer total) {
         this.size = size;
         this.content = content;
         this.numberOfElements = numberOfElements;
         this.threshold = threshold;
-        this.hasPrevious = hasPrevious;
         this.hasNext = hasNext;
         this.total = total;
     }
@@ -46,12 +40,10 @@ public class SliceResponse<T> {
      */
     public static <P, R> SliceResponse<R> toSliceResponse(Slice<P> sliceObject, List<R> content, String threshold, Integer total) {
         return SliceResponse.<R>builder()
-            .number(sliceObject.getNumber())
             .size(sliceObject.getSize())
             .content(content)
             .numberOfElements(sliceObject.getNumberOfElements())
             .threshold(threshold)
-            .hasPrevious(sliceObject.hasPrevious())
             .hasNext(sliceObject.hasNext())
             .total(total)
             .build();
