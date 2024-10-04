@@ -37,7 +37,7 @@ public class MailUtilImpl implements MailUtil {
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(receiver);
-            mimeMessageHelper.setSubject("[Capple] 회원가입 인증코드 안내");
+            mimeMessageHelper.setSubject("[Qapple] 회원가입 인증코드 안내");
             mimeMessageHelper.setText(setCertMailContext(certCode), true);
             javaMailSender.send(mimeMessage);
             return CompletableFuture.completedFuture(certCode);
