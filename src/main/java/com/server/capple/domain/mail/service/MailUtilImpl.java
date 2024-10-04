@@ -29,12 +29,15 @@ public class MailUtilImpl implements MailUtil {
     @Override
     public CompletableFuture<String> sendMailAddressCertificationMail(String receiver, Boolean isWhiteList) {
         String certCode = generateCertCode();
-        if (isWhiteList) certCode = whiteListCertCode;
+        if (isWhiteList)  {
+            certCode = whiteListCertCode;
+            return CompletableFuture.completedFuture(certCode);
+        }
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             mimeMessageHelper.setTo(receiver);
-            mimeMessageHelper.setSubject("[Capple] 회원가입 인증코드 안내");
+            mimeMessageHelper.setSubject("[Qapple] 회원가입 인증코드 안내");
             mimeMessageHelper.setText(setCertMailContext(certCode), true);
             javaMailSender.send(mimeMessage);
             return CompletableFuture.completedFuture(certCode);
