@@ -1,5 +1,6 @@
 package com.server.capple.domain.notifiaction.entity;
 
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,7 +14,9 @@ public class Notification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long memberId;
+    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private NotificationLog notificationLog;
     @Enumerated(EnumType.ORDINAL)
