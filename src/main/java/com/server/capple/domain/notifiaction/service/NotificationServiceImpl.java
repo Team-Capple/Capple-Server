@@ -44,7 +44,7 @@ public class NotificationServiceImpl implements NotificationService {
         apnsService.sendApnsToMembers(boardNotificationBody, board.getWriter().getId());
         // 알림 데이터베이스 저장
         Notification notification = notificationMapper.toNotification(
-            board.getWriter().getId(),
+            board.getWriter(),
             notificationMapper.toNotificationLog(board),
             BOARD_HEART);
         notificationRepository.save(notification);
@@ -55,36 +55,35 @@ public class NotificationServiceImpl implements NotificationService {
     public void sendBoardCommentNotification(Long actorId, Board board, BoardComment boardComment) {
         List<Member> subscribers = boardSubscribeMemberService.findBoardSubscribeMembers(board.getId());
         NotificationLog notificationLog = notificationMapper.toNotificationLog(board, boardComment);
-        List<Long> subscriberIds = subscribers.stream()
-            .map(Member::getId)
-            .filter(id -> !id.equals(actorId))
+        List<Member> subscribersExceptWriter = subscribers.stream()
+            .filter(member -> !member.getId().equals(actorId))
 //        게시판 구독자에게 알림 전송
-            .peek(subscriberId -> {
-                if (subscriberId.equals(board.getWriter().getId())) {
+            .peek(subscriber -> {
+                if (subscriber.getId().equals(board.getWriter().getId())) {
                     BoardCommentNotificationBody boardCommentNotificationBody = BoardCommentNotificationBody.builder()
                         .type(BOARD_COMMENT)
                         .board(board)
                         .boardComment(boardComment)
                         .build();
-                    apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriberId);
+                    apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriber.getId());
                     notificationRepository.save(notificationMapper.toNotification(
-                        subscriberId,
+                        subscriber,
                         notificationLog,
                         BOARD_COMMENT));
                 }
             })
-            .filter(id -> !id.equals(board.getWriter().getId()))
+            .filter(member -> !member.getId().equals(board.getWriter().getId()))
             .toList();
         BoardCommentNotificationBody boardCommentNotificationBody = BoardCommentNotificationBody.builder()
             .type(BOARD_COMMENT_DUPLICATE)
             .board(board)
             .boardComment(boardComment)
             .build();
-        apnsService.sendApnsToMembers(boardCommentNotificationBody, subscriberIds);
+        apnsService.sendApnsToMembers(boardCommentNotificationBody, subscribersExceptWriter.stream().map(Member::getId).toList());
         // 알림 데이터베이스 저장
-        List<Notification> notifications = subscriberIds.stream()
-            .map(subscriberId -> notificationMapper.toNotification(
-                subscriberId,
+        List<Notification> notifications = subscribersExceptWriter.stream()
+            .map(subscriber -> notificationMapper.toNotification(
+                subscriber,
                 notificationLog,
                 BOARD_COMMENT_DUPLICATE))
             .toList();
@@ -101,7 +100,7 @@ public class NotificationServiceImpl implements NotificationService {
         apnsService.sendApnsToMembers(boardCommentNotificationBody, boardComment.getWriter().getId());
         // 알림 데이터베이스 저장
         Notification notification = notificationMapper.toNotification(
-            boardComment.getWriter().getId(),
+            boardComment.getWriter(),
             notificationMapper.toNotificationLog(board, boardComment),
             BOARD_COMMENT_HEART);
         notificationRepository.save(notification);
@@ -135,7 +134,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public SliceResponse<NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable) {
-        Slice<Notification> notifications = notificationRepository.findByMemberId(member.getId(), lastIndex, pageable);
+        Slice<Notification> notifications = notificationRepository.findByMemberId(member, lastIndex, pageable);
         lastIndex = getLastIndexFromNotification(notifications);
         return notificationMapper.toNotificationInfoSlice(notifications, lastIndex);
     }

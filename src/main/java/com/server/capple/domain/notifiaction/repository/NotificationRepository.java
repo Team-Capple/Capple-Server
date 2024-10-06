@@ -1,5 +1,6 @@
 package com.server.capple.domain.notifiaction.repository;
 
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -17,13 +18,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "where " +
         "(n.id < :lastIndex OR :lastIndex IS NULL) AND " +
         "(" +
-        "n.memberId = :memberId " +
+        "n.member = :member " +
         "OR " +
-        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_PUBLISHED " +
+        "((n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_PUBLISHED " +
         "OR " +
-        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED" +
+        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED) " +
+        "AND n.createdAt > (select m.createdAt from Member m where m = :member))" +
         ")"
     )
-    Slice<Notification> findByMemberId(Long memberId, Long lastIndex, Pageable pageable);
+    Slice<Notification> findByMemberId(Member member, Long lastIndex, Pageable pageable);
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
 }
