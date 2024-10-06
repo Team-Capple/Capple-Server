@@ -2,6 +2,7 @@ package com.server.capple.domain.notifiaction.mapper;
 
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
+import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.notifiaction.dto.NotificationResponse.NotificationInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import com.server.capple.domain.notifiaction.entity.NotificationLog;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class NotificationMapper {
-    public Notification toNotification(Long memberId, NotificationLog notificationLog, NotificationType type) {
+    public Notification toNotification(Member member, NotificationLog notificationLog, NotificationType type) {
         return Notification.builder()
-            .memberId(memberId)
+            .member(member)
             .notificationLog(notificationLog)
             .type(type)
             .build();
