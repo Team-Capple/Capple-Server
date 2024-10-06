@@ -59,6 +59,17 @@ dependencies {
 //	thymeleaf
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+
+//  https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+//	webflux
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.68.Final:osx-aarch_64'
+//	actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'io.micrometer:micrometer-registry-prometheus'
+//	open csv
+	implementation 'com.opencsv:opencsv:5.5.1'
 }
 
 dependencyManagement {

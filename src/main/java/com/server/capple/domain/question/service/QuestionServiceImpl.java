@@ -4,44 +4,43 @@ import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.dto.response.QuestionResponse;
-import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfos;
+import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionInfo;
 import com.server.capple.domain.question.dto.response.QuestionResponse.QuestionSummary;
 import com.server.capple.domain.question.entity.Question;
-import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.mapper.QuestionMapper;
+import com.server.capple.domain.question.repository.QuestionHeartRedisRepository;
 import com.server.capple.domain.question.repository.QuestionRepository;
-import com.server.capple.domain.tag.repository.TagRedisRepository;
-import com.server.capple.domain.tag.service.TagService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.QuestionErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static com.server.capple.domain.question.dto.response.QuestionResponse.*;
-import static com.server.capple.domain.question.entity.QuestionStatus.*;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
-    private final TagService tagService;
     private final AnswerRepository answerRepository;
     private final QuestionMapper questionMapper;
+    private final QuestionHeartRedisRepository questionHeartRepository;
+    private final QuestionCountService questionCountService;
 
     @Override
     public Question findQuestion(Long questionId) {
         return questionRepository.findById(questionId).orElseThrow(()
-                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
+            -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
     }
 
     @Override
     public QuestionSummary getMainQuestion(Member member) {
-        Question mainQuestion = questionRepository.findByQuestionStatusIsLiveAndOldOrderByLivedAt().orElseThrow(()
-                -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
+        Question mainQuestion = questionRepository.findByQuestionStatusIsLiveAndOldOrderByLivedAt()
+            .orElseThrow(() -> new RestApiException(QuestionErrorCode.QUESTION_NOT_FOUND));
 
         boolean isAnswered = answerRepository.existsByQuestionAndMember(mainQuestion, member);
 
@@ -49,19 +48,30 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public QuestionInfos getQuestions(Member member) {
-        List<QuestionInfoInterface> questions = questionRepository.findAllByQuestionStatusIsLiveAndOldOrderByLivedAtDesc(member);
+    public SliceResponse<QuestionInfo> getQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable) {
+        lastDateTime = getThresholdDate(lastDateTime);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findQuestionsByLivedAtBefore(member, lastDateTime, pageable);
+        lastDateTime = getThresholdDateFromQuestionInfoInterface(questionSlice);
+        return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
+            .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
+            ).toList(), lastDateTime.toString(), questionCountService.getLiveOrOldQuestionCount());
+    }
 
-        return questionMapper.toQuestionInfos(questions
-                .stream()
-                .map(questionInfo -> {
-                    Question question = questionInfo.getQuestion();
+    @Override
+    public QuestionResponse.QuestionToggleHeart toggleQuestionHeart(Member member, Long questionId) {
+        Question question = findQuestion(questionId);
 
-                    String tags = question.getQuestionStatus().equals(LIVE) ?
-                            String.join(" ", tagService.getTagsByQuestion(question.getId(),3).getTags()) :
-                            question.getPopularTags().trim();
+        Boolean isLiked = questionHeartRepository.toggleBoardHeart(member.getId(), question.getId());
+        return new QuestionResponse.QuestionToggleHeart(questionId, isLiked);
+    }
 
-                    return questionMapper.toQuestionInfo(question, tags, questionInfo.getIsAnsweredByMember());
-                }).toList());
+    private LocalDateTime getThresholdDate(LocalDateTime thresholdDate) {
+        return thresholdDate == null ? LocalDateTime.now() : thresholdDate;
+    }
+
+    private LocalDateTime getThresholdDateFromQuestionInfoInterface(Slice<QuestionInfoInterface> questionSlice) {
+        if(questionSlice.hasContent())
+            return questionSlice.stream().map(QuestionInfoInterface::getQuestion).map(Question::getLivedAt).min(LocalDateTime::compareTo).get();
+        return LocalDateTime.parse("0000-01-01T00:00:00");
     }
 }

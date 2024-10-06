@@ -1,7 +1,5 @@
 package com.server.capple.domain.answer.dto;
 
-import java.util.List;
-
 import lombok.*;
 
 public class AnswerResponse {
@@ -16,20 +14,14 @@ public class AnswerResponse {
     @Builder
     public static class AnswerInfo {
         private Long answerId;
+        private Long writerId;
         private String profileImage;
         private String nickname;
         private String content;
-        private String tags;
-        private Boolean isMyAnswer;
+        private Boolean isMine;
         private Boolean isReported;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class AnswerList {
-        private List<AnswerInfo> answerInfos;
+        private Boolean isLiked;
+        private String writeAt;
     }
 
     @Getter
@@ -45,17 +37,12 @@ public class AnswerResponse {
     public static class MemberAnswerInfo {
         private Long questionId;
         private Long answerId;
+        private Long writerId;
         private String nickname;
         private String profileImage;
         private String content;
-        private String tags;
         private int heartCount;
         private String writeAt;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class MemberAnswerList {
-        private List<MemberAnswerInfo> memberAnswerInfos;
+        private Boolean isLiked;
     }
 }

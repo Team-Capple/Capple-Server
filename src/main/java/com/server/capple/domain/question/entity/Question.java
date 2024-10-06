@@ -36,8 +36,8 @@ public class Question extends BaseEntity {
 
     private LocalDateTime livedAt;
 
-    private String popularTags;
-
+//    @Column(nullable = false)
+//    private Integer commentCount;
 
     //question Status를 바꾸는 함수
     public void setQuestionStatus(QuestionStatus questionStatus) {
@@ -47,8 +47,12 @@ public class Question extends BaseEntity {
             this.livedAt = LocalDateTime.now();
     }
 
-    public void setPopularTags(String popularTags) {
-        this.popularTags = popularTags;
-    }
+//    public void increaseCommentCount() {
+//        this.commentCount += 1;
+//    }
+//
+//    public void decreaseCommentCount() {
+//        this.commentCount -= 1;
+//    }
 
 }

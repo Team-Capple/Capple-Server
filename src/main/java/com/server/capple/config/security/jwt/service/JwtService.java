@@ -16,4 +16,5 @@ public interface JwtService {
     Boolean isExpired(String token);
     Boolean checkJwt(String token);
     MemberResponse.Tokens refreshTokens(Long memberId, Role role);
+    String createApnsJwt();
 }

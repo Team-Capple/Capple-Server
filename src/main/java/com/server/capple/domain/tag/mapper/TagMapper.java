@@ -15,8 +15,6 @@ public class TagMapper {
                 .map(Tag::getTagName)
                 .toList();
 
-        return TagResponse.TagInfos.builder()
-                .tags(tagNames)
-                .build();
+        return new TagResponse.TagInfos(tagNames);
     }
 }

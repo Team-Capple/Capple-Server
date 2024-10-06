@@ -28,7 +28,11 @@ public class SwaggerConfig {
         Info info = new Info()
                 .title("Capple API Document")
                 .version(version)
-                .description("Capple API 명세서입니다.");
+                .description(
+                    version.charAt(0) == 'v' ?
+                    String.format("Capple API 명세서입니다.<br>[%s 변경사항](https://github.com/Team-Capple/Capple-Server/releases/tag/%s)",version, version)
+                    : "Capple API 명세서입니다."
+                );
         return new OpenAPI()
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
                 .security(Arrays.asList(securityRequirement))

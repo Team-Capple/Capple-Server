@@ -11,6 +11,7 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.mapper.MemberMapper;
 import com.server.capple.domain.member.mapper.TokensMapper;
+import com.server.capple.domain.member.repository.DeviceTokenRedisRepository;
 import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.AuthErrorCode;
@@ -39,6 +40,7 @@ public class MemberServiceImpl implements MemberService {
     private final AppleAuthService appleAuthService;
     private final JwtService jwtService;
     private final MailService mailService;
+    private final DeviceTokenRedisRepository deviceTokenRedisRepository;
 
     @Override
     public MemberResponse.MyPageMemberInfo getMemberInfo(Member member) {
@@ -93,7 +95,7 @@ public class MemberServiceImpl implements MemberService {
         return new MemberResponse.DeleteProfileImages(deleteImages);
     }
 
-    public MemberResponse.SignInResponse signIn(String authorizationCode) {
+    public MemberResponse.SignInResponse signIn(String authorizationCode, String deviceToken) {
         AppleIdTokenPayload appleIdTokenPayload = appleAuthService.get(authorizationCode);
         Optional<Member> optionalMember = memberRepository.findBySub(appleIdTokenPayload.getSub());
         if (optionalMember.isEmpty()) {
@@ -104,12 +106,14 @@ public class MemberServiceImpl implements MemberService {
         String role = optionalMember.get().getRole().getName();
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        if(deviceToken != null)
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
     }
 
     @Override
     @Transactional
-    public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage) {
+    public MemberResponse.Tokens signUp(String signUpToken, String email, String nickname, String profileImage, String deviceToken) {
         String sub = jwtService.getSub(signUpToken);
         String encryptedEmail = convertEmailToJwt(email);
 
@@ -120,11 +124,13 @@ public class MemberServiceImpl implements MemberService {
         String role = member.getRole().getName();
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        if(deviceToken != null)
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return tokensMapper.toTokens(accessToken, refreshToken);
     }
 
     @Override
-    public MemberResponse.SignInResponse localSignIn(String testId) {
+    public MemberResponse.SignInResponse localSignIn(String testId, String deviceToken) {
         Optional<Member> optionalMember = memberRepository.findBySub(testId);
         if (optionalMember.isEmpty()) {
             String signUpToken = jwtService.createSignUpAccessJwt(testId);
@@ -134,6 +140,8 @@ public class MemberServiceImpl implements MemberService {
         String role = optionalMember.get().getRole().getName();
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
+        if(deviceToken != null)
+            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return memberMapper.toSignInResponse(accessToken, refreshToken, true);
     }
 
@@ -153,6 +161,7 @@ public class MemberServiceImpl implements MemberService {
         Member resignedMember = memberRepository.findById(member.getId()).orElseThrow(
                 () -> new RestApiException(MemberErrorCode.MEMBER_NOT_FOUND));
         resignedMember.resignMember();
+        deviceTokenRedisRepository.deleteDeviceToken(member.getId());
         return memberMapper.toMemberId(member);
     }
 
@@ -211,5 +220,11 @@ public class MemberServiceImpl implements MemberService {
         String emailJwt = convertEmailToJwt(email);
         // 이메일 인증코드 체크
         return mailService.checkEmailCertificationCode(emailJwt, certCode);
+    }
+
+    @Override
+    public Boolean logout(Member member) {
+        deviceTokenRedisRepository.deleteDeviceToken(member.getId());
+        return true;
     }
 }

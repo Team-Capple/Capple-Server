@@ -2,13 +2,18 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
+import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.tag.service.TagService;
+import com.server.capple.global.common.SliceResponse;
+import com.server.capple.global.exception.RestApiException;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -24,37 +29,49 @@ public class AnswerServiceTest extends ServiceTestConfig {
     private TagService tagService;
 
     @Test
-    @DisplayName("Answer 생성 테스트")
+    @DisplayName("Answer 중복 생성 시 예외 발생 테스트")
+    @Transactional
+    public void createDuplicateAnswerTest() {
+        // given
+        AnswerRequest request = getAnswerRequest();
+
+        // 이미 `setUp()`에서 답변이 생성된 상태이므로, 다시 답변을 생성하면 예외 발생
+        // then
+        assertThrows(RestApiException.class, () -> {
+            answerService.createAnswer(member, liveQuestion.getId(), request);
+        });
+    }
+
+    @Test
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 생성 테스트")
     @Transactional
     public void createAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
 
         //when
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
         Answer answer = answerService.findAnswer(answerId);
-        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId(), 7).getTags();
 
         //then
         assertEquals("나는 와플을 좋아하는 사람이 좋아", answer.getContent());
-        assertEquals("#와플유니버시티 #와플 ", answer.getTags());
-        assertEquals(2, tags.size());
-        assertTrue(tags.contains("#와플"));
-        assertTrue(tags.contains("#와플유니버시티"));
 
     }
 
     @Test
-    @DisplayName("Answer 수정 테스트")
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 수정 테스트")
     @Transactional
     public void updateAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
 
         AnswerRequest updateRequest = AnswerRequest.builder()
                 .answer("나는 동그랗고 와플 좋아하는 사람이 좋아")
-                .tags(List.of("#동그라미", "#와플", "#동글"))
                 .build();
 
         //when
@@ -63,20 +80,14 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals("나는 동그랗고 와플 좋아하는 사람이 좋아", answer.getContent());
-        assertEquals("#동그라미 #와플 #동글 ", answer.getTags());
-        List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId(), 7).getTags();
-
-        assertEquals(3, tags.size());
-        assertTrue(tags.contains("#와플"));
-        assertTrue(tags.contains("#동그라미"));
-        assertFalse(tags.contains("#와플유니버시티"));
-
     }
 
     @Test
-    @DisplayName("Answer 삭제 테스트")
+    @DisplayName("Answer 중복 생성 방지 후 새로운 답변 삭제 테스트")
     @Transactional
     public void deleteAnswerTest() {
+        // 기존 답변 삭제
+        answerService.deleteAnswer(member, answer.getId());
         //given
         AnswerRequest request = getAnswerRequest();
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
@@ -107,5 +118,29 @@ public class AnswerServiceTest extends ServiceTestConfig {
         //then
         assertEquals(Boolean.FALSE, answerLike2.getIsLiked());
 
+    }
+
+    @Test
+    @DisplayName("작성한 Answer 목록 조회 테스트")
+    @Transactional
+    public void getMemberAnswerTest() {
+        //when
+        SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
+        //then
+        assertEquals(memberAnswer.getContent().get(0).getContent(), "나는 무자비한 사람이 좋아");
+    }
+
+    @Test
+    @DisplayName("좋아한 Answer 목록 조회 테스트")
+    @Transactional
+    public void getMemberHeartAnswerTest() {
+        //given
+        answerService.toggleAnswerHeart(member, answer.getId());
+
+        //when
+        SliceResponse<MemberAnswerInfo> memberHeartAnswer = answerService.getMemberHeartAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
+
+        //then
+        assertEquals(memberHeartAnswer.getContent().get(0).getHeartCount(), 1);
     }
 }

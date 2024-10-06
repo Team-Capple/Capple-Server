@@ -21,7 +21,7 @@ public class TagServiceTest extends ServiceTestConfig {
     @Autowired
     private TagService tagService;
 
-    @Test
+   /* @Test
     @DisplayName("Tag 검색 테스트")
     @Transactional
     public void searchTags() {
@@ -54,5 +54,5 @@ public class TagServiceTest extends ServiceTestConfig {
 
         //then
         assertEquals("#와플", tags.getTags().get(0));
-    }
+    }*/
 }
