@@ -91,5 +91,4 @@ public class QuestionServiceTest extends ServiceTestConfig {
         assertEquals(popularTags.size(), 3);
     }
 */
-
 }
