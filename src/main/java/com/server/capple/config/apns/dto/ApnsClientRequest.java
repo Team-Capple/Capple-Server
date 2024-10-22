@@ -117,8 +117,8 @@ public class ApnsClientRequest {
         public static class Aps {
             private Alert alert;
             private Integer badge;
-            @Schema(defaultValue = "default")
-            private String sound; // Library/Sounds 폴더 내의 파일 이름
+            @Builder.Default
+            private String sound = "default"; // Library/Sounds 폴더 내의 파일 이름
             @JsonProperty("thread-id")
             private String threadId;
 
@@ -160,8 +160,8 @@ public class ApnsClientRequest {
         public static class Aps {
             private Alert alert;
             private Integer badge;
-            @Schema(defaultValue = "default")
-            private String sound; // Library/Sounds 폴더 내의 파일 이름
+            @Builder.Default
+            private String sound = "default"; // Library/Sounds 폴더 내의 파일 이름
             @JsonProperty("thread-id")
             private String threadId;
 
