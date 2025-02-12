@@ -26,13 +26,13 @@ jobs:
         - 36379:6379
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.TOKEN_GITHUB }}
           submodules: recursive
 
       - name: Setup Java JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: 17
@@ -55,7 +55,7 @@ jobs:
 
       - name: Upload Report Artifact When Build Failed
         if: ${{ failure() && steps.buildWithGradle.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: report-artifact
           path: ./build/reports
