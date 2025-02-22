@@ -1,6 +1,7 @@
 package com.server.capple.domain.notifiaction.repository;
 
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.notifiaction.dto.NotificationDBResponse.NotificationDBInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -12,10 +13,20 @@ import java.time.LocalDateTime;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     @EntityGraph(attributePaths = {"notificationLog"})
-    @Query("select " +
-        "n " +
-        "from Notification n " +
-        "where " +
+    @Query("SELECT " +
+        "n notification" +
+        ", CASE WHEN n.notificationLog.question IS NULL THEN NULL " +
+        "   ELSE (a.member IS NOT NULL) " +
+        "   END AS isResponsedQuestion " +
+        ", CASE WHEN n.notificationLog.board IS NULL THEN NULL " +
+        "   ELSE (br.board IS NOT NULL) " +
+        "   END AS isReportedBoard " +
+        "FROM Notification n " +
+        "LEFT JOIN Answer a " +
+        "   ON (a.question = n.notificationLog.question and a.member = :member) " +
+        "LEFT JOIN BoardReport br " +
+        "   on (br.board = n.notificationLog.board) " +
+        "WHERE " +
         "(n.id < :lastIndex OR :lastIndex IS NULL) AND " +
         "(" +
         "n.member = :member " +
@@ -26,6 +37,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "AND n.createdAt > (select m.createdAt from Member m where m = :member))" +
         ")"
     )
-    Slice<Notification> findByMemberId(Member member, Long lastIndex, Pageable pageable);
+    Slice<NotificationDBInfo> findByMemberId(Member member, Long lastIndex, Pageable pageable);
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
 }
