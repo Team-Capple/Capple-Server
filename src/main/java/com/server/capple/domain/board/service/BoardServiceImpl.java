@@ -68,7 +68,8 @@ public class BoardServiceImpl implements BoardService {
                                 sliceBoardInfo.getBoard(),
                                 sliceBoardInfo.getWriterNickname(),
                                 sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
+                                sliceBoardInfo.getIsMine(),
+                                sliceBoardInfo.getWriterAcademyGeneration()))
                 .toList(), lastIndex.toString(), boardCountService.getBoardCount()
         );
     }
@@ -82,7 +83,8 @@ public class BoardServiceImpl implements BoardService {
                                 sliceBoardInfo.getBoard(),
                                 sliceBoardInfo.getWriterNickname(),
                                 sliceBoardInfo.getIsLike(),
-                                sliceBoardInfo.getIsMine()))
+                                sliceBoardInfo.getIsMine(),
+                                sliceBoardInfo.getWriterAcademyGeneration()))
                 .toList(), lastIndex.toString(), null
         );
     }
@@ -102,7 +104,8 @@ public class BoardServiceImpl implements BoardService {
                             sliceBoardInfo.getWriterNickname(),
                             heartCount,
                             isLiked,
-                            sliceBoardInfo.getIsMine());
+                            sliceBoardInfo.getIsMine(),
+                            sliceBoardInfo.getWriterAcademyGeneration());
                 })
                 .toList(), lastIndex.toString(), boardCountService.getBoardCount());
     }
@@ -115,7 +118,8 @@ public class BoardServiceImpl implements BoardService {
                 boardInfo.getBoard(),
                 boardInfo.getWriterNickname(),
                 boardInfo.getIsLike(),
-                boardInfo.getIsMine()
+                boardInfo.getIsMine(),
+                boardInfo.getWriterAcademyGeneration()
         );
     }
 
