@@ -11,7 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface BoardCommentRepository extends JpaRepository<BoardComment, Long> {
     @Query("SELECT bc AS boardComment, " +
             "(CASE WHEN bch.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLike, " +
-            "(CASE WHEN bc.writer = :member THEN TRUE ELSE FALSE END) AS isMine " +
+            "(CASE WHEN bc.writer = :member THEN TRUE ELSE FALSE END) AS isMine," +
+            "bc.writer.academyGeneration AS writerAcademyGeneration " +
             "FROM BoardComment bc " +
             "LEFT JOIN BoardCommentHeart bch ON bc = bch.boardComment AND bch.member = :member " +
             "WHERE bc.board.id = :boardId AND (bc.id > :lastIndex OR :lastIndex IS NULL)")
