@@ -1,6 +1,7 @@
 package com.server.capple.domain.member.mapper;
 
 import com.server.capple.domain.member.dto.MemberResponse;
+import com.server.capple.domain.member.entity.AcademyGeneration;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,14 @@ public class MemberMapper {
             .build();
     }
 
-    public Member createMember(String sub, String email, String nickName, Role role, String profileImage) {
+    public Member createMember(String sub, String email, String nickName, Role role, String profileImage, AcademyGeneration academyGeneration) {
         return Member.builder()
             .sub(sub)
             .nickname(nickName)
             .email(email)
             .role(role)
             .profileImage(profileImage)
+            .academyGeneration(academyGeneration)
             .build();
     }
 

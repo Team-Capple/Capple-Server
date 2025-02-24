@@ -31,6 +31,10 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AcademyGeneration academyGeneration;
+
     private String profileImage;
 
     public void updateNickname(String nickname) {

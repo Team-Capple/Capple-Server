@@ -17,6 +17,7 @@ public class AnswerResponse {
         private Long writerId;
         private String profileImage;
         private String nickname;
+        private String writerGeneration;
         private String content;
         private Boolean isMine;
         private Boolean isReported;
@@ -40,6 +41,7 @@ public class AnswerResponse {
         private Long writerId;
         private String nickname;
         private String profileImage;
+        private String writerGeneration;
         private String content;
         private int heartCount;
         private String writeAt;

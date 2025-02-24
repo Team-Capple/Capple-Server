@@ -1,6 +1,7 @@
 package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
+import com.server.capple.domain.answer.dao.AnswerRDBDao.MemberAnswerInfoDBDto;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
@@ -113,28 +114,28 @@ public class AnswerServiceImpl implements AnswerService {
     // 유저가 작성한 답변 조회
     @Override
     public SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Long lastIndex, Pageable pageable) {
-        Slice<Answer> answerSlice = answerRepository.findByMemberAndIdIsLessThan(member, lastIndex, pageable);
-        lastIndex = getLastIndexFromAnswer(answerSlice);
+        Slice<MemberAnswerInfoDBDto> memberAnswerSlice = answerRepository.findByMemberAndIdIsLessThan(member, lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(memberAnswerSlice);
         return SliceResponse.toSliceResponse(
-            answerSlice, answerSlice.getContent().stream()
-                .map(answer -> answerMapper.toMemberAnswerInfo(
-                    answer,
-                    answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
-                    answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
+            memberAnswerSlice, memberAnswerSlice.getContent().stream()
+                .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
+                    memberAnswer,
+                    answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
+                    answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
                 )).toList(), lastIndex.toString(), null
         );
     }
 
-    // 유저가 좋아한 답변 조회 //TODO 좋아요니까 좋아요한 순으로 정렬해야할거같은데 Answer의 createAt으로 하고 있음
+    // 유저가 좋아한 답변 조회
     @Override
     public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Long lastIndex, Pageable pageable) {
-        Slice<Answer> answerSlice = answerRepository.findByIdInAndIdIsLessThan(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
-        lastIndex = getLastIndexFromAnswer(answerSlice);
-        return SliceResponse.toSliceResponse(answerSlice, answerSlice.getContent().stream()
-            .map(answer -> answerMapper.toMemberAnswerInfo(
-                answer,
-                answerHeartRedisRepository.getAnswerHeartsCount(answer.getId()),
-                answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), answer.getId())
+        Slice<MemberAnswerInfoDBDto> memberAnswerSlice = answerRepository.findByIdInAndIdIsLessThan(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
+        lastIndex = getLastIndexFromAnswer(memberAnswerSlice);
+        return SliceResponse.toSliceResponse(memberAnswerSlice, memberAnswerSlice.getContent().stream()
+            .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
+                memberAnswer,
+                answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
+                answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
             )).toList(), lastIndex.toString(), null
         );
     }
@@ -160,9 +161,9 @@ public class AnswerServiceImpl implements AnswerService {
         return -1L;
     }
 
-    private Long getLastIndexFromAnswer(Slice<Answer> answerSlice) {
-        if (answerSlice.hasContent())
-            return answerSlice.stream().map(Answer::getId).min(Long::compareTo).get();
+    private Long getLastIndexFromAnswer(Slice<MemberAnswerInfoDBDto> memberAnswerSlice) {
+        if (memberAnswerSlice.hasContent())
+            return memberAnswerSlice.stream().map(MemberAnswerInfoDBDto::getAnswer).map(Answer::getId).min(Long::compareTo).get();
         return -1L;
     }
 
