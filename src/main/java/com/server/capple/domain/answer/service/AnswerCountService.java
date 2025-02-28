@@ -1,7 +1,9 @@
 package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.repository.AnswerRepository;
+import com.server.capple.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Async;
@@ -24,4 +26,12 @@ public class AnswerCountService {
     public CompletableFuture<Integer> updateQuestionAnswerCount(Long questionId) {
         return CompletableFuture.completedFuture(answerRepository.getAnswerCountByQuestionId(questionId));
     }
+
+    @Cacheable(value = "answerCountByMember", key = "#member.id", cacheManager = "oneDayExpireCacheManager")
+    public Integer getAnswerCountByMember(Member member) {
+        return answerRepository.getAnswerCountByMember(member);
+    }
+
+    @CacheEvict(value = "answerCountByMember", key = "#member.id", cacheManager = "oneDayExpireCacheManager")
+    public void expireMembersAnsweredCount(Member member) {}
 }
