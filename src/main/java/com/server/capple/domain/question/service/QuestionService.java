@@ -19,5 +19,8 @@ public interface QuestionService {
 
     SliceResponse<QuestionInfo> getAnsweredQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable);
 
+    SliceResponse<QuestionInfo> getNotAnsweredQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable);
+
     QuestionResponse.QuestionToggleHeart toggleQuestionHeart(Member member, Long questionId);
+
 }

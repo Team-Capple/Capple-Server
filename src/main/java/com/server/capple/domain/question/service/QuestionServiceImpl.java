@@ -70,6 +70,16 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public SliceResponse<QuestionInfo> getNotAnsweredQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable) {
+        lastDateTime = getThresholdDate(lastDateTime);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findNotAnswerdQuestionsByLivedAtBefore(member, lastDateTime, pageable);
+        lastDateTime = getThresholdDateFromQuestionInfoInterface(questionSlice);
+        return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
+            .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
+            ).toList(), lastDateTime.toString(), questionCountService.getLiveOrOldQuestionCount() - answerCountService.getAnswerCountByMember(member));
+    }
+
+    @Override
     public QuestionResponse.QuestionToggleHeart toggleQuestionHeart(Member member, Long questionId) {
         Question question = findQuestion(questionId);
 
