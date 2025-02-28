@@ -122,7 +122,7 @@ public class AnswerServiceImpl implements AnswerService {
                     memberAnswer,
                     answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
                     answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
-                )).toList(), lastIndex.toString(), null
+                )).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
         );
     }
 
