@@ -50,6 +50,7 @@ class QuestionRepositoryTest {
         questions.add(Question.builder().content("질문5").livedAt(LocalDateTime.now().minusDays(3)).questionStatus(QuestionStatus.OLD).build());
         questions.add(Question.builder().content("질문6").livedAt(LocalDateTime.now().minusDays(2)).questionStatus(QuestionStatus.OLD).build());
         questions.add(Question.builder().content("질문7").livedAt(LocalDateTime.now().minusHours(1)).questionStatus(QuestionStatus.LIVE).build());
+        questions.add(Question.builder().content("질문8").questionStatus(QuestionStatus.PENDING).build());
         questionRepository.saveAll(questions);
     }
 
@@ -101,6 +102,52 @@ class QuestionRepositoryTest {
                     .containsExactlyInAnyOrder(
                         tuple(questions.get(1).getContent(), questions.get(1).getQuestionStatus(), true),
                         tuple(questions.get(0).getContent(), questions.get(0).getQuestionStatus(), true)
+                    );
+            })
+        );
+    }
+
+    @DisplayName("사용자가 답변하지 않은 질문을 조회한다.")
+    @TestFactory
+    Collection<DynamicTest> findNotAnswerdQuestionsByLivedAtBefore() {
+        // given
+        answerRepository.save(createAnswer(member1, questions.get(3)));
+        answerRepository.save(createAnswer(member1, questions.get(0)));
+        answerRepository.save(createAnswer(member1, questions.get(5)));
+        answerRepository.save(createAnswer(member2, questions.get(1)));
+        answerRepository.save(createAnswer(member2, questions.get(2)));
+
+        return List.of(
+            DynamicTest.dynamicTest("첫 페이지 조회", () -> {
+                // when
+                Slice<QuestionInfoInterface> returnedQuestions = questionRepository.findNotAnswerdQuestionsByLivedAtBefore(
+                    member1,
+                    LocalDateTime.now(),
+                    PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "livedAt"))
+                );
+
+                // then
+                assertThat(returnedQuestions.getContent()).hasSize(3)
+                    .extracting("question.content", "question.questionStatus", "isAnsweredByMember")
+                    .containsExactlyInAnyOrder(
+                        tuple(questions.get(6).getContent(), questions.get(6).getQuestionStatus(), false),
+                        tuple(questions.get(4).getContent(), questions.get(4).getQuestionStatus(), false),
+                        tuple(questions.get(2).getContent(), questions.get(2).getQuestionStatus(), false)
+                    );
+            }),
+            DynamicTest.dynamicTest("마지막 페이지 조회", () -> {
+                // when
+                Slice<QuestionInfoInterface> returnedQuestions = questionRepository.findNotAnswerdQuestionsByLivedAtBefore(
+                    member1,
+                    questions.get(2).getLivedAt(),
+                    PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "livedAt"))
+                );
+
+                // then
+                assertThat(returnedQuestions.getContent()).hasSize(1)
+                    .extracting("question.content", "question.questionStatus", "isAnsweredByMember")
+                    .containsExactlyInAnyOrder(
+                        tuple(questions.get(1).getContent(), questions.get(1).getQuestionStatus(), false)
                     );
             })
         );

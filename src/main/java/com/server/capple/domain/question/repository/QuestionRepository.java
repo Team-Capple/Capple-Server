@@ -38,6 +38,15 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
         """)
     Slice<QuestionInfoInterface> findAnswerdQuestionsByLivedAtBefore(@Param("member") Member member, @Param("lastDateTime") LocalDateTime lastDateTime, Pageable pageable);
 
+    @Query("""
+        SELECT q AS question, (a IS NOT NULL) AS isAnsweredByMember
+        FROM Question q
+        LEFT JOIN Answer a
+        ON q = a.question AND a.deletedAt is NULL AND a.member = :member
+        WHERE (a IS NULL) AND (q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE') AND q.livedAt < :lastDateTime
+        """)
+    Slice<QuestionInfoInterface> findNotAnswerdQuestionsByLivedAtBefore(@Param("member") Member member, @Param("lastDateTime") LocalDateTime lastDateTime, Pageable pageable);
+
     @Query("SELECT COUNT(q) FROM Question q WHERE q.questionStatus = 'OLD' OR q.questionStatus = 'LIVE'")
     Integer getLiveOrOldQuestionCount();
 }
