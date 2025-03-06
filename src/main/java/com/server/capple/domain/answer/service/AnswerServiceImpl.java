@@ -57,7 +57,7 @@ public class AnswerServiceImpl implements AnswerService {
         //답변 저장
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
 //        answer.getQuestion().increaseCommentCount();
-        applicationEventPublisher.publishEvent(new QuestionAnswerCountChangedEvent(questionId));
+        applicationEventPublisher.publishEvent(new AnswerCountChangedEvent(questionId, loginMember));
         return new AnswerResponse.AnswerId(answer.getId());
     }
 
@@ -79,7 +79,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Transactional
     public AnswerResponse.AnswerId deleteAnswer(Member loginMember, Long answerId) {
         Answer answer = findAnswer(answerId);
-        applicationEventPublisher.publishEvent(new QuestionAnswerCountChangedEvent(answer.getQuestion().getId()));
+        applicationEventPublisher.publishEvent(new AnswerCountChangedEvent(answer.getQuestion().getId(), loginMember));
 
         checkPermission(loginMember, answer);
 //        answer.getQuestion().decreaseCommentCount();
@@ -122,7 +122,7 @@ public class AnswerServiceImpl implements AnswerService {
                     memberAnswer,
                     answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
                     answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
-                )).toList(), lastIndex.toString(), null
+                )).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
         );
     }
 
@@ -169,12 +169,14 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Getter
     @AllArgsConstructor
-    static class QuestionAnswerCountChangedEvent {
+    static class AnswerCountChangedEvent {
         private Long questionId;
+        private Member member;
     }
 
-    @TransactionalEventListener(classes = QuestionAnswerCountChangedEvent.class, phase = TransactionPhase.AFTER_COMPLETION)
-    public void handleQuestionCreatedEvent(QuestionAnswerCountChangedEvent event) {
+    @TransactionalEventListener(classes = AnswerCountChangedEvent.class, phase = TransactionPhase.AFTER_COMPLETION)
+    public void handleQuestionCreatedEvent(AnswerCountChangedEvent event) {
         answerCountService.updateQuestionAnswerCount(event.getQuestionId());
+        answerCountService.expireMembersAnsweredCount(event.getMember());
     }
 }

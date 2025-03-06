@@ -1,6 +1,7 @@
 package com.server.capple.domain.question.service;
 
 import com.server.capple.domain.answer.repository.AnswerRepository;
+import com.server.capple.domain.answer.service.AnswerCountService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.dao.QuestionInfoInterface;
 import com.server.capple.domain.question.dto.response.QuestionResponse;
@@ -30,6 +31,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionMapper questionMapper;
     private final QuestionHeartRedisRepository questionHeartRepository;
     private final QuestionCountService questionCountService;
+    private final AnswerCountService answerCountService;
 
     @Override
     public Question findQuestion(Long questionId) {
@@ -55,6 +57,26 @@ public class QuestionServiceImpl implements QuestionService {
         return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
             .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
             ).toList(), lastDateTime.toString(), questionCountService.getLiveOrOldQuestionCount());
+    }
+
+    @Override
+    public SliceResponse<QuestionInfo> getAnsweredQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable) {
+        lastDateTime = getThresholdDate(lastDateTime);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findAnswerdQuestionsByLivedAtBefore(member, lastDateTime, pageable);
+        lastDateTime = getThresholdDateFromQuestionInfoInterface(questionSlice);
+        return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
+            .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
+            ).toList(), lastDateTime.toString(), answerCountService.getAnswerCountByMember(member));
+    }
+
+    @Override
+    public SliceResponse<QuestionInfo> getNotAnsweredQuestions(Member member, LocalDateTime lastDateTime, Pageable pageable) {
+        lastDateTime = getThresholdDate(lastDateTime);
+        Slice<QuestionInfoInterface> questionSlice = questionRepository.findNotAnswerdQuestionsByLivedAtBefore(member, lastDateTime, pageable);
+        lastDateTime = getThresholdDateFromQuestionInfoInterface(questionSlice);
+        return SliceResponse.toSliceResponse(questionSlice, questionSlice.getContent().stream()
+            .map(questionInfoInterface -> questionMapper.toQuestionInfo(questionInfoInterface.getQuestion(), questionInfoInterface.getIsAnsweredByMember())
+            ).toList(), lastDateTime.toString(), questionCountService.getLiveOrOldQuestionCount() - answerCountService.getAnswerCountByMember(member));
     }
 
     @Override

@@ -51,6 +51,28 @@ public class QuestionController {
         return BaseResponse.onSuccess(questionService.getQuestions(member, lastDateTime, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
     }
 
+    @Operation(summary = "사용자가 답변한 질문 리스트 조회")
+    @GetMapping("/answered")
+    public BaseResponse<SliceResponse<QuestionInfo>> getAnsweredQuestion(
+        @AuthMember Member member,
+        @Parameter(description = "이전 조회의 마지막 데이터의 시각")
+        @RequestParam(required = false, name = "threshold") LocalDateTime lastDateTime,
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+    ) {
+        return BaseResponse.onSuccess(questionService.getAnsweredQuestions(member, lastDateTime, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
+    }
+
+    @Operation(summary = "사용자가 답변하지 않은 질문 리스트 조회")
+    @GetMapping("/notAnswered")
+    public BaseResponse<SliceResponse<QuestionInfo>> getNotAnsweredQuestion(
+        @AuthMember Member member,
+        @Parameter(description = "이전 조회의 마지막 데이터의 시각")
+        @RequestParam(required = false, name = "threshold") LocalDateTime lastDateTime,
+        @RequestParam(defaultValue = "1000", required = false) Integer pageSize
+    ) {
+        return BaseResponse.onSuccess(questionService.getNotAnsweredQuestions(member, lastDateTime, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "livedAt"))));
+    }
+
     @Operation(summary = "질문 좋아요/취소 API", description = " 질문 좋아요/취소 API 입니다." +
         "pathvariable 으로 questionId를 주세요.")
     @PostMapping("/{questionId}/heart")

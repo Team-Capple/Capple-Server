@@ -1,6 +1,5 @@
 package com.server.capple.domain.answer.repository;
 
-import com.server.capple.domain.answer.dao.AnswerRDBDao;
 import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
 import com.server.capple.domain.answer.dao.AnswerRDBDao.MemberAnswerInfoDBDto;
 import com.server.capple.domain.answer.entity.Answer;
@@ -35,7 +34,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
         "a.member.id AS writerId, " +
         "a.member.profileImage AS writerProfileImage, " +
         "a.member.nickname AS writerNickname," +
-        "a.member.academyGeneration AS writerAcademyGeneration "+
+        "a.member.academyGeneration AS writerAcademyGeneration " +
         "FROM Answer a " +
         "LEFT JOIN " +
         "Report r ON r.answer = a " +
@@ -54,4 +53,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     @Query("SELECT COUNT(a) FROM Answer a WHERE a.question.id = :questionId")
     Integer getAnswerCountByQuestionId(Long questionId);
+
+    @Query("SELECT COUNT(a.id) FROM Answer a WHERE a.member = :member")
+    Integer getAnswerCountByMember(Member member);
 }
