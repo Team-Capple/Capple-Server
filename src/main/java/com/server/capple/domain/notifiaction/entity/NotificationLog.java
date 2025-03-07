@@ -1,10 +1,10 @@
 package com.server.capple.domain.notifiaction.entity;
 
+import com.server.capple.domain.board.entity.Board;
+import com.server.capple.domain.boardComment.entity.BoardComment;
+import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Getter
@@ -18,7 +18,13 @@ public class NotificationLog extends BaseEntity {
     private Long id;
     private String subtitle;
     private String body;
-    private Long boardId;
-    private Long boardCommentId;
-    private Long questionId;
+    @JoinColumn(name = "board_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Board board;
+    @JoinColumn(name = "board_comment_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private BoardComment boardComment;
+    @JoinColumn(name = "question_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Question question;
 }

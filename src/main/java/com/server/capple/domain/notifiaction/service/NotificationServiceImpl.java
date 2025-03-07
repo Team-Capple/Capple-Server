@@ -8,6 +8,7 @@ import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
+import com.server.capple.domain.notifiaction.dto.NotificationDBResponse.NotificationDBInfo;
 import com.server.capple.domain.notifiaction.dto.NotificationResponse.NotificationInfo;
 import com.server.capple.domain.notifiaction.entity.Notification;
 import com.server.capple.domain.notifiaction.entity.NotificationLog;
@@ -134,7 +135,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public SliceResponse<NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable) {
-        Slice<Notification> notifications = notificationRepository.findByMemberId(member, lastIndex, pageable);
+        Slice<NotificationDBInfo> notifications = notificationRepository.findByMemberId(member, lastIndex, pageable);
         lastIndex = getLastIndexFromNotification(notifications);
         return notificationMapper.toNotificationInfoSlice(notifications, lastIndex);
     }
@@ -145,9 +146,9 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.deleteNotificationsByCreatedAtBefore(targetTime);
     }
 
-    private Long getLastIndexFromNotification(Slice<Notification> notifications) {
+    private Long getLastIndexFromNotification(Slice<NotificationDBInfo> notifications) {
         if(notifications.hasContent())
-            return notifications.stream().map(Notification::getId).min(Long::compareTo).get();
+            return notifications.stream().map(NotificationDBInfo::getNotification).map(Notification::getId).min(Long::compareTo).get();
         return -1L;
     }
 }

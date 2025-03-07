@@ -1,10 +1,12 @@
 package com.server.capple.domain.answer.mapper;
 
 import com.server.capple.domain.answer.dao.AnswerRDBDao.AnswerInfoInterface;
+import com.server.capple.domain.answer.dao.AnswerRDBDao.MemberAnswerInfoDBDto;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.member.entity.AcademyGeneration;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.question.entity.Question;
 import org.springframework.stereotype.Component;
@@ -25,6 +27,7 @@ public class AnswerMapper {
                 .writerId(answerInfoDto.getWriterId())
                 .profileImage(answerInfoDto.getWriterProfileImage())
                 .nickname(answerInfoDto.getWriterNickname())
+                .writerGeneration(answerInfoDto.getWriterAcademyGeneration().orElse(AcademyGeneration.UNKNOWN).getGeneration())
                 .content(answerInfoDto.getAnswer().getContent())
                 .isMine(answerInfoDto.getWriterId().equals(memberId))
                 .isReported(answerInfoDto.getIsReported())
@@ -33,16 +36,17 @@ public class AnswerMapper {
                 .build();
     }
 
-    public MemberAnswerInfo toMemberAnswerInfo(Answer answer, int heartCount, Boolean isLiked) {
+    public MemberAnswerInfo toMemberAnswerInfo(MemberAnswerInfoDBDto memberAnswer, int heartCount, Boolean isLiked) {
         return MemberAnswerInfo.builder()
-                .questionId(answer.getQuestion().getId())
-                .answerId(answer.getId())
-                .writerId(answer.getMember().getId())
-                .nickname(answer.getMember().getNickname())
-                .profileImage(answer.getMember().getProfileImage())
-                .content(answer.getContent())
+                .questionId(memberAnswer.getAnswer().getQuestion().getId())
+                .answerId(memberAnswer.getAnswer().getId())
+                .writerId(memberAnswer.getAnswer().getMember().getId())
+                .nickname(memberAnswer.getAnswer().getMember().getNickname())
+                .profileImage(memberAnswer.getAnswer().getMember().getProfileImage())
+                .writerGeneration(memberAnswer.getWriterAcademyGeneration().orElse(AcademyGeneration.UNKNOWN).getGeneration())
+                .content(memberAnswer.getAnswer().getContent())
                 .heartCount(heartCount)
-                .writeAt(answer.getCreatedAt().toString())
+                .writeAt(memberAnswer.getAnswer().getCreatedAt().toString())
                 .isLiked(isLiked)
                 .build();
     }

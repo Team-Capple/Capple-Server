@@ -22,6 +22,7 @@ public class BoardResponse {
         private Long boardId;
         private Long writerId;
         private String writerNickname;
+        private String writerGeneration;
         private String content;
         private Integer heartCount;
         private Integer commentCount;

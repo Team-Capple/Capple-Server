@@ -7,6 +7,7 @@ import com.server.capple.domain.mail.service.MailService;
 import com.server.capple.domain.mail.service.MailUtil;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
+import com.server.capple.domain.member.entity.AcademyGeneration;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
 import com.server.capple.domain.member.mapper.MemberMapper;
@@ -118,7 +119,7 @@ public class MemberServiceImpl implements MemberService {
         String encryptedEmail = convertEmailToJwt(email);
 
         // TODO : 추후 profileImage 파라미터 수정 예정
-        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, "");
+        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, "", getGeneration(email));
         memberRepository.save(member);
         Long memberId = member.getId();
         String role = member.getRole().getName();
@@ -127,6 +128,15 @@ public class MemberServiceImpl implements MemberService {
         if(deviceToken != null)
             deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
         return tokensMapper.toTokens(accessToken, refreshToken);
+    }
+
+    protected AcademyGeneration getGeneration(String email) {
+        String nickname = email.split("@")[0];
+        try {
+            return AcademyGeneration.generation(Integer.parseInt(nickname.substring(nickname.length() - 2)));
+        } catch(NumberFormatException e) {
+            return AcademyGeneration.UNKNOWN;
+        }
     }
 
     @Override

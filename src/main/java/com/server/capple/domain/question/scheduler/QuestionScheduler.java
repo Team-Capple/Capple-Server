@@ -16,14 +16,14 @@ public class QuestionScheduler {
     private final NotificationService notificationService;
 
     //초 분 시 일 월 요일
-    @Scheduled(cron = "0 0 7,18 * * *") //매일 오전 7시에, 오후 6시에
+    @Scheduled(cron = "0 30 12 * * *") //매일 오후 12시 30분에
     public void setLiveQuestion() {
         Question question = adminQuestionService.setLiveQuestion();
         notificationService.sendLiveQuestionOpenNotification(question);
         log.info("live question이 등록되었습니다.");
     }
 
-    @Scheduled(cron = "0 0 1,14 * * *") //매일 오전 1시에, 오후 14시에
+    @Scheduled(cron = "59 59 23 * * *") //매일 오후 23시 59분 59초에
     public void closeLiveQuestion() {
         //question을 닫음
         Question question = adminQuestionService.closeLiveQuestion();

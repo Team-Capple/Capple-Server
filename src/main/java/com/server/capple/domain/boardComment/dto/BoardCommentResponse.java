@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class BoardCommentResponse {
 
@@ -27,6 +26,7 @@ public class BoardCommentResponse {
     public static class BoardCommentInfo {
         private Long boardCommentId;
         private Long writerId;
+        private String writerGeneration;
         private String content;
         private Integer heartCount;
         private Boolean isLiked;
