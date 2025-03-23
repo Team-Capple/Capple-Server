@@ -52,4 +52,8 @@ public class Member extends BaseEntity {
         this.sub = "Resign Member";
         delete();
     }
+
+    public void updateSub(String sub) {
+        this.sub = sub;
+    }
 }

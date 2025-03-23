@@ -99,8 +99,8 @@ public class JwtServiceImpl implements JwtService {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("tokenType", String.class);
     }
 
-    public Integer getMemberId(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("memberId", Integer.class);
+    public Long getMemberId(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("memberId", Long.class);
     }
 
     public String getRole(String token) { //TODO 인가 관련 추가 구현 필요

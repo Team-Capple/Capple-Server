@@ -1,11 +1,10 @@
 package com.server.capple.domain.member.repository;
 
 import com.server.capple.domain.member.entity.Member;
-import org.springframework.data.jpa.repository.JpaRepository;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -25,4 +24,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsMemberByNickname(String nickname);
 
     boolean existsMemberByEmail(String email);
+
+    Member getMemberByEmail(String email);
 }
