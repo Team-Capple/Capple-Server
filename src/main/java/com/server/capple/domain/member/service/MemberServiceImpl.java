@@ -96,20 +96,20 @@ public class MemberServiceImpl implements MemberService {
         return new MemberResponse.DeleteProfileImages(deleteImages);
     }
 
-    public MemberResponse.SignInResponse signIn(String authorizationCode, String deviceToken) {
-        AppleIdTokenPayload appleIdTokenPayload = appleAuthService.get(authorizationCode);
-        Optional<Member> optionalMember = memberRepository.findBySub(appleIdTokenPayload.getSub());
-        if (optionalMember.isEmpty()) {
-            String signUpToken = jwtService.createSignUpAccessJwt(appleIdTokenPayload.getSub());
-            return memberMapper.toSignInResponse(null, signUpToken, false);
-        }
-        Long memberId = optionalMember.get().getId();
-        String role = optionalMember.get().getRole().getName();
+    private MemberResponse.Tokens getTokens(String deviceToken, Member member) {
+        Long memberId = member.getId();
+        String role = member.getRole().getName();
         String accessToken = jwtService.createJwt(memberId, role, "access");
         String refreshToken = jwtService.createJwt(memberId, role, "refresh");
-        if(deviceToken != null)
+        if (deviceToken != null)
             deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
-        return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+        return tokensMapper.toTokens(accessToken, refreshToken);
+    }
+
+    @Override
+    public MemberResponse.SignInResponse signIn(String authorizationCode, String deviceToken) {
+        AppleIdTokenPayload appleIdTokenPayload = appleAuthService.get(authorizationCode);
+        return localSignIn(appleIdTokenPayload.getSub(), deviceToken);
     }
 
     @Override
@@ -118,16 +118,15 @@ public class MemberServiceImpl implements MemberService {
         String sub = jwtService.getSub(signUpToken);
         String encryptedEmail = convertEmailToJwt(email);
 
-        // TODO : 추후 profileImage 파라미터 수정 예정
-        Member member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, "", getGeneration(email));
-        memberRepository.save(member);
-        Long memberId = member.getId();
-        String role = member.getRole().getName();
-        String accessToken = jwtService.createJwt(memberId, role, "access");
-        String refreshToken = jwtService.createJwt(memberId, role, "refresh");
-        if(deviceToken != null)
-            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
-        return tokensMapper.toTokens(accessToken, refreshToken);
+        Member member;
+        if ((member = memberRepository.getMemberByEmail(encryptedEmail)) != null) { // sub가 변경된 회원
+            member.updateSub(sub);
+        } else {
+            // TODO : 추후 profileImage 파라미터 수정 예정
+            member = memberMapper.createMember(sub, encryptedEmail, nickname, Role.ROLE_ACADEMIER, "", getGeneration(email));
+            memberRepository.save(member);
+        }
+        return getTokens(deviceToken, member);
     }
 
     protected AcademyGeneration getGeneration(String email) {
@@ -140,19 +139,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberResponse.SignInResponse localSignIn(String testId, String deviceToken) {
-        Optional<Member> optionalMember = memberRepository.findBySub(testId);
-        if (optionalMember.isEmpty()) {
-            String signUpToken = jwtService.createSignUpAccessJwt(testId);
+    public MemberResponse.SignInResponse localSignIn(String sub, String deviceToken) {
+        Optional<Member> optionalMember = memberRepository.findBySub(sub);
+        if (optionalMember.isEmpty()) { // 해당 동일한 회원이 없음
+            String signUpToken = jwtService.createSignUpAccessJwt(sub);
             return memberMapper.toSignInResponse(null, signUpToken, false);
         }
-        Long memberId = optionalMember.get().getId();
-        String role = optionalMember.get().getRole().getName();
-        String accessToken = jwtService.createJwt(memberId, role, "access");
-        String refreshToken = jwtService.createJwt(memberId, role, "refresh");
-        if(deviceToken != null)
-            deviceTokenRedisRepository.saveDeviceToken(memberId, deviceToken);
-        return memberMapper.toSignInResponse(accessToken, refreshToken, true);
+        MemberResponse.Tokens tokens = getTokens(deviceToken, optionalMember.get());
+        return memberMapper.toSignInResponse(tokens.getAccessToken(), tokens.getRefreshToken(), true);
     }
 
     @Override
@@ -182,8 +176,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public Boolean checkEmail(String email) {
-        String encryptedEmail = convertEmailToJwt(email);
-        return memberRepository.existsMemberByEmail(encryptedEmail);
+        Boolean isWhiteList = mailService.checkWhiteList(email);
+        if (!isWhiteList && !mailService.checkMailDomain(email)) {
+            throw new RestApiException(MailErrorCode.NOT_SUPPORTED_EMAIL_DOMAIN);
+        }
+        return false;
     }
 
     private String convertEmailToJwt(String email) {
@@ -209,12 +206,6 @@ public class MemberServiceImpl implements MemberService {
         // 지원 도메인 체크
         if (!isWhiteList && !mailService.checkMailDomain(email)) {
             throw new RestApiException(MailErrorCode.NOT_SUPPORTED_EMAIL_DOMAIN);
-        }
-        // 이메일 암호화
-        String emailJwt = convertEmailToJwt(email);
-        // 이메일 중복 체크
-        if (memberRepository.existsMemberByEmail(emailJwt)) {
-            throw new RestApiException(MailErrorCode.DUPLICATE_EMAIL);
         }
         // 이메일 발송
         return mailService.sendMailAddressCertificationMail(email, isWhiteList);

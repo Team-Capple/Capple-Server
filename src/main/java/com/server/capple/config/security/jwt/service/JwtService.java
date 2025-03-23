@@ -11,7 +11,7 @@ public interface JwtService {
     Authentication getAuthentication(String token);
     String getSub(String token);
     String getTokenType(String token);
-    Integer getMemberId(String token);
+    Long getMemberId(String token);
     String getRole(String token);
     Boolean isExpired(String token);
     Boolean checkJwt(String token);
