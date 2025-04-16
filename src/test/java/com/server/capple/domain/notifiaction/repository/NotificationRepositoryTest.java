@@ -10,7 +10,7 @@ import com.server.capple.domain.notifiaction.entity.Notification;
 import com.server.capple.domain.notifiaction.entity.NotificationLog;
 import com.server.capple.domain.notifiaction.entity.NotificationType;
 import com.server.capple.domain.notifiaction.mapper.NotificationMapper;
-import org.junit.jupiter.api.AfterEach;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,6 @@ import java.util.List;
 
 import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -37,14 +36,8 @@ class NotificationRepositoryTest {
     @Autowired
     private NotificationRepository notificationRepository;
 
-    @AfterEach
-    void tearDown() {
-        notificationRepository.deleteAll();
-        boardRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
     @Test
+    @Transactional
     @DisplayName("자신의 게시글을 제외한 다른 사람이 작성한 게시글 알림을 조회할 수 있다")
     void findByMemberId2() {
         // given
@@ -96,29 +89,26 @@ class NotificationRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Slice<NotificationDBInfo> result1 = notificationRepository.findByMemberId(savedMember1, -1L, pageRequest);
-        Slice<NotificationDBInfo> result2 = notificationRepository.findByMemberId(savedMember2, -1L, pageRequest);
-        Slice<NotificationDBInfo> result3 = notificationRepository.findByMemberId(savedMember3, -1L, pageRequest);
+        Slice<NotificationDBInfo> result1 = notificationRepository.findByMemberId(savedMember1, null, pageRequest);
+        Slice<NotificationDBInfo> result2 = notificationRepository.findByMemberId(savedMember2, null, pageRequest);
+        Slice<NotificationDBInfo> result3 = notificationRepository.findByMemberId(savedMember3, null, pageRequest);
 
         // then
         assertThat(result1.getContent()).hasSize(2)
             .extracting("notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                tuple(board2.getContent()),
-                tuple(board3.getContent())
-            )
-        ;
+                board3.getContent(),
+                board2.getContent()
+            );
         assertThat(result2.getContent()).hasSize(1)
             .extracting("notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                tuple(board3.getContent())
-            )
-        ;
+                board3.getContent()
+            );
         assertThat(result3.getContent()).hasSize(1)
             .extracting("notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                tuple(board2.getContent())
-            )
-        ;
+                board2.getContent()
+            );
     }
 }
