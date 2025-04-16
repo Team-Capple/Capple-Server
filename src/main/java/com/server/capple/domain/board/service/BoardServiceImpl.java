@@ -47,6 +47,7 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.save(boardMapper.toBoard(member, boardType, content));
         boardSubscribeMemberService.createBoardSubscribeMember(member, board);
         applicationEventPublisher.publishEvent(new BoardCreatedEvent());
+        notificationService.sendNewBoardNotificationExceptAuthor(board, member);
         return new BoardId(board.getId());
     }
 
