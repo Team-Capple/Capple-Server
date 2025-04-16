@@ -2,8 +2,10 @@ package com.server.capple.domain.notifiaction.service;
 
 import com.server.capple.config.apns.dto.ApnsClientRequest.BoardCommentNotificationBody;
 import com.server.capple.config.apns.dto.ApnsClientRequest.BoardNotificationBody;
+import com.server.capple.config.apns.dto.ApnsClientRequest.LiveAnswerAddedNotificationBody;
 import com.server.capple.config.apns.dto.ApnsClientRequest.QuestionNotificationBody;
 import com.server.capple.config.apns.service.ApnsService;
+import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
@@ -147,8 +149,25 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private Long getLastIndexFromNotification(Slice<NotificationDBInfo> notifications) {
-        if(notifications.hasContent())
+        if (notifications.hasContent())
             return notifications.stream().map(NotificationDBInfo::getNotification).map(Notification::getId).min(Long::compareTo).get();
         return -1L;
+    }
+
+    @Override
+    public void sendLiveAnswerAddedNotification(List<Member> subscribers, Question question, Answer answer) {
+        // 원격 푸시 발송
+        LiveAnswerAddedNotificationBody liveAnswerAddedNotificationBody = LiveAnswerAddedNotificationBody.builder()
+            .type(LIVE_QUESTION_ANSWER_ADDED)
+            .questionId(question.getId())
+            .build();
+        apnsService.sendApnsToMembers(liveAnswerAddedNotificationBody, subscribers.stream().map(Member::getId).toList());
+        // 알림 저장
+        List<Notification> notifications = subscribers.stream().map(subscriber -> notificationMapper.toNotification(
+                subscriber,
+                notificationMapper.toNotificationLog(question, answer),
+                LIVE_QUESTION_ANSWER_ADDED))
+            .toList();
+        notificationRepository.saveAll(notifications);
     }
 }
