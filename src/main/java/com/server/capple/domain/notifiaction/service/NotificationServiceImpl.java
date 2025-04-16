@@ -1,9 +1,6 @@
 package com.server.capple.domain.notifiaction.service;
 
-import com.server.capple.config.apns.dto.ApnsClientRequest.BoardCommentNotificationBody;
-import com.server.capple.config.apns.dto.ApnsClientRequest.BoardNotificationBody;
-import com.server.capple.config.apns.dto.ApnsClientRequest.LiveAnswerAddedNotificationBody;
-import com.server.capple.config.apns.dto.ApnsClientRequest.QuestionNotificationBody;
+import com.server.capple.config.apns.dto.ApnsClientRequest.*;
 import com.server.capple.config.apns.service.ApnsService;
 import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.board.entity.Board;
@@ -22,6 +19,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -169,5 +167,19 @@ public class NotificationServiceImpl implements NotificationService {
                 LIVE_QUESTION_ANSWER_ADDED))
             .toList();
         notificationRepository.saveAll(notifications);
+    }
+
+    @Async
+    @Override
+    public void sendNewBoardNotificationExceptAuthor(Board board, Member member) {
+        // 원격 푸시 발송
+        NewFreeBoardNotificationBody liveAnswerAddedNotificationBody = NewFreeBoardNotificationBody.builder()
+            .type(NEW_FREE_BOARD)
+            .board(board)
+            .build();
+        apnsService.sendApnsToAllMembersExceptOne(liveAnswerAddedNotificationBody, member.getId());
+        // 알림 저장
+        Notification notification = notificationMapper.toNotification(member, notificationMapper.toNotificationLog(board), NEW_FREE_BOARD);
+        notificationRepository.save(notification);
     }
 }

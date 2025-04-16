@@ -13,6 +13,7 @@ public enum NotificationType {
     TODAY_QUESTION_PUBLISHED("오늘의 질문 준비 완료!", null),
     TODAY_QUESTION_CLOSED("오늘의 질문 답변 마감!", null),
     LIVE_QUESTION_ANSWER_ADDED("오늘의 질문", "새로운 답변이 달렸어요!"),
+    NEW_FREE_BOARD("자유 게시판", "새로운 게시글이 올라왔어요!"),
     ;
     private final String title;
     private final String body;

@@ -128,4 +128,24 @@ public class ApnsClientRequest {
             this.questionId = questionId.toString();
         }
     }
+
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class NewFreeBoardNotificationBody {
+        private Aps aps;
+        private String boardId;
+
+        @Builder
+        public NewFreeBoardNotificationBody(NotificationType type, Board board) {
+            this.aps = Aps.builder()
+                .threadId("freeboard")
+                .alert(Alert.builder()
+                    .title(type.getTitle())
+                    .body(type.getBody())
+                    .build())
+                .build();
+            this.boardId = board.getId().toString();
+        }
+    }
 }

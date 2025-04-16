@@ -72,7 +72,8 @@ public class NotificationMapper {
             case BOARD_COMMENT, BOARD_COMMENT_DUPLICATE, BOARD_COMMENT_HEART ->
                 toBoardCommentNotificationInfo(notificationDBInfo);
             case TODAY_QUESTION_PUBLISHED, TODAY_QUESTION_CLOSED -> toQuestionNotificationInfo(notificationDBInfo);
-            case LIVE_QUESTION_ANSWER_ADDED -> toQuestionLiveAnswerAddedNotificationInfo(notificationDBInfo); // TODO
+            case LIVE_QUESTION_ANSWER_ADDED -> toQuestionLiveAnswerAddedNotificationInfo(notificationDBInfo);
+            case NEW_FREE_BOARD -> toNewBoardNotificationInfo(notificationDBInfo);
         };
     }
 
@@ -114,6 +115,16 @@ public class NotificationMapper {
             .questionId(notificationDBInfo.getNotification().getNotificationLog().getQuestion().getId().toString())
             .answerId(notificationDBInfo.getNotification().getNotificationLog().getAnswer().getId().toString())
             .isResponsedQuestion(notificationDBInfo.getIsResponsedQuestion())
+            .createdAt(notificationDBInfo.getNotification().getCreatedAt())
+            .build();
+    }
+
+    private NotificationInfo toNewBoardNotificationInfo(NotificationDBInfo notificationDBInfo) {
+        return NotificationInfo.builder()
+            .title(notificationDBInfo.getNotification().getType().getTitle())
+            .content(notificationDBInfo.getNotification().getType().getBody())
+            .boardId(notificationDBInfo.getNotification().getNotificationLog().getBoard().getId().toString())
+            .isReportedBoard(notificationDBInfo.getIsReportedBoard())
             .createdAt(notificationDBInfo.getNotification().getCreatedAt())
             .build();
     }

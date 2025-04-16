@@ -21,4 +21,5 @@ public interface NotificationService {
     SliceResponse<NotificationResponse.NotificationInfo> getNotifications(Member member, Long lastIndex, Pageable pageable);
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
     void sendLiveAnswerAddedNotification(List<Member> subscriber, Question question, Answer answer);
+    void sendNewBoardNotificationExceptAuthor(Board board, Member member);
 }

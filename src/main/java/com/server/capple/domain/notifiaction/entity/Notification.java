@@ -19,6 +19,6 @@ public class Notification extends BaseEntity {
     private Member member;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private NotificationLog notificationLog;
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private NotificationType type;
 }
