@@ -104,4 +104,12 @@ public class ApnsServiceImpl implements ApnsService {
     public <T> Boolean sendApnsToAllMembers(T request) {
         return sendApns(request, deviceTokenRedisRepository.getAllDeviceTokens());
     }
+
+    @Override
+    public <T> Boolean sendApnsToAllMembersExceptOne(T request, Long memberId) {
+        List<String> allDeviceTokens = deviceTokenRedisRepository.getAllDeviceTokens();
+        String memberDeviceToken = deviceTokenRedisRepository.getDeviceToken(memberId);
+        List<String> allDeviceTokensExceptOne = allDeviceTokens.stream().filter(token -> !token.equals(memberDeviceToken)).toList();
+        return sendApns(request, allDeviceTokensExceptOne);
+    }
 }

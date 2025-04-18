@@ -29,11 +29,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         "WHERE " +
         "(n.id < :lastIndex OR :lastIndex IS NULL) AND " +
         "(" +
-        "n.member = :member " +
+        "(n.type <> com.server.capple.domain.notifiaction.entity.NotificationType.NEW_FREE_BOARD AND n.member = :member) " +
         "OR " +
         "((n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_PUBLISHED " +
         "OR " +
-        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED) " +
+        "n.type = com.server.capple.domain.notifiaction.entity.NotificationType.TODAY_QUESTION_CLOSED " +
+        "OR " +
+        "(n.type = com.server.capple.domain.notifiaction.entity.NotificationType.NEW_FREE_BOARD AND n.member <> :member) " +
+        ") " +
         "AND n.createdAt > (select m.createdAt from Member m where m = :member))" +
         ")"
     )
