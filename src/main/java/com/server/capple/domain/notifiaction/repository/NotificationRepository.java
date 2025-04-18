@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-    @EntityGraph(attributePaths = {"notificationLog"})
+    @EntityGraph(attributePaths = {"notificationLog", "notificationLog.question", "notificationLog.answer"})
     @Query("SELECT " +
         "n notification" +
         ", CASE WHEN n.notificationLog.question IS NULL THEN NULL " +

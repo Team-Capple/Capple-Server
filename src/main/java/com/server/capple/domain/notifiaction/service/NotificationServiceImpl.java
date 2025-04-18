@@ -182,4 +182,18 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = notificationMapper.toNotification(member, notificationMapper.toNotificationLog(board), NEW_FREE_BOARD);
         notificationRepository.save(notification);
     }
+
+    @Async
+    @Override
+    public void sendAnswerHeartNotification(Long actorId, Answer answer) {
+        if(actorId.equals(answer.getMember().getId())) return;
+        AnswerHeartNotificationBody answerHeartNotificationBody = AnswerHeartNotificationBody.builder()
+            .type(ANSWER_HEART)
+            .answer(answer)
+            .build();
+        apnsService.sendApnsToMembers(answerHeartNotificationBody, answer.getMember().getId());
+
+        Notification notification = notificationMapper.toNotification(answer.getMember(), notificationMapper.toNotificationLog(answer.getQuestion(), answer), ANSWER_HEART);
+        notificationRepository.save(notification);
+    }
 }

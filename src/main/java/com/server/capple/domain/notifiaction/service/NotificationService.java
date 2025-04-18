@@ -22,4 +22,5 @@ public interface NotificationService {
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
     void sendLiveAnswerAddedNotification(List<Member> subscriber, Question question, Answer answer);
     void sendNewBoardNotificationExceptAuthor(Board board, Member member);
+    void sendAnswerHeartNotification(Long actorId, Answer answer);
 }
