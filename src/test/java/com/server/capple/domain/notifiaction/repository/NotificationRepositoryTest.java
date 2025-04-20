@@ -11,6 +11,7 @@ import com.server.capple.domain.notifiaction.entity.NotificationLog;
 import com.server.capple.domain.notifiaction.entity.NotificationType;
 import com.server.capple.domain.notifiaction.mapper.NotificationMapper;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.List;
 
 import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -59,56 +61,53 @@ class NotificationRepositoryTest {
             .sub("member3")
             .role(ROLE_ACADEMIER)
             .build();
-        Member savedMember1 = memberRepository.save(member1);
-        Member savedMember2 = memberRepository.save(member2);
-        Member savedMember3 = memberRepository.save(member3);
+        memberRepository.saveAll(List.of(member1, member2, member3));
         Board board2 = Board.builder()
             .boardType(BoardType.FREEBOARD)
             .content("boardContent2")
-            .writer(savedMember2)
+            .writer(member2)
             .isReport(false)
             .build();
         Board board3 = Board.builder()
             .boardType(BoardType.FREEBOARD)
             .content("boardContent3")
-            .writer(savedMember3)
+            .writer(member3)
             .isReport(false)
             .build();
-        Board savedBoard2 = boardRepository.save(board2);
-        Board savedBoard3 = boardRepository.save(board3);
+        boardRepository.saveAll(List.of(board2, board3));
         NotificationLog notificationLog2 = new NotificationMapper()
-            .toNotificationLog(savedBoard2);
+            .toNotificationLog(board2);
         NotificationLog notificationLog3 = new NotificationMapper()
-            .toNotificationLog(savedBoard3);
+            .toNotificationLog(board3);
         Notification notification2 = new NotificationMapper()
-            .toNotification(savedMember2, notificationLog2, NotificationType.NEW_FREE_BOARD);
+            .toNotification(member2, notificationLog2, NotificationType.NEW_FREE_BOARD);
         Notification notification3 = new NotificationMapper()
-            .toNotification(savedMember3, notificationLog3, NotificationType.NEW_FREE_BOARD);
+            .toNotification(member3, notificationLog3, NotificationType.NEW_FREE_BOARD);
         notificationRepository.saveAll(List.of(notification2, notification3));
 
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Slice<NotificationDBInfo> result1 = notificationRepository.findByMemberId(savedMember1, null, pageRequest);
-        Slice<NotificationDBInfo> result2 = notificationRepository.findByMemberId(savedMember2, null, pageRequest);
-        Slice<NotificationDBInfo> result3 = notificationRepository.findByMemberId(savedMember3, null, pageRequest);
+        Slice<NotificationDBInfo> result1 = notificationRepository.findByMemberId(member1, null, pageRequest);
+        Slice<NotificationDBInfo> result2 = notificationRepository.findByMemberId(member2, null, pageRequest);
+        Slice<NotificationDBInfo> result3 = notificationRepository.findByMemberId(member3, null, pageRequest);
 
         // then
         assertThat(result1.getContent()).hasSize(2)
-            .extracting("notification.notificationLog.board.content")
+            .extracting("notification.id", "notification.type", "notification.notificationLog.id", "notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                board3.getContent(),
-                board2.getContent()
+                tuple(notification3.getId(), NotificationType.NEW_FREE_BOARD, notification3.getNotificationLog().getId(), board3.getContent()),
+                tuple(notification2.getId(), NotificationType.NEW_FREE_BOARD, notification2.getNotificationLog().getId(), board2.getContent())
             );
         assertThat(result2.getContent()).hasSize(1)
-            .extracting("notification.notificationLog.board.content")
+            .extracting("notification.id", "notification.type", "notification.notificationLog.id", "notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                board3.getContent()
+                tuple(notification3.getId(), NotificationType.NEW_FREE_BOARD, notification3.getNotificationLog().getId(), board3.getContent())
             );
         assertThat(result3.getContent()).hasSize(1)
-            .extracting("notification.notificationLog.board.content")
+            .extracting("notification.id", "notification.type", "notification.notificationLog.id", "notification.notificationLog.board.content")
             .containsExactlyInAnyOrder(
-                board2.getContent()
+                tuple(notification2.getId(), NotificationType.NEW_FREE_BOARD, notification2.getNotificationLog().getId(), board2.getContent())
             );
     }
 }
