@@ -250,4 +250,58 @@ class NotificationServiceImplTest {
             })
         );
     }
+
+    @Test
+    @DisplayName("답변 댓글의 좋아요 알림을 발송할 수 있다.")
+    void sendAnswerCommentHeartNotification() {
+        // given
+        Member answerAuthor = Member.builder()
+            .nickname("answerAuthor")
+            .email("answerAuthor")
+            .sub("answerAuthor")
+            .role(ROLE_ACADEMIER)
+            .build();
+        Member commentAuthor = Member.builder()
+            .nickname("commentAuthor")
+            .email("commentAuthor")
+            .sub("commentAuthor")
+            .role(ROLE_ACADEMIER)
+            .build();
+        memberRepository.saveAll(List.of(answerAuthor, commentAuthor));
+        Question question = Question.builder()
+            .content("question")
+            .questionStatus(LIVE)
+            .build();
+        questionRepository.save(question);
+        Answer answer = Answer.builder()
+            .content("answer")
+            .question(question)
+            .member(answerAuthor)
+            .build();
+        answerRepository.save(answer);
+        AnswerComment answerComment = AnswerComment.builder()
+            .content("answerComment")
+            .answer(answer)
+            .member(commentAuthor)
+            .build();
+        answerCommentRepository.save(answerComment);
+
+        // when
+        notificationServiceImpl.sendAnswerCommentHeartNotification(answerComment);
+
+        // then
+
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(2))
+            .untilAsserted(() -> {
+                verify(apnsService, times(1)).sendApnsToMembers(any(), eq(commentAuthor.getId()));
+                PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+                Slice<NotificationDBInfo> notifications = notificationRepository.findByMemberId(commentAuthor, null, pageRequest);
+                assertThat(notifications.getContent()).hasSize(1)
+                    .extracting("isResponsedQuestion", "notification.type.title", "notification.notificationLog.answer.content", "notification.notificationLog.answerComment.content")
+                    .containsExactlyInAnyOrder(
+                        tuple(false, ANSWER_COMMENT_HEART.getTitle(), answer.getContent(), answerComment.getContent())
+                    );
+            });
+    }
 }

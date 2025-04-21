@@ -25,4 +25,5 @@ public interface NotificationService {
     void sendNewBoardNotificationExceptAuthor(Board board, Member member);
     void sendAnswerHeartNotification(Long actorId, Answer answer);
     void sendAnswerCommentNotification(Answer answer, AnswerComment answerComment);
+    void sendAnswerCommentHeartNotification(AnswerComment answerComment);
 }

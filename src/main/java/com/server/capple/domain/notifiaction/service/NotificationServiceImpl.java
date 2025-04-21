@@ -3,7 +3,9 @@ package com.server.capple.domain.notifiaction.service;
 import com.server.capple.config.apns.dto.ApnsClientRequest.*;
 import com.server.capple.config.apns.service.ApnsService;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.dto.AnswerCommentDBResponse.AnswerCommentAuthorNAnswerNQuestionInfo;
 import com.server.capple.domain.answerComment.entity.AnswerComment;
+import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.answerSubscribeMember.service.AnswerSubscribeMemberService;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
@@ -17,6 +19,8 @@ import com.server.capple.domain.notifiaction.mapper.NotificationMapper;
 import com.server.capple.domain.notifiaction.repository.NotificationRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.SliceResponse;
+import com.server.capple.global.exception.RestApiException;
+import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.server.capple.domain.notifiaction.entity.NotificationType.*;
 
@@ -37,6 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
     private final ApnsService apnsService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
     private final AnswerSubscribeMemberService answerSubscribeMemberService;
+    private final AnswerCommentRepository answerCommentRepository;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
@@ -239,5 +245,29 @@ public class NotificationServiceImpl implements NotificationService {
         }
         answerSubscribeMemberService.createAnswerSubscribeMember(answerComment.getMember(), answer);
         notificationRepository.saveAll(notifications);
+    }
+
+    @Async
+    @Override
+    public void sendAnswerCommentHeartNotification(AnswerComment answerComment) {
+        AnswerCommentAuthorNAnswerNQuestionInfo answerCommentInfo = answerCommentRepository.findAnswerCommentInfo(answerComment).get()
+//            .orElseThrow(
+//            () -> new RestApiException(CommentErrorCode.COMMENT_NOT_FOUND)
+//        )
+            ;
+        Answer answer = answerCommentInfo.getAnswer();
+        Member answerCommentAuthor = answerCommentInfo.getAuthor();
+        Question question = answerCommentInfo.getQuestion();
+        // 원격 푸시 발송
+        AnswerCommentNotificationBody answerCommentNotificationBody = AnswerCommentNotificationBody.builder()
+            .type(ANSWER_COMMENT_HEART)
+            .answer(answer)
+            .answerComment(answerComment)
+            .build();
+        apnsService.sendApnsToMembers(answerCommentNotificationBody, answerCommentInfo.getAuthor().getId());
+
+        // 알림 저장
+        Notification notification = notificationMapper.toNotification(answerCommentAuthor, notificationMapper.toNotificationLog(question, answer, answerComment), ANSWER_COMMENT_HEART);
+        notificationRepository.save(notification);
     }
 }

@@ -71,7 +71,10 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     @Override
     @Transactional
     public AnswerCommentHeart heartAnswerComment(Member member, Long commentId) {
+        AnswerComment answerComment = findAnswerComment(commentId);
         Boolean isLiked = answerCommentHeartRedisRepository.toggleAnswerCommentHeart(commentId, member.getId());
+        if(isLiked)
+            notificationService.sendAnswerCommentHeartNotification(answerComment);
         return new AnswerCommentHeart(commentId, isLiked);
     }
 
