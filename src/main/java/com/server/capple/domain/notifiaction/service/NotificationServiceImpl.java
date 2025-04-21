@@ -3,6 +3,8 @@ package com.server.capple.domain.notifiaction.service;
 import com.server.capple.config.apns.dto.ApnsClientRequest.*;
 import com.server.capple.config.apns.service.ApnsService;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
+import com.server.capple.domain.answerSubscribeMember.service.AnswerSubscribeMemberService;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.boardSubscribeMember.service.BoardSubscribeMemberService;
@@ -23,6 +25,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.server.capple.domain.notifiaction.entity.NotificationType.*;
@@ -32,6 +36,7 @@ import static com.server.capple.domain.notifiaction.entity.NotificationType.*;
 public class NotificationServiceImpl implements NotificationService {
     private final ApnsService apnsService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+    private final AnswerSubscribeMemberService answerSubscribeMemberService;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
 
@@ -195,5 +200,44 @@ public class NotificationServiceImpl implements NotificationService {
 
         Notification notification = notificationMapper.toNotification(answer.getMember(), notificationMapper.toNotificationLog(answer.getQuestion(), answer), ANSWER_HEART);
         notificationRepository.save(notification);
+    }
+
+    @Async
+    @Override
+    public void sendAnswerCommentNotification(Answer answer, AnswerComment answerComment) {
+        // 답변 작성자
+        // 원격 푸시 발송
+        AnswerCommentNotificationBody answerCommentNotificationBodyToAuthor = AnswerCommentNotificationBody.builder()
+            .type(ANSWER_COMMENT)
+            .answer(answer)
+            .answerComment(answerComment)
+            .build();
+        apnsService.sendApnsToMembers(answerCommentNotificationBodyToAuthor, answer.getMember().getId());
+
+        // 알림 저장
+        NotificationLog notificationLog = notificationMapper.toNotificationLog(answer.getQuestion(), answer, answerComment);
+        List<Notification> notifications = new LinkedList<>();
+        Notification notificationToAuthor = notificationMapper.toNotification(answer.getMember(), notificationLog, ANSWER_COMMENT);
+        notifications.add(notificationToAuthor);
+
+        // 댓글 작성자
+        List<Member> subscribersExceptWriter = answerSubscribeMemberService.findAnswerSubscribeMembers(answer.getId())
+            .stream().filter(member -> !answer.getMember().getId().equals(member.getId()) && !answerComment.getMember().getId().equals(member.getId())).toList();
+        if (!subscribersExceptWriter.isEmpty()) {
+            // 원격 푸시 발송
+            AnswerCommentNotificationBody answerCommentNotificationBody = AnswerCommentNotificationBody.builder()
+                .type(ANSWER_COMMENT_DUPLICATE)
+                .answer(answer)
+                .answerComment(answerComment)
+                .build();
+            apnsService.sendApnsToMembers(answerCommentNotificationBody, subscribersExceptWriter.stream().map(Member::getId).toList());
+
+            // 알림 저장
+            List<Notification> notificationsExceptAuthor = new ArrayList<>(subscribersExceptWriter.stream()
+                .map(member -> notificationMapper.toNotification(member, notificationLog, ANSWER_COMMENT_DUPLICATE)).toList());
+            notifications.addAll(notificationsExceptAuthor);
+        }
+        answerSubscribeMemberService.createAnswerSubscribeMember(answerComment.getMember(), answer);
+        notificationRepository.saveAll(notifications);
     }
 }

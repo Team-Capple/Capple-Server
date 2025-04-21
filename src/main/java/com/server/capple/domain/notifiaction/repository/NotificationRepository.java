@@ -18,6 +18,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         , nlq notificationLogQuestion
         , nla notificationLogAnswer
         , nlb notificationLogBoard
+        , nlac notificationLogAnswerComment
         , CASE WHEN n.notificationLog.question IS NULL THEN NULL
            ELSE (a.member IS NOT NULL)
            END AS isResponsedQuestion
@@ -33,6 +34,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
            ON nl.answer = nla
         LEFT JOIN FETCH Board nlb
            ON nl.board = nlb
+        LEFT JOIN FETCH AnswerComment nlac
+           ON nl.answerComment = nlac
         LEFT JOIN Answer a
            ON (a.question = n.notificationLog.question and a.member = :member)
         LEFT JOIN BoardReport br

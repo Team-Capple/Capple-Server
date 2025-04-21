@@ -20,6 +20,7 @@ public class NotificationResponse {
         private Boolean isReportedBoard;
         private String questionId;
         private String answerId;
+        private String answerCommentId;
         private Boolean isResponsedQuestion;
         private String boardCommentId;
         private LocalDateTime createdAt;

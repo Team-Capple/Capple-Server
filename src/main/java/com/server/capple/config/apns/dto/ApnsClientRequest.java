@@ -2,6 +2,7 @@ package com.server.capple.config.apns.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.notifiaction.entity.NotificationType;
@@ -168,6 +169,28 @@ public class ApnsClientRequest {
                     .build())
                 .build();
             this.answerId = answer.getId().toString();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class AnswerCommentNotificationBody {
+        private Aps aps;
+        private String answerId;
+        private String answerCommentId;
+
+        @Builder
+        public AnswerCommentNotificationBody(NotificationType type, Answer answer, AnswerComment answerComment) {
+            this.aps = Aps.builder()
+                .threadId("answer-" + answer.getId())
+                .alert(Alert.builder()
+                    .title(type.getTitle())
+                    .body(answerComment.getContent())
+                    .build())
+                .build();
+            this.answerId = answer.getId().toString();
+            this.answerCommentId = answerComment.getId().toString();
         }
     }
 }
