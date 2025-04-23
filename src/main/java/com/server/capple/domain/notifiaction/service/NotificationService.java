@@ -1,6 +1,7 @@
 package com.server.capple.domain.notifiaction.service;
 
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.member.entity.Member;
@@ -22,4 +23,7 @@ public interface NotificationService {
     void deleteNotificationsByCreatedAtBefore(LocalDateTime targetTime);
     void sendLiveAnswerAddedNotification(List<Member> subscriber, Question question, Answer answer);
     void sendNewBoardNotificationExceptAuthor(Board board, Member member);
+    void sendAnswerHeartNotification(Long actorId, Answer answer);
+    void sendAnswerCommentNotification(Answer answer, AnswerComment answerComment);
+    void sendAnswerCommentHeartNotification(AnswerComment answerComment);
 }

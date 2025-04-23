@@ -1,6 +1,7 @@
 package com.server.capple.domain.notifiaction.entity;
 
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.question.entity.Question;
@@ -31,4 +32,7 @@ public class NotificationLog extends BaseEntity {
     @JoinColumn(name = "answer_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Answer answer;
+    @JoinColumn(name = "answer_comment_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private AnswerComment answerComment;
 }

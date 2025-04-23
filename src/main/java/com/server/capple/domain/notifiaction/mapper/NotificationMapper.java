@@ -1,6 +1,7 @@
 package com.server.capple.domain.notifiaction.mapper;
 
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.boardComment.entity.BoardComment;
 import com.server.capple.domain.member.entity.Member;
@@ -62,6 +63,14 @@ public class NotificationMapper {
             .build();
     }
 
+    public NotificationLog toNotificationLog(Question question, Answer answer, AnswerComment answerComment) {
+        return NotificationLog.builder()
+            .question(question)
+            .answer(answer)
+            .answerComment(answerComment)
+            .build();
+    }
+
     public SliceResponse<NotificationInfo> toNotificationInfoSlice(Slice<NotificationDBInfo> notificationDBInfo, Long lastIndex) {
         return SliceResponse.toSliceResponse(notificationDBInfo, notificationDBInfo.stream().map(this::toNotificationInfo).toList(), lastIndex.toString(), null);
     }
@@ -74,6 +83,8 @@ public class NotificationMapper {
             case TODAY_QUESTION_PUBLISHED, TODAY_QUESTION_CLOSED -> toQuestionNotificationInfo(notificationDBInfo);
             case LIVE_QUESTION_ANSWER_ADDED -> toQuestionLiveAnswerAddedNotificationInfo(notificationDBInfo);
             case NEW_FREE_BOARD -> toNewBoardNotificationInfo(notificationDBInfo);
+            case ANSWER_HEART  -> toAnswerNotificationInfo(notificationDBInfo);
+            case ANSWER_COMMENT, ANSWER_COMMENT_DUPLICATE, ANSWER_COMMENT_HEART -> toAnswerCommentNotificationInfo(notificationDBInfo);
         };
     }
 
@@ -126,6 +137,29 @@ public class NotificationMapper {
             .boardId(notificationDBInfo.getNotification().getNotificationLog().getBoard().getId().toString())
             .isReportedBoard(notificationDBInfo.getIsReportedBoard())
             .createdAt(notificationDBInfo.getNotification().getCreatedAt())
+            .build();
+    }
+
+    private NotificationInfo toAnswerNotificationInfo(NotificationDBInfo notificationDBInfo) {
+        return NotificationInfo.builder()
+            .title(notificationDBInfo.getNotification().getType().getTitle())
+            .content(notificationDBInfo.getNotification().getNotificationLog().getAnswer().getContent())
+            .questionId(notificationDBInfo.getNotification().getNotificationLog().getQuestion().getId().toString())
+            .answerId(notificationDBInfo.getNotification().getNotificationLog().getAnswer().getId().toString())
+            .createdAt(notificationDBInfo.getNotification().getCreatedAt())
+            .isResponsedQuestion(notificationDBInfo.getIsResponsedQuestion())
+            .build();
+    }
+
+    private NotificationInfo toAnswerCommentNotificationInfo(NotificationDBInfo notificationDBInfo) {
+        return NotificationInfo.builder()
+            .title(notificationDBInfo.getNotification().getType().getTitle())
+            .content(notificationDBInfo.getNotification().getNotificationLog().getAnswerComment().getContent())
+            .questionId(notificationDBInfo.getNotification().getNotificationLog().getQuestion().getId().toString())
+            .answerId(notificationDBInfo.getNotification().getNotificationLog().getAnswer().getId().toString())
+            .answerCommentId(notificationDBInfo.getNotification().getNotificationLog().getAnswerComment().getId().toString())
+            .createdAt(notificationDBInfo.getNotification().getCreatedAt())
+            .isResponsedQuestion(notificationDBInfo.getIsResponsedQuestion())
             .build();
     }
 }

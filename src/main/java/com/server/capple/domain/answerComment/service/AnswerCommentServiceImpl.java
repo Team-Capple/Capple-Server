@@ -8,8 +8,10 @@ import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.answerComment.mapper.AnswerCommentMapper;
 import com.server.capple.domain.answerComment.repository.AnswerCommentHeartRedisRepository;
 import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
+import com.server.capple.domain.answerSubscribeMember.service.AnswerSubscribeMemberService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
+import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.exception.RestApiException;
 import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     private final AnswerCommentMapper answerCommentMapper;
     private final MemberService memberService;
     private final AnswerService answerService;
+    private final NotificationService notificationService;
+    private final AnswerSubscribeMemberService answerSubscribeMemberService;
 
     /* 댓글 작성 */
     @Override
@@ -36,6 +40,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Member loginMember = memberService.findMember(member.getId());
         Answer answer = answerService.findAnswer(answerId);
         AnswerComment answerComment = answerCommentRepository.save(answerCommentMapper.toAnswerCommentEntity(loginMember, answer, request.getAnswerComment()));
+        notificationService.sendAnswerCommentNotification(answer, answerComment);
         return new AnswerCommentId(answerComment.getId());
     }
 
@@ -46,6 +51,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         AnswerComment answerComment = findAnswerComment(commentId);
         checkPermission(member, answerComment); // 유저 권한 체크
 
+        answerSubscribeMemberService.deleteAnswerSubscribeMemberByAnswerId(answerComment.getAnswer().getId());
         answerComment.delete();
         return new AnswerCommentId(answerComment.getId());
     }
@@ -65,7 +71,10 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     @Override
     @Transactional
     public AnswerCommentHeart heartAnswerComment(Member member, Long commentId) {
+        AnswerComment answerComment = findAnswerComment(commentId);
         Boolean isLiked = answerCommentHeartRedisRepository.toggleAnswerCommentHeart(commentId, member.getId());
+        if(isLiked)
+            notificationService.sendAnswerCommentHeartNotification(answerComment);
         return new AnswerCommentHeart(commentId, isLiked);
     }
 
