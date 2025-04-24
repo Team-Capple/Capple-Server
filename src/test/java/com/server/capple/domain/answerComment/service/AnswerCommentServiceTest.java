@@ -1,23 +1,36 @@
 package com.server.capple.domain.answerComment.service;
 
+import com.server.capple.config.apns.service.ApnsService;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
-import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentHeart;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfos;
 import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.support.ServiceTestConfig;
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("AnswerComment 서비스의 ")
 @SpringBootTest
 public class AnswerCommentServiceTest extends ServiceTestConfig {
 
-    @Autowired private AnswerCommentService answerCommentService;
+    @Autowired
+    private AnswerCommentService answerCommentService;
+    @MockBean
+    private ApnsService apnsService;
 
     @Test
     @DisplayName("답변 댓글 생성 테스트")
@@ -73,7 +86,6 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("답변 댓글 좋아요/취소 토글 테스트")
-    @Transactional
     public void heartAnswerCommentTest() {
         //1. 좋아요
         //given
@@ -82,6 +94,11 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
         //then
         assertEquals(answerComment.getId(), liked.getAnswerCommentId());
         assertEquals(Boolean.TRUE, liked.getIsLiked());
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(2))
+            .untilAsserted(() -> {
+                verify(apnsService, times(1)).sendApnsToMembers(any(), eq(member.getId()));
+            });
 
         //2. 좋아요 취소
         //given
@@ -90,7 +107,11 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
         //then
         assertEquals(answerComment.getId(), unLiked.getAnswerCommentId());
         assertEquals(Boolean.FALSE, unLiked.getIsLiked());
-
+        Awaitility.await()
+            .atMost(Duration.ofSeconds(2))
+            .untilAsserted(() -> {
+                verify(apnsService, times(1)).sendApnsToMembers(any(), eq(member.getId()));
+            });
     }
 
     @Test

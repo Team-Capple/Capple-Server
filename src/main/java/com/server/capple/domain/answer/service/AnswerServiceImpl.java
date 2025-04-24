@@ -13,8 +13,10 @@ import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
+import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.service.QuestionService;
+import com.server.capple.domain.questionSubcribeMember.service.QuestionSubscribeMemberService;
 import com.server.capple.domain.report.repository.ReportRepository;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.global.exception.RestApiException;
@@ -30,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import static com.server.capple.domain.question.entity.QuestionStatus.LIVE;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,6 +46,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerHeartRedisRepository answerHeartRedisRepository;
     private final AnswerCountService answerCountService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final QuestionSubscribeMemberService questionSubscribeMemberService;
+    private final NotificationService notificationService;
 
     @Transactional
     @Override
@@ -58,6 +64,11 @@ public class AnswerServiceImpl implements AnswerService {
         Answer answer = answerRepository.save(answerMapper.toAnswerEntity(request, member, question));
 //        answer.getQuestion().increaseCommentCount();
         applicationEventPublisher.publishEvent(new AnswerCountChangedEvent(questionId, loginMember));
+
+        if(question.getQuestionStatus().equals(LIVE)) {
+            questionSubscribeMemberService.addMemberAndSendLiveAnswerAddedNotification(member, question, answer);
+        }
+
         return new AnswerResponse.AnswerId(answer.getId());
     }
 
@@ -93,8 +104,10 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
-        answerRepository.findById(answerId).orElseThrow(() -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
+        Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
         Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
+        if(isLiked)
+            notificationService.sendAnswerHeartNotification(loginMember.getId(), answer);
         return new AnswerLike(answerId, isLiked);
     }
 

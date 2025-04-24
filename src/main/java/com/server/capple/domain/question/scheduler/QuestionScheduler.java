@@ -3,6 +3,7 @@ package com.server.capple.domain.question.scheduler;
 import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.service.AdminQuestionService;
+import com.server.capple.domain.questionSubcribeMember.service.QuestionSubscribeMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -14,12 +15,14 @@ import org.springframework.stereotype.Component;
 public class QuestionScheduler {
     private final AdminQuestionService adminQuestionService;
     private final NotificationService notificationService;
+    private final QuestionSubscribeMemberService questionSubscribeMemberService;
 
     //초 분 시 일 월 요일
     @Scheduled(cron = "0 30 12 * * *") //매일 오후 12시 30분에
     public void setLiveQuestion() {
         Question question = adminQuestionService.setLiveQuestion();
         notificationService.sendLiveQuestionOpenNotification(question);
+        questionSubscribeMemberService.removeAll(question);
         log.info("live question이 등록되었습니다.");
     }
 
@@ -28,6 +31,7 @@ public class QuestionScheduler {
         //question을 닫음
         Question question = adminQuestionService.closeLiveQuestion();
         notificationService.sendLiveQuestionCloseNotification(question);
+        questionSubscribeMemberService.removeAll(question);
         log.info("live question이 닫혔습니다.");
     }
 }
