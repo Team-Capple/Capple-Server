@@ -37,7 +37,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Value("${apns.key-id}")
     private String kid;
-    @Value("${apple-auth.team_id}")
+    @Value("${apns.team_id}")
     private String iss;
     @Value("${apns.key}")
     private String apnsKeyString;
