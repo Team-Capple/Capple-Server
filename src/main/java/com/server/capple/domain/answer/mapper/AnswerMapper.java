@@ -21,7 +21,7 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked) {
+    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked, int commentCount, int likeCount) {
         return AnswerInfo.builder()
                 .answerId(answerInfoDto.getAnswer().getId())
                 .writerId(answerInfoDto.getWriterId())
@@ -33,6 +33,8 @@ public class AnswerMapper {
                 .isReported(answerInfoDto.getIsReported())
                 .isLiked(isLiked)
                 .writeAt(answerInfoDto.getAnswer().getCreatedAt().toString())
+                .commentCount(commentCount)
+                .likeCount(likeCount)
                 .build();
     }
 

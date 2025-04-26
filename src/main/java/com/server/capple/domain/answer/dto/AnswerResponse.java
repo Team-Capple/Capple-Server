@@ -23,6 +23,8 @@ public class AnswerResponse {
         private Boolean isReported;
         private Boolean isLiked;
         private String writeAt;
+        private int commentCount;
+        private int likeCount;
     }
 
     @Getter

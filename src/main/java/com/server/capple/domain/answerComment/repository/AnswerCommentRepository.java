@@ -29,4 +29,6 @@ public interface AnswerCommentRepository extends JpaRepository<AnswerComment, Lo
         LIMIT 1
     """)
     Optional<AnswerCommentAuthorNAnswerNQuestionInfo> findAnswerCommentInfo(AnswerComment answerComment);
+    @Query("SELECT COUNT(ac) FROM AnswerComment ac WHERE ac.answer.id = :answerId")
+    int countByAnswerId(Long answerId);
 }

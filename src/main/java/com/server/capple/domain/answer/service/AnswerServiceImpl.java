@@ -11,6 +11,7 @@ import com.server.capple.domain.answer.entity.Answer;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
+import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.notifiaction.service.NotificationService;
@@ -48,6 +49,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final QuestionSubscribeMemberService questionSubscribeMemberService;
     private final NotificationService notificationService;
+    private final AnswerCommentRepository answerCommentRepository;
 
     @Transactional
     @Override
@@ -117,9 +119,11 @@ public class AnswerServiceImpl implements AnswerService {
         lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
-                answerInfoDto,
-                memberId,
-                answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId())
+                    answerInfoDto,
+                    memberId,
+                    answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
+                    answerCommentRepository.countByAnswerId(answerInfoDto.getAnswer().getId()),
+                    answerHeartRedisRepository.getAnswerHeartsCount(answerInfoDto.getAnswer().getId())
             )
         ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }
