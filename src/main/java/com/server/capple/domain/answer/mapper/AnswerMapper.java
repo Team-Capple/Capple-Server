@@ -21,7 +21,7 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked, int commentCount, int likeCount) {
+    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked) {
         return AnswerInfo.builder()
                 .answerId(answerInfoDto.getAnswer().getId())
                 .writerId(answerInfoDto.getWriterId())
@@ -33,12 +33,12 @@ public class AnswerMapper {
                 .isReported(answerInfoDto.getIsReported())
                 .isLiked(isLiked)
                 .writeAt(answerInfoDto.getAnswer().getCreatedAt().toString())
-                .commentCount(commentCount)
-                .likeCount(likeCount)
+                .commentCount(answerInfoDto.getAnswer().getCommentCount())
+                .heartCount(answerInfoDto.getAnswer().getHeartCount())
                 .build();
     }
 
-    public MemberAnswerInfo toMemberAnswerInfo(MemberAnswerInfoDBDto memberAnswer, int heartCount, Boolean isLiked) {
+    public MemberAnswerInfo toMemberAnswerInfo(MemberAnswerInfoDBDto memberAnswer, Boolean isLiked) {
         return MemberAnswerInfo.builder()
                 .questionId(memberAnswer.getAnswer().getQuestion().getId())
                 .answerId(memberAnswer.getAnswer().getId())
@@ -47,7 +47,8 @@ public class AnswerMapper {
                 .profileImage(memberAnswer.getAnswer().getMember().getProfileImage())
                 .writerGeneration(memberAnswer.getWriterAcademyGeneration().orElse(AcademyGeneration.UNKNOWN).getGeneration())
                 .content(memberAnswer.getAnswer().getContent())
-                .heartCount(heartCount)
+                .heartCount(memberAnswer.getAnswer().getHeartCount())
+                .commentCount(memberAnswer.getAnswer().getCommentCount())
                 .writeAt(memberAnswer.getAnswer().getCreatedAt().toString())
                 .isLiked(isLiked)
                 .build();

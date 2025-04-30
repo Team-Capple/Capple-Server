@@ -104,12 +104,14 @@ public class AnswerServiceImpl implements AnswerService {
 
     //답변 좋아요 / 취소
     @Override
+    @Transactional
     public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
         Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
         if(isLiked)
             notificationService.sendAnswerHeartNotification(loginMember.getId(), answer);
+        answer.setHeartCount(isLiked); // 답변에 대한 좋아요 heartCount 증가/감소
         return new AnswerLike(answerId, isLiked);
     }
 
@@ -121,9 +123,7 @@ public class AnswerServiceImpl implements AnswerService {
             answerInfoDto -> answerMapper.toAnswerInfo(
                     answerInfoDto,
                     memberId,
-                    answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId()),
-                    answerCommentRepository.countByAnswerId(answerInfoDto.getAnswer().getId()),
-                    answerHeartRedisRepository.getAnswerHeartsCount(answerInfoDto.getAnswer().getId())
+                    answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId())
             )
         ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }
@@ -137,7 +137,6 @@ public class AnswerServiceImpl implements AnswerService {
             memberAnswerSlice, memberAnswerSlice.getContent().stream()
                 .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
                     memberAnswer,
-                    answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
                     answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
                 )).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
         );
@@ -151,7 +150,6 @@ public class AnswerServiceImpl implements AnswerService {
         return SliceResponse.toSliceResponse(memberAnswerSlice, memberAnswerSlice.getContent().stream()
             .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
                 memberAnswer,
-                answerHeartRedisRepository.getAnswerHeartsCount(memberAnswer.getAnswer().getId()),
                 answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
             )).toList(), lastIndex.toString(), null
         );

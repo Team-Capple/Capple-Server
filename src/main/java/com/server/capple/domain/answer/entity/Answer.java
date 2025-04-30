@@ -6,6 +6,7 @@ import com.server.capple.domain.question.entity.Question;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -32,7 +33,29 @@ public class Answer extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @ColumnDefault("0")
+    private Integer commentCount;
+
+    @ColumnDefault("0")
+    private Integer heartCount;
+
     public void update(AnswerRequest request) {
         this.content = request.getAnswer();
+    }
+
+    public void increaseCommentCount() {
+        this.commentCount++;
+    }
+
+    public void decreaseCommentCount() {
+        this.commentCount--;
+    }
+
+    public void setHeartCount(boolean isLiked) {
+        if (isLiked) {
+            this.heartCount++;
+        } else {
+            this.heartCount--;
+        }
     }
 }

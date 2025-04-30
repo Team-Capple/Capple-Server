@@ -27,7 +27,7 @@ public class AnswerCommentResponse {
         private Long answerCommentId;
         private Long writerId;
         private String content;
-        private Long heartCount;
+        private Integer heartCount;
         private LocalDateTime createdAt;
 
     }
