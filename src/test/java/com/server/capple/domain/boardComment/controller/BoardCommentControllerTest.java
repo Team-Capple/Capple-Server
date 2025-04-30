@@ -153,7 +153,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.result.numberOfElements").value(1))
                 .andExpect(jsonPath("$.result.content[0].boardCommentId").value(1L))
                 .andExpect(jsonPath("$.result.content[0].content").value("댓글"))
-                .andExpect(jsonPath("$.result.content[0].heartCount").value(2L))
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(2))
                 .andExpect(jsonPath("$.result.content[0].isLiked").value(true));
     }
 }
