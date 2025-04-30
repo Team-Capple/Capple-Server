@@ -165,6 +165,7 @@ public abstract class ServiceTestConfig {
                 .member(member)
                 .answer(answer)
                 .content("답변에 대한 댓글이어유")
+                .heartCount(0)
                 .build()
         );
     }
