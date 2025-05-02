@@ -49,7 +49,6 @@ public class AnswerServiceImpl implements AnswerService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final QuestionSubscribeMemberService questionSubscribeMemberService;
     private final NotificationService notificationService;
-    private final AnswerCommentRepository answerCommentRepository;
 
     @Transactional
     @Override
