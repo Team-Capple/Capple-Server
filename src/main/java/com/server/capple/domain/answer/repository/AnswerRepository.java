@@ -17,6 +17,7 @@ import java.util.Set;
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findById(Long answerId);
 
+    // redis와 같이 사용했던 메서드(현재 사용 X)
     @Query("""
         SELECT
             a AS answer,
@@ -44,10 +45,13 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
     @Query("""
         SELECT
             a AS answer,
-            m.academyGeneration AS writerAcademyGeneration
+            m.academyGeneration AS writerAcademyGeneration,
+            (CASE WHEN ah.isLiked = TRUE THEN TRUE ELSE FALSE END) AS isLiked
         FROM Answer a
         LEFT JOIN Member m ON a.member = m
-        WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.member = :member
+        LEFT JOIN AnswerHeart ah ON ah.answer = a AND ah.member = :member
+        WHERE (a.id < :lastIndex OR :lastIndex IS NULL)
+          AND a.member = :member
         """)
     Slice<MemberAnswerInfoDBDto> findByMemberAndIdIsLessThan(@Param("member") Member member, Long lastIndex, Pageable pageable);
 
@@ -56,4 +60,16 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     @Query("SELECT COUNT(a.id) FROM Answer a WHERE a.member = :member")
     Integer getAnswerCountByMember(Member member);
+
+    @Query("""
+        SELECT
+            a AS answer,
+            m.academyGeneration AS writerAcademyGeneration,
+            TRUE AS isLiked
+        FROM Answer a
+        LEFT JOIN Member m ON a.member = m
+        JOIN AnswerHeart ah ON ah.answer = a AND ah.member = :member AND ah.isLiked = TRUE
+        WHERE (a.id < :lastIndex OR :lastIndex IS NULL)
+        """)
+    Slice<MemberAnswerInfoDBDto> findLikedAnswersByMemberAndIdInAndIdIsLessThan(@Param("member") Member member, @Param("lastIndex") Long lastIndex, Pageable pageable);
 }

@@ -13,10 +13,12 @@ public class AnswerRDBDao {
         public String getWriterProfileImage();
         public String getWriterNickname();
         public Optional<AcademyGeneration> getWriterAcademyGeneration();
+        public Boolean getIsLiked();
     }
 
     public interface MemberAnswerInfoDBDto {
         public Answer getAnswer();
         public Optional<AcademyGeneration> getWriterAcademyGeneration();
+        public Boolean getIsLiked();
     }
 }

@@ -8,8 +8,11 @@ import com.server.capple.domain.answer.dto.AnswerResponse.AnswerInfo;
 import com.server.capple.domain.answer.dto.AnswerResponse.AnswerLike;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answer.entity.AnswerHeart;
+import com.server.capple.domain.answer.mapper.AnswerHeartMapper;
 import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
+import com.server.capple.domain.answer.repository.AnswerHeartRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.member.entity.Member;
@@ -49,6 +52,8 @@ public class AnswerServiceImpl implements AnswerService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final QuestionSubscribeMemberService questionSubscribeMemberService;
     private final NotificationService notificationService;
+    private final AnswerHeartRepository answerHeartRepository;
+    private final AnswerHeartMapper answerHeartMapper;
 
     @Transactional
     @Override
@@ -107,22 +112,31 @@ public class AnswerServiceImpl implements AnswerService {
     public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
         Member member = memberService.findMember(loginMember.getId());
         Answer answer = answerRepository.findById(answerId).orElseThrow(() -> new RestApiException(AnswerErrorCode.ANSWER_NOT_FOUND));
-        Boolean isLiked = answerHeartRedisRepository.toggleAnswerHeart(member.getId(), answerId);
+
+        // 좋아요 여부 확인 (없으면 새로 저장)
+        AnswerHeart answerHeart = answerHeartRepository.findByMemberAndAnswer(member, answer)
+                .orElseGet(() -> {
+                    AnswerHeart newHeart = answerHeartMapper.toAnswerHeart(answer, member);
+                    return answerHeartRepository.save(newHeart);
+                });
+
+        boolean isLiked = answerHeart.toggleHeart();
+        answer.setHeartCount(answerHeart.isLiked()); // 답변에 대한 좋아요 heartCount 증가/감소
+
         if(isLiked)
             notificationService.sendAnswerHeartNotification(loginMember.getId(), answer);
-        answer.setHeartCount(isLiked); // 답변에 대한 좋아요 heartCount 증가/감소
         return new AnswerLike(answerId, isLiked);
     }
 
     @Override
-    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
+    public SliceResponse<AnswerInfo> getAnswerList(Member member, Long questionId, Long lastIndex, Pageable pageable) {
+
         Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, pageable);
         lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                     answerInfoDto,
-                    memberId,
-                    answerHeartRedisRepository.isMemberLikedAnswer(memberId, answerInfoDto.getAnswer().getId())
+                    member.getId()
             )
         ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }
@@ -135,8 +149,7 @@ public class AnswerServiceImpl implements AnswerService {
         return SliceResponse.toSliceResponse(
             memberAnswerSlice, memberAnswerSlice.getContent().stream()
                 .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
-                    memberAnswer,
-                    answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
+                    memberAnswer
                 )).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
         );
     }
@@ -144,12 +157,11 @@ public class AnswerServiceImpl implements AnswerService {
     // 유저가 좋아한 답변 조회
     @Override
     public SliceResponse<MemberAnswerInfo> getMemberHeartAnswer(Member member, Long lastIndex, Pageable pageable) {
-        Slice<MemberAnswerInfoDBDto> memberAnswerSlice = answerRepository.findByIdInAndIdIsLessThan(answerHeartRedisRepository.getMemberHeartsAnswer(member.getId()), lastIndex, pageable);
+        Slice<MemberAnswerInfoDBDto> memberAnswerSlice = answerRepository.findLikedAnswersByMemberAndIdInAndIdIsLessThan(member, lastIndex, pageable);
         lastIndex = getLastIndexFromAnswer(memberAnswerSlice);
         return SliceResponse.toSliceResponse(memberAnswerSlice, memberAnswerSlice.getContent().stream()
             .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
-                memberAnswer,
-                answerHeartRedisRepository.isMemberLikedAnswer(member.getId(), memberAnswer.getAnswer().getId())
+                memberAnswer
             )).toList(), lastIndex.toString(), null
         );
     }

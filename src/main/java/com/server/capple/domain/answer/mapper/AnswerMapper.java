@@ -21,7 +21,7 @@ public class AnswerMapper {
                 .build();
     }
 
-    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId, Boolean isLiked) {
+    public AnswerInfo toAnswerInfo(AnswerInfoInterface answerInfoDto, Long memberId) {
         return AnswerInfo.builder()
                 .answerId(answerInfoDto.getAnswer().getId())
                 .writerId(answerInfoDto.getWriterId())
@@ -31,14 +31,14 @@ public class AnswerMapper {
                 .content(answerInfoDto.getAnswer().getContent())
                 .isMine(answerInfoDto.getWriterId().equals(memberId))
                 .isReported(answerInfoDto.getIsReported())
-                .isLiked(isLiked)
+                .isLiked(answerInfoDto.getIsLiked())
                 .writeAt(answerInfoDto.getAnswer().getCreatedAt().toString())
                 .commentCount(answerInfoDto.getAnswer().getCommentCount())
                 .heartCount(answerInfoDto.getAnswer().getHeartCount())
                 .build();
     }
 
-    public MemberAnswerInfo toMemberAnswerInfo(MemberAnswerInfoDBDto memberAnswer, Boolean isLiked) {
+    public MemberAnswerInfo toMemberAnswerInfo(MemberAnswerInfoDBDto memberAnswer) {
         return MemberAnswerInfo.builder()
                 .questionId(memberAnswer.getAnswer().getQuestion().getId())
                 .answerId(memberAnswer.getAnswer().getId())
@@ -50,7 +50,7 @@ public class AnswerMapper {
                 .heartCount(memberAnswer.getAnswer().getHeartCount())
                 .commentCount(memberAnswer.getAnswer().getCommentCount())
                 .writeAt(memberAnswer.getAnswer().getCreatedAt().toString())
-                .isLiked(isLiked)
+                .isLiked(memberAnswer.getIsLiked())
                 .build();
     }
 }
