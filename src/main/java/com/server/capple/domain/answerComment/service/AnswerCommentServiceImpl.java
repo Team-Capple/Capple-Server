@@ -85,9 +85,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     @Override
     public AnswerCommentInfos getAnswerCommentInfos(Long answerId) {
         List<AnswerCommentInfo> commentInfos = answerCommentRepository.findAnswerCommentByAnswerId(answerId).stream()
-                .map(comment -> {
-                    return answerCommentMapper.toAnswerCommentInfo(comment);
-                })
+                .map(answerCommentMapper::toAnswerCommentInfo)
                 .toList();
 
         return new AnswerCommentInfos(commentInfos);

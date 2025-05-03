@@ -45,7 +45,7 @@ public class AnswerController {
         @RequestParam(required = false, name = "threshold") Long lastIndex,
         @Parameter(description = "조회할 페이지 크기")
         @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
-        return BaseResponse.onSuccess(answerService.getAnswerList(member, questionId, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
+        return BaseResponse.onSuccess(answerService.getAnswerList(member.getId(), questionId, lastIndex, PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
     @Operation(summary = "답변 수정 API", description = " 답변 수정 API 입니다." +

@@ -129,14 +129,14 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public SliceResponse<AnswerInfo> getAnswerList(Member member, Long questionId, Long lastIndex, Pageable pageable) {
+    public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
 
         Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, pageable);
         lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
                     answerInfoDto,
-                    member.getId()
+                    memberId
             )
         ).toList(), lastIndex.toString(), answerCountService.getQuestionAnswerCount(questionId));
     }
@@ -148,9 +148,7 @@ public class AnswerServiceImpl implements AnswerService {
         lastIndex = getLastIndexFromAnswer(memberAnswerSlice);
         return SliceResponse.toSliceResponse(
             memberAnswerSlice, memberAnswerSlice.getContent().stream()
-                .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
-                    memberAnswer
-                )).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
+                .map(answerMapper::toMemberAnswerInfo).toList(), lastIndex.toString(), answerCountService.getAnswerCountByMember(member)
         );
     }
 
@@ -160,9 +158,7 @@ public class AnswerServiceImpl implements AnswerService {
         Slice<MemberAnswerInfoDBDto> memberAnswerSlice = answerRepository.findLikedAnswersByMemberAndIdInAndIdIsLessThan(member, lastIndex, pageable);
         lastIndex = getLastIndexFromAnswer(memberAnswerSlice);
         return SliceResponse.toSliceResponse(memberAnswerSlice, memberAnswerSlice.getContent().stream()
-            .map(memberAnswer -> answerMapper.toMemberAnswerInfo(
-                memberAnswer
-            )).toList(), lastIndex.toString(), null
+            .map(answerMapper::toMemberAnswerInfo).toList(), lastIndex.toString(), null
         );
     }
 

@@ -20,7 +20,7 @@ public interface AnswerService {
 
     AnswerResponse.AnswerLike toggleAnswerHeart(Member loginMember, Long answerId);
 
-    SliceResponse<AnswerInfo> getAnswerList(Member member, Long questionId, Long lastIndex, Pageable pageable);
+    SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable);
 
     SliceResponse<MemberAnswerInfo> getMemberAnswer(Member member, Long lastIndex, Pageable pageable);
 
