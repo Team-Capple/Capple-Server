@@ -115,6 +115,8 @@ public abstract class ServiceTestConfig {
                 .content("나는 무자비한 사람이 좋아")
                 .question(liveQuestion)
                 .member(member)
+                .commentCount(0)
+                .heartCount(0)
                 .build()
         );
     }
@@ -163,6 +165,7 @@ public abstract class ServiceTestConfig {
                 .member(member)
                 .answer(answer)
                 .content("답변에 대한 댓글이어유")
+                .heartCount(0)
                 .build()
         );
     }

@@ -23,6 +23,8 @@ public class AnswerResponse {
         private Boolean isReported;
         private Boolean isLiked;
         private String writeAt;
+        private Integer commentCount;
+        private Integer heartCount;
     }
 
     @Getter
@@ -43,7 +45,8 @@ public class AnswerResponse {
         private String profileImage;
         private String writerGeneration;
         private String content;
-        private int heartCount;
+        private Integer heartCount;
+        private Integer commentCount;
         private String writeAt;
         private Boolean isLiked;
     }

@@ -41,6 +41,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Answer answer = answerService.findAnswer(answerId);
         AnswerComment answerComment = answerCommentRepository.save(answerCommentMapper.toAnswerCommentEntity(loginMember, answer, request.getAnswerComment()));
         notificationService.sendAnswerCommentNotification(answer, answerComment);
+        answer.increaseCommentCount(); // 답변 commentCount 증가
         return new AnswerCommentId(answerComment.getId());
     }
 
@@ -52,6 +53,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         checkPermission(member, answerComment); // 유저 권한 체크
 
         answerSubscribeMemberService.deleteAnswerSubscribeMemberByAnswerId(answerComment.getAnswer().getId());
+        answerComment.getAnswer().decreaseCommentCount(); // 답변 commentCount 감소
         answerComment.delete();
         return new AnswerCommentId(answerComment.getId());
     }
@@ -75,6 +77,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Boolean isLiked = answerCommentHeartRedisRepository.toggleAnswerCommentHeart(commentId, member.getId());
         if(isLiked)
             notificationService.sendAnswerCommentHeartNotification(answerComment);
+        answerComment.setHeartCount(isLiked); // 댓글 좋아요 heartCount 감소
         return new AnswerCommentHeart(commentId, isLiked);
     }
 
@@ -82,10 +85,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     @Override
     public AnswerCommentInfos getAnswerCommentInfos(Long answerId) {
         List<AnswerCommentInfo> commentInfos = answerCommentRepository.findAnswerCommentByAnswerId(answerId).stream()
-                .map(comment -> {
-                    Long heartCount = answerCommentHeartRedisRepository.getAnswerCommentHeartsCount(comment.getId());
-                    return answerCommentMapper.toAnswerCommentInfo(comment, heartCount);
-                })
+                .map(answerCommentMapper::toAnswerCommentInfo)
                 .toList();
 
         return new AnswerCommentInfos(commentInfos);

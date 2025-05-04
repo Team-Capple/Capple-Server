@@ -17,12 +17,12 @@ public class AnswerCommentMapper {
                 .build();
     }
 
-    public AnswerCommentInfo toAnswerCommentInfo(AnswerComment comment, Long heartCount) {
+    public AnswerCommentInfo toAnswerCommentInfo(AnswerComment comment) {
         return AnswerCommentInfo.builder()
                 .answerCommentId(comment.getId())
                 .writerId(comment.getMember().getId())
                 .content(comment.getContent())
-                .heartCount(heartCount)
+                .heartCount(comment.getHeartCount())
                 .createdAt(comment.getCreatedAt())
                 .build();
     }
