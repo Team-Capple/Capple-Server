@@ -1,13 +1,12 @@
 package com.server.capple.domain.board.entity;
 
-import com.server.capple.domain.answer.dto.AnswerRequest;
-import com.server.capple.domain.board.dto.BoardRequest;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLRestriction;
 
 @Getter
@@ -17,6 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
 @DynamicInsert
+@DynamicUpdate
 public class Board extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
