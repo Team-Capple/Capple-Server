@@ -40,6 +40,7 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     private final NotificationService notificationService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
     private final BoardConcurrentService boardConcurrentService;
+    private final BoardCommentConcurrentService boardCommentConcurrentService;
 
     @Override
     @Transactional
@@ -92,7 +93,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                     return boardCommentHeartRepository.save(newHeart);
                 });
         boolean isLiked = boardCommentHeart.toggleHeart();
-        boardComment.setHeartCount(boardCommentHeart.isLiked());
+        if(!boardCommentConcurrentService.setHeartCount(boardComment, boardCommentHeart.isLiked()))
+            throw new RestApiException(CommentErrorCode.COMMENT_HEART_CHANGE_FAILED);
         if (isLiked && !boardComment.getWriter().getId().equals(member.getId())) {
             notificationService.sendBoardCommentHeartNotification(member.getId(), boardComment.getBoard(), boardComment);
         }
