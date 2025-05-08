@@ -32,6 +32,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     private final AnswerService answerService;
     private final NotificationService notificationService;
     private final AnswerSubscribeMemberService answerSubscribeMemberService;
+    private final AnswerCommentConcurrentService answerCommentConcurrentService;
 
     /* 댓글 작성 */
     @Override
@@ -77,7 +78,9 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Boolean isLiked = answerCommentHeartRedisRepository.toggleAnswerCommentHeart(commentId, member.getId());
         if(isLiked)
             notificationService.sendAnswerCommentHeartNotification(answerComment);
-        answerComment.setHeartCount(isLiked); // 댓글 좋아요 heartCount 감소
+        if (!answerCommentConcurrentService.setHeartCount(answerComment, isLiked)) { // 댓글 좋아요 heartCount 감소
+            throw new RestApiException(CommentErrorCode.COMMENT_HEART_CHANGE_FAILED);
+        }
         return new AnswerCommentHeart(commentId, isLiked);
     }
 
