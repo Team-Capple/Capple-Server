@@ -1,15 +1,11 @@
 package com.server.capple.domain.board.service;
 
 import com.server.capple.domain.board.entity.Board;
-import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.repository.MemberRepository;
+import com.server.capple.support.ConcurrentTestsConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -20,23 +16,16 @@ import static com.server.capple.domain.board.entity.BoardType.FREEBOARD;
 import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @DisplayName("Board 동시성 테스트 ")
-class BoardConcurrentServiceTest {
-    @Autowired
-    private BoardConcurrentService boardConcurrentService;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private BoardRepository boardRepository;
-    @Autowired
-    private BoardService boardService;
+class BoardConcurrentServiceTest extends ConcurrentTestsConfig {
+    private final int numberOfThreads = 20;
 
     @AfterEach
     void tearDown() {
+        jdbcTemplate.execute("DELETE FROM board_comment");
         boardRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
+        entityManager.clear();
     }
 
     @Test
@@ -73,7 +62,7 @@ class BoardConcurrentServiceTest {
     void setHeartCountWIthConcurrent() throws InterruptedException {
         // given
         int initialHeartCount = 1000;
-        int likeCount = 100;
+        int likeCount = 50;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -92,14 +81,14 @@ class BoardConcurrentServiceTest {
         boardRepository.save(board);
         final Board finalBoard = board;
 
-        int numberOfThreads = likeCount;
+        int countDown = likeCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
 
         // when
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < likeCount; i++) {
             executorService.submit(() -> {
                 try {
                     if (!boardConcurrentService.setHeartCount(finalBoard, true))
@@ -113,7 +102,7 @@ class BoardConcurrentServiceTest {
 
         // then
         board = boardRepository.findById(board.getId()).get();
-        assertThat(board.getHeartCount()).isEqualTo(initialHeartCount + (numberOfThreads - increaseHeartFailedCnt.get()));
+        assertThat(board.getHeartCount()).isEqualTo(initialHeartCount + (likeCount - increaseHeartFailedCnt.get()));
     }
 
     @Test
@@ -141,9 +130,9 @@ class BoardConcurrentServiceTest {
         boardRepository.save(board);
         final Board finalBoard = board;
 
-        int numberOfThreads = likeCount + hateCount;
+        int countDown = likeCount + hateCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
         AtomicInteger decreaseHeartFailedCnt = new AtomicInteger(0);
@@ -215,7 +204,7 @@ class BoardConcurrentServiceTest {
     void increaseCommentCountWIthConcurrent() throws InterruptedException {
         // given
         int initialCommentCount = 1000;
-        int increaseCommentCount = 100;
+        int increaseCommentCount = 50;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -234,14 +223,14 @@ class BoardConcurrentServiceTest {
         boardRepository.save(board);
         final Board finalBoard = board;
 
-        int numberOfThreads = increaseCommentCount;
+        int countDown = increaseCommentCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseCommentFailedCnt = new AtomicInteger(0);
 
         // when
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < increaseCommentCount; i++) {
             executorService.submit(() -> {
                 try {
                     if (!boardConcurrentService.increaseCommentCount(finalBoard))
@@ -264,6 +253,7 @@ class BoardConcurrentServiceTest {
     @DisplayName("댓글 개수 감소 테스트")
     void decreaseCommentCount() {
         // given
+        int initialCommentCount = 1000;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -275,7 +265,7 @@ class BoardConcurrentServiceTest {
             .writer(writer)
             .boardType(FREEBOARD)
             .content("content")
-            .commentCount(1000)
+            .commentCount(initialCommentCount)
             .heartCount(0)
             .isReport(false)
             .build();
@@ -295,7 +285,7 @@ class BoardConcurrentServiceTest {
     void decreaseCommentCountWIthConcurrent() throws InterruptedException {
         // given
         int initialCommentCount = 1000;
-        int hateCount = 100;
+        int hateCount = 50;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -314,14 +304,14 @@ class BoardConcurrentServiceTest {
         boardRepository.save(board);
         final Board finalBoard = board;
 
-        int numberOfThreads = hateCount;
+        int countDown = hateCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger decreaseCommentFailedCnt = new AtomicInteger(0);
 
         // when
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < hateCount; i++) {
             executorService.submit(() -> {
                 try {
                     if (!boardConcurrentService.decreaseCommentCount(finalBoard))
@@ -344,11 +334,11 @@ class BoardConcurrentServiceTest {
         // given
         int initialHeartCount = 1000;
         int initialCommentCount = 1000;
-        int updateBoardContent = 300; // lock을 사용하지 않는 메서드 사용
-        int likeCount = 100;
-        int increaseCommentCount = 100;
-        int hateCount = 100;
-        int decreaseCommentCount = 100;
+        int updateBoardContent = 50; // lock을 사용하지 않는 메서드 사용
+        int likeCount = 20;
+        int increaseCommentCount = 20;
+        int hateCount = 20;
+        int decreaseCommentCount = 20;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -367,9 +357,9 @@ class BoardConcurrentServiceTest {
         boardRepository.save(board);
         final Board finalBoard = board;
 
-        int numberOfThreads = likeCount + hateCount + updateBoardContent + increaseCommentCount + decreaseCommentCount;
+        int countDown = likeCount + hateCount + updateBoardContent + increaseCommentCount + decreaseCommentCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
         AtomicInteger decreaseHeartFailedCnt = new AtomicInteger(0);

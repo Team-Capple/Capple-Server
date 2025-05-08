@@ -2,27 +2,19 @@ package com.server.capple.domain.answer.service;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.entity.Answer;
-import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.entity.AnswerComment;
-import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
-import com.server.capple.domain.answerComment.service.AnswerCommentService;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.repository.MemberRepository;
-import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.domain.question.entity.Question;
-import com.server.capple.domain.question.repository.QuestionRepository;
 import com.server.capple.global.exception.RestApiException;
+import com.server.capple.support.ConcurrentTestsConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -35,27 +27,8 @@ import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static com.server.capple.domain.question.entity.QuestionStatus.LIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @DisplayName("Answer 동시성 테스트 ")
-public class AnswerConcurrentServiceTest {
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private QuestionRepository questionRepository;
-    @Autowired
-    private AnswerRepository answerRepository;
-    @Autowired
-    private AnswerCommentRepository answerCommentRepository;
-    @Autowired
-    private AnswerConcurrentService answerConcurrentService;
-    @Autowired
-    private AnswerService answerService;
-    @Autowired
-    private AnswerCommentService answerCommentService;
-    @MockBean
-    private NotificationService notificationService;
-
+public class AnswerConcurrentServiceTest extends ConcurrentTestsConfig {
     private final int numberOfThreads = 20;
 
     private Member writer;
@@ -136,7 +109,7 @@ public class AnswerConcurrentServiceTest {
         memberRepository.saveAll(members);
 
         int countDown = likeCount;
-        ExecutorService executorService = Executors.newFixedThreadPool(30);
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);

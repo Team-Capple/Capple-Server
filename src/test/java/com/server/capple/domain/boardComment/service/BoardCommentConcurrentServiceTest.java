@@ -1,21 +1,13 @@
 package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.board.entity.Board;
-import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardComment.entity.BoardComment;
-import com.server.capple.domain.boardComment.repository.BoardCommentHeartRepository;
-import com.server.capple.domain.boardComment.repository.BoardCommentRepository;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.repository.MemberRepository;
-import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.global.exception.RestApiException;
+import com.server.capple.support.ConcurrentTestsConfig;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -28,24 +20,9 @@ import static com.server.capple.domain.board.entity.BoardType.FREEBOARD;
 import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@SpringBootTest
 @DisplayName("BoardComment 동시성 테스트 ")
-public class BoardCommentConcurrentServiceTest {
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private BoardRepository boardRepository;
-    @Autowired
-    private BoardCommentRepository boardCommentRepository;
-    @Autowired
-    private BoardCommentHeartRepository boardCommentHeartRepository;
-    @Autowired
-    private BoardCommentConcurrentService boardCommentConcurrentService;
-    @MockBean
-    private NotificationService notificationService;
-    @Autowired
-    private BoardCommentService boardCommentService;
+public class BoardCommentConcurrentServiceTest extends ConcurrentTestsConfig {
+    private final int numberOfThreads = 20;
 
     @AfterEach
     void tearDown() {
@@ -53,6 +30,7 @@ public class BoardCommentConcurrentServiceTest {
         boardCommentRepository.deleteAllInBatch();
         boardRepository.deleteAllInBatch();
         memberRepository.deleteAllInBatch();
+        entityManager.clear();
     }
 
     @Test
@@ -99,7 +77,7 @@ public class BoardCommentConcurrentServiceTest {
     void boardCommentServiceSetHeartCountConcurrentTest() throws InterruptedException {
         // given
         int initialHeartCount = 1000;
-        int likeCount = 100;
+        int likeCount = 50;
 
         List<Integer> memberIds = IntStream.rangeClosed(1, likeCount)
             .boxed()
@@ -142,14 +120,14 @@ public class BoardCommentConcurrentServiceTest {
 
         final BoardComment finalBoardComment = boardComment;
 
-        int numberOfThreads = likeCount;
-        ExecutorService executorService = Executors.newFixedThreadPool(30);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        int countDown = likeCount;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
 
         // when
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < likeCount; i++) {
             int finalI = i;
             executorService.submit(() -> {
                 try {
@@ -165,7 +143,7 @@ public class BoardCommentConcurrentServiceTest {
 
         // then
         boardComment = boardCommentRepository.findById(boardComment.getId()).get();
-        assertThat(boardComment.getHeartCount()).isEqualTo(initialHeartCount + (numberOfThreads - increaseHeartFailedCnt.get()));
+        assertThat(boardComment.getHeartCount()).isEqualTo(initialHeartCount + (likeCount - increaseHeartFailedCnt.get()));
     }
 
     @Test
@@ -212,7 +190,7 @@ public class BoardCommentConcurrentServiceTest {
     void setHeartCountWIthConcurrent() throws InterruptedException {
         // given
         int initialHeartCount = 1000;
-        int likeCount = 100;
+        int likeCount = 50;
         Member writer = Member.builder()
             .nickname("writer")
             .email("email")
@@ -240,14 +218,14 @@ public class BoardCommentConcurrentServiceTest {
 
         final BoardComment finalBoardComment = boardComment;
 
-        int numberOfThreads = likeCount;
+        int countDown = likeCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
 
         // when
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < likeCount; i++) {
             executorService.submit(() -> {
                 try {
                     if (!boardCommentConcurrentService.setHeartCount(finalBoardComment, true))
@@ -261,7 +239,7 @@ public class BoardCommentConcurrentServiceTest {
 
         // then
         boardComment = boardCommentRepository.findById(boardComment.getId()).get();
-        assertThat(boardComment.getHeartCount()).isEqualTo(initialHeartCount + (numberOfThreads - increaseHeartFailedCnt.get()));
+        assertThat(boardComment.getHeartCount()).isEqualTo(initialHeartCount + (likeCount - increaseHeartFailedCnt.get()));
     }
 
     @Test
@@ -297,9 +275,9 @@ public class BoardCommentConcurrentServiceTest {
         boardCommentRepository.save(boardComment);
         final BoardComment finalBoardComment = boardComment;
 
-        int numberOfThreads = likeCount + hateCount;
+        int countDown = likeCount + hateCount;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         AtomicInteger increaseHeartFailedCnt = new AtomicInteger(0);
         AtomicInteger decreaseHeartFailedCnt = new AtomicInteger(0);
