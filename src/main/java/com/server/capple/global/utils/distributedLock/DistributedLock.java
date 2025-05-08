@@ -15,7 +15,7 @@ public @interface DistributedLock {
 
     long waitTime() default 5L;
 
-    long leaseTime() default 3L;
+    long leaseTime() default 40L;
 
     long retryCount() default 10L;
 }

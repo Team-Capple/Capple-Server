@@ -44,12 +44,13 @@ public class DistributedLockAop {
                     return false;
                 }
             }
-
             return aopForTransaction.proceed(joinPoint);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            rLock.unlock();
+            if (rLock.isLocked() && rLock.isHeldByCurrentThread()) {
+                rLock.unlock();
+            }
         }
     }
 
