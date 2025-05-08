@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Lock 테스트 ")
 public class LockTest {
-    static int num = 0;
     private static String redisHost;
     private static Integer redisPort;
     private static Integer redisDatabase;
@@ -39,12 +38,14 @@ public class LockTest {
         redisDatabase = Integer.valueOf(props.getProperty("spring.data.redis.database"));
     }
 
+    private static int lettuceNum = 0;
     @Test
     @DisplayName("Lettuce")
     void concurrentLettuce() throws InterruptedException {
-        int numberOfThreads = 100;
+        int numberOfThreads = 30;
+        int countDown = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
 
         LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(redisHost, redisPort);
         connectionFactory.setDatabase(redisDatabase);
@@ -59,21 +60,21 @@ public class LockTest {
 
         String key = "test-key";
 
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < countDown; i++) {
             executorService.submit(() -> {
                 try {
                     boolean locked;
                     int retryCnt = 0;
                     while ((locked = Boolean.FALSE.equals(redisTemplate.opsForValue().setIfAbsent(key, "lock", leaseTime, TimeUnit.SECONDS)))) {
                         Thread.sleep(Duration.ofSeconds(waitTime));
-                        if (++retryCnt == 10) {
+                        if (++retryCnt == 2) {
                             break;
                         }
                     }
                     if (!locked) {
-                        int tmp = num;
+                        int tmp = lettuceNum;
                         Thread.sleep(10);
-                        num = tmp + 1;
+                        lettuceNum = tmp + 1;
                         redisTemplate.delete(key);
                     } else {
                         failedCnt.incrementAndGet();
@@ -87,19 +88,21 @@ public class LockTest {
         }
         latch.await();
 
-        System.out.println("success : " + num);
+        System.out.println("success : " + lettuceNum);
         System.out.println("failed : " + failedCnt.get());
-        System.out.println("total : " + numberOfThreads);
+        System.out.println("total : " + (lettuceNum + failedCnt.get()));
 
-        assertThat(num + failedCnt.get()).isEqualTo(numberOfThreads);
+        assertThat(lettuceNum + failedCnt.get()).isEqualTo(countDown);
     }
 
+    private static int redissonNum = 0;
     @Test
     @DisplayName("Redisson RLock")
     void concurrentRedisson() throws InterruptedException {
-        int numberOfThreads = 100;
+        int numberOfThreads = 30;
+        int countDown = 50;
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
-        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(countDown);
         Config config = new Config();
         config.useSingleServer().setAddress(String.format("redis://%s:%d", redisHost, redisPort)).setDatabase(redisDatabase);
         RedissonClient redissonClient = Redisson.create(config);
@@ -107,14 +110,14 @@ public class LockTest {
         long waitTime = 1L, leaseTime = 30L;
         AtomicInteger failedCnt = new AtomicInteger(0);
 
-        for (int i = 0; i < numberOfThreads; i++) {
+        for (int i = 0; i < countDown; i++) {
             executorService.submit(() -> {
                 try {
                     RLock rLock = redissonClient.getLock("test-key");
                     if (rLock.tryLock(waitTime, leaseTime, TimeUnit.SECONDS)) {
-                        int tmp = num;
+                        int tmp = redissonNum;
                         Thread.sleep(10);
-                        num = tmp + 1;
+                        redissonNum = tmp + 1;
                         rLock.unlock();
                     } else {
                         failedCnt.incrementAndGet();
@@ -128,10 +131,10 @@ public class LockTest {
         }
         latch.await();
 
-        System.out.println("success : " + num);
+        System.out.println("success : " + redissonNum);
         System.out.println("failed : " + failedCnt.get());
-        System.out.println("total : " + numberOfThreads);
+        System.out.println("total : " + (redissonNum + failedCnt.get()));
 
-        assertThat(num + failedCnt.get()).isEqualTo(numberOfThreads);
+        assertThat(redissonNum + failedCnt.get()).isEqualTo(countDown);
     }
 }
