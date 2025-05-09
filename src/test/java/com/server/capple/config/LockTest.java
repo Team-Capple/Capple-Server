@@ -66,7 +66,7 @@ public class LockTest {
                     boolean locked;
                     int retryCnt = 0;
                     while ((locked = Boolean.FALSE.equals(redisTemplate.opsForValue().setIfAbsent(key, "lock", leaseTime, TimeUnit.SECONDS)))) {
-                        Thread.sleep(Duration.ofSeconds(waitTime));
+                        Thread.sleep(Duration.ofSeconds(waitTime).toMillis());
                         if (++retryCnt == 2) {
                             break;
                         }
