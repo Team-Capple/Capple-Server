@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +31,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("Answer 중복 생성 시 예외 발생 테스트")
-    @Transactional
     public void createDuplicateAnswerTest() {
         // given
         AnswerRequest request = getAnswerRequest();
@@ -44,7 +44,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("Answer 중복 생성 방지 후 새로운 답변 생성 테스트")
-    @Transactional
     public void createAnswerTest() {
         // 기존 답변 삭제
         answerService.deleteAnswer(member, answer.getId());
@@ -71,8 +70,8 @@ public class AnswerServiceTest extends ServiceTestConfig {
         Long answerId = answerService.createAnswer(member, liveQuestion.getId(), request).getAnswerId();
 
         AnswerRequest updateRequest = AnswerRequest.builder()
-                .answer("나는 동그랗고 와플 좋아하는 사람이 좋아")
-                .build();
+            .answer("나는 동그랗고 와플 좋아하는 사람이 좋아")
+            .build();
 
         //when
         answerService.updateAnswer(member, answerId, updateRequest);
@@ -84,7 +83,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("Answer 중복 생성 방지 후 새로운 답변 삭제 테스트")
-    @Transactional
     public void deleteAnswerTest() {
         // 기존 답변 삭제
         answerService.deleteAnswer(member, answer.getId());
@@ -94,19 +92,18 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
         //when
         answerService.deleteAnswer(member, answerId);
-        Answer answer = answerService.findAnswer(answerId);
 
         //then
         List<String> tags = tagService.getTagsByQuestion(liveQuestion.getId(), 7).getTags();
+        Optional<Answer> answer = answerRepository.findById(answerId);
 
         assertEquals(0, tags.size());
-        assertNotNull(answer.getDeletedAt());
+        assertTrue(answer.isEmpty());
 
     }
 
     @Test
     @DisplayName("Answer 좋아요/취소 테스트")
-    @Transactional
     public void toggleAnswerHeartTest() {
         //when
         AnswerResponse.AnswerLike answerLike = answerService.toggleAnswerHeart(member, answer.getId());
@@ -122,7 +119,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("작성한 Answer 목록 조회 테스트")
-    @Transactional
     public void getMemberAnswerTest() {
         //when
         SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
@@ -132,7 +128,6 @@ public class AnswerServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("좋아한 Answer 목록 조회 테스트")
-    @Transactional
     public void getMemberHeartAnswerTest() {
         //given
         answerService.toggleAnswerHeart(member, answer.getId());

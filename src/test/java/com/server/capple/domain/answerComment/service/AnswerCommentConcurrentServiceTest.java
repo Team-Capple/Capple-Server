@@ -23,7 +23,7 @@ import static com.server.capple.domain.member.entity.Role.ROLE_ACADEMIER;
 import static com.server.capple.domain.question.entity.QuestionStatus.LIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("BoardComment 동시성 테스트 ")
+@DisplayName("AnswerComment 동시성 테스트 ")
 public class AnswerCommentConcurrentServiceTest extends ConcurrentTestsConfig {
     private final int numberOfThreads = 20;
 
