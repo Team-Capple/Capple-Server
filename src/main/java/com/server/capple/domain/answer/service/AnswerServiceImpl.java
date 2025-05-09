@@ -14,7 +14,6 @@ import com.server.capple.domain.answer.mapper.AnswerMapper;
 import com.server.capple.domain.answer.repository.AnswerHeartRedisRepository;
 import com.server.capple.domain.answer.repository.AnswerHeartRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
-import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.notifiaction.service.NotificationService;
@@ -54,6 +53,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final NotificationService notificationService;
     private final AnswerHeartRepository answerHeartRepository;
     private final AnswerHeartMapper answerHeartMapper;
+    private final AnswerConcurrentService answerConcurrentService;
 
     @Transactional
     @Override
@@ -121,7 +121,9 @@ public class AnswerServiceImpl implements AnswerService {
                 });
 
         boolean isLiked = answerHeart.toggleHeart();
-        answer.setHeartCount(answerHeart.isLiked()); // 답변에 대한 좋아요 heartCount 증가/감소
+        if (!answerConcurrentService.setHeartCount(answer, isLiked)) { // 답변에 대한 좋아요 heartCount 증가/감소
+            throw new RestApiException(AnswerErrorCode.ANSWER_COUNT_CHANGE_FAILED);
+        }
 
         if(isLiked)
             notificationService.sendAnswerHeartNotification(loginMember.getId(), answer);

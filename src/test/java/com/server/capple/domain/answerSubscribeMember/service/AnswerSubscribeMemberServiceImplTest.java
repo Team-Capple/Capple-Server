@@ -9,13 +9,11 @@ import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.repository.QuestionRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Collection;
@@ -41,9 +39,20 @@ class AnswerSubscribeMemberServiceImplTest {
     private AnswerSubscribeMemberRepository answerSubscribeMemberRepository;
     @Autowired
     private AnswerSubscribeMemberServiceImpl answerSubscribeMemberService;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @AfterEach
+    void tearDown() {
+        jdbcTemplate.execute("DELETE FROM answer_subscribe_member");
+        jdbcTemplate.execute("DELETE FROM answer_comment");
+        jdbcTemplate.execute("DELETE FROM answer_heart");
+        jdbcTemplate.execute("DELETE FROM answer");
+        jdbcTemplate.execute("DELETE FROM question");
+        jdbcTemplate.execute("DELETE FROM member");
+    }
 
     @DisplayName("답변의 댓글의 구독자를 추가할 때 ")
-    @Transactional
     @TestFactory
     Collection<DynamicTest> createAnswerSubscribeMember() {
         // given

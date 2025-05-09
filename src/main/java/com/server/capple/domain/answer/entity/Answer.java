@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLRestriction;
 
 @Getter
@@ -17,6 +18,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
 @DynamicInsert
+@DynamicUpdate
 public class Answer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -11,7 +11,8 @@ import org.springframework.http.HttpStatus;
 public enum BoardErrorCode implements ErrorCodeInterface {
     BOARD_NOT_FOUND("BOARD001", "게시글이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     BOARD_BAD_REQUEST("BOARD002", "게시글에 내용이 없습니다.",HttpStatus.BAD_REQUEST),
-    BOARD_NO_AUTHORIZATION("BOARD003", "해당 게시글에 삭제 권한이 없습니다.", HttpStatus.FORBIDDEN)
+    BOARD_NO_AUTHORIZATION("BOARD003", "해당 게시글에 삭제 권한이 없습니다.", HttpStatus.FORBIDDEN),
+    BOARD_COUNT_CHANGE_FAILED("BOARD004", "게시글 좋아요에 실패했습니다.", HttpStatus.LOCKED),
     ;
     private final String code;
     private final String message;

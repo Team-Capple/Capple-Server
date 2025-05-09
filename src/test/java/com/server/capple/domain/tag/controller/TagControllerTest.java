@@ -26,10 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class TagControllerTest extends ControllerTestConfig {
-
-    @MockBean
-    private TagService tagService;
-
 /*    @Test
     @DisplayName("Tag 검색 테스트")
     @WithMockUser(username = "user")

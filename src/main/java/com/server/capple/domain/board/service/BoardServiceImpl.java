@@ -40,6 +40,7 @@ public class BoardServiceImpl implements BoardService {
     private final BoardSubscribeMemberService boardSubscribeMemberService;
     private final BoardCountService boardCountService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final BoardConcurrentService boardConcurrentService;
 
     @Override
     @Transactional
@@ -151,7 +152,8 @@ public class BoardServiceImpl implements BoardService {
                 });
 
         boolean isLiked = boardHeart.toggleHeart();
-        board.setHeartCount(boardHeart.isLiked());
+        if(!boardConcurrentService.setHeartCount(board, boardHeart.isLiked()))
+            throw new RestApiException(BoardErrorCode.BOARD_COUNT_CHANGE_FAILED);
 
         if (isLiked) notificationService.sendBoardHeartNotification(member.getId(), board);
         return new ToggleBoardHeart(boardId, isLiked);
