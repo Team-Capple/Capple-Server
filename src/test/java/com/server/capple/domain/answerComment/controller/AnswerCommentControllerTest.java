@@ -2,14 +2,12 @@ package com.server.capple.domain.answerComment.controller;
 
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse;
-import com.server.capple.domain.answerComment.service.AnswerCommentService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -25,10 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AnswerCommentControllerTest extends ControllerTestConfig {
-
-    @MockBean
-    private AnswerCommentService answerCommentService;
-
     @Test
     @DisplayName("답변 댓글 생성 API 테스트")
     public void createAnswerCommentTest() throws Exception {

@@ -1,6 +1,7 @@
 package com.server.capple.domain.answerComment.service;
 
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answer.service.AnswerConcurrentService;
 import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
@@ -32,6 +33,8 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     private final AnswerService answerService;
     private final NotificationService notificationService;
     private final AnswerSubscribeMemberService answerSubscribeMemberService;
+    private final AnswerCommentConcurrentService answerCommentConcurrentService;
+    private final AnswerConcurrentService answerConcurrentService;
 
     /* 댓글 작성 */
     @Override
@@ -41,7 +44,9 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Answer answer = answerService.findAnswer(answerId);
         AnswerComment answerComment = answerCommentRepository.save(answerCommentMapper.toAnswerCommentEntity(loginMember, answer, request.getAnswerComment()));
         notificationService.sendAnswerCommentNotification(answer, answerComment);
-        answer.increaseCommentCount(); // 답변 commentCount 증가
+        if (!answerConcurrentService.increaseCommentCount(answer)) { // 답변 commentCount 증가
+            throw new RestApiException(CommentErrorCode.COMMENT_COUNT_INCREASE_FAILED);
+        }
         return new AnswerCommentId(answerComment.getId());
     }
 
@@ -53,7 +58,9 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         checkPermission(member, answerComment); // 유저 권한 체크
 
         answerSubscribeMemberService.deleteAnswerSubscribeMemberByAnswerId(answerComment.getAnswer().getId());
-        answerComment.getAnswer().decreaseCommentCount(); // 답변 commentCount 감소
+        if (!answerConcurrentService.decreaseCommentCount(answerComment.getAnswer())) { // 답변 commentCount 감소
+            throw new RestApiException(CommentErrorCode.COMMENT_COUNT_DECREASE_FAILED);
+        }
         answerComment.delete();
         return new AnswerCommentId(answerComment.getId());
     }
@@ -77,7 +84,9 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Boolean isLiked = answerCommentHeartRedisRepository.toggleAnswerCommentHeart(commentId, member.getId());
         if(isLiked)
             notificationService.sendAnswerCommentHeartNotification(answerComment);
-        answerComment.setHeartCount(isLiked); // 댓글 좋아요 heartCount 감소
+        if (!answerCommentConcurrentService.setHeartCount(answerComment, isLiked)) { // 댓글 좋아요 heartCount 감소
+            throw new RestApiException(CommentErrorCode.COMMENT_HEART_CHANGE_FAILED);
+        }
         return new AnswerCommentHeart(commentId, isLiked);
     }
 

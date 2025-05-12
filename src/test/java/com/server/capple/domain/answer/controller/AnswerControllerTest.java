@@ -3,7 +3,6 @@ package com.server.capple.domain.answer.controller;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
-import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ControllerTestConfig;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,9 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AnswerControllerTest extends ControllerTestConfig {
-    @MockBean
-    private AnswerService answerService;
-
     @Test
     @DisplayName("답변 생성 API 테스트")
     public void createAnswerTest() throws Exception {
