@@ -5,7 +5,9 @@ import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLRestriction;
 
 @Getter
@@ -15,6 +17,7 @@ import org.hibernate.annotations.SQLRestriction;
 @AllArgsConstructor
 @SQLRestriction("deleted_at is null")
 @DynamicInsert
+@DynamicUpdate
 public class AnswerComment extends BaseEntity {
 
     @Id
@@ -31,6 +34,17 @@ public class AnswerComment extends BaseEntity {
 
     @Column(nullable = false)
     private String content;
+
+    @ColumnDefault("0")
+    private Integer heartCount;
+
+    public void setHeartCount(boolean isLiked) {
+        if (isLiked) {
+            this.heartCount++;
+        } else {
+            this.heartCount--;
+        }
+    }
 
     public void update(String content) {
         this.content = content;

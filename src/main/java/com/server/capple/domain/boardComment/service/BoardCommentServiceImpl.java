@@ -1,6 +1,7 @@
 package com.server.capple.domain.boardComment.service;
 
 import com.server.capple.domain.board.entity.Board;
+import com.server.capple.domain.board.service.BoardConcurrentService;
 import com.server.capple.domain.board.service.BoardService;
 import com.server.capple.domain.boardComment.dao.BoardCommentInfoInterface;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
@@ -38,6 +39,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
     private final BoardCommentHeartMapper boardCommentHeartMapper;
     private final NotificationService notificationService;
     private final BoardSubscribeMemberService boardSubscribeMemberService;
+    private final BoardConcurrentService boardConcurrentService;
+    private final BoardCommentConcurrentService boardCommentConcurrentService;
 
     @Override
     @Transactional
@@ -49,7 +52,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         notificationService.sendBoardCommentNotification(member.getId(), board, boardComment); // 게시글 댓글 알림
         boardSubscribeMemberService.createBoardSubscribeMember(member, board); // 알림 리스트 추가
 
-        board.increaseCommentCount();
+        if(!boardConcurrentService.increaseCommentCount(board))
+            throw new RestApiException(CommentErrorCode.COMMENT_COUNT_INCREASE_FAILED);
         return new BoardCommentId(boardComment.getId());
     }
 
@@ -72,8 +76,9 @@ public class BoardCommentServiceImpl implements BoardCommentService {
         Board board = boardComment.getBoard();
 
         boardComment.delete();
-        board.decreaseCommentCount();
 
+        if(!boardConcurrentService.decreaseCommentCount(board))
+            throw new RestApiException(CommentErrorCode.COMMENT_COUNT_INCREASE_FAILED);
         return new BoardCommentId(boardComment.getId());
     }
 
@@ -88,7 +93,8 @@ public class BoardCommentServiceImpl implements BoardCommentService {
                     return boardCommentHeartRepository.save(newHeart);
                 });
         boolean isLiked = boardCommentHeart.toggleHeart();
-        boardComment.setHeartCount(boardCommentHeart.isLiked());
+        if(!boardCommentConcurrentService.setHeartCount(boardComment, boardCommentHeart.isLiked()))
+            throw new RestApiException(CommentErrorCode.COMMENT_HEART_CHANGE_FAILED);
         if (isLiked && !boardComment.getWriter().getId().equals(member.getId())) {
             notificationService.sendBoardCommentHeartNotification(member.getId(), boardComment.getBoard(), boardComment);
         }

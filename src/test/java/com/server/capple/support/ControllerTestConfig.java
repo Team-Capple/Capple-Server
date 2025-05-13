@@ -7,15 +7,21 @@ import com.server.capple.config.security.jwt.service.JwtService;
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.dto.AnswerResponse.MemberAnswerInfo;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answer.service.AnswerService;
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfo;
 import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfos;
+import com.server.capple.domain.answerComment.service.AnswerCommentService;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.dto.BoardCommentResponse.BoardCommentInfo;
+import com.server.capple.domain.boardComment.service.BoardCommentService;
+import com.server.capple.domain.boardCommentReport.service.BoardCommentReportService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.entity.Role;
+import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
+import com.server.capple.domain.tag.service.TagService;
 import com.server.capple.global.common.SliceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +52,18 @@ public abstract class ControllerTestConfig {
     JwtService jwtService;
     @MockBean
     JpaUserDetailService jpaUserDetailService;
+    @MockBean
+    protected AnswerService answerService;
+    @MockBean
+    protected AnswerCommentService answerCommentService;
+    @MockBean
+    protected BoardCommentService boardCommentService;
+    @MockBean
+    protected BoardCommentReportService boardCommentReportService;
+    @MockBean
+    protected MemberService memberService;
+    @MockBean
+    protected TagService tagService;
     protected Question question;
     protected Answer answer;
 
@@ -152,7 +170,7 @@ public abstract class ControllerTestConfig {
             .writerId(member.getId())
             .content("댓글 1")
             .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
-            .heartCount(3L)
+            .heartCount(3)
             .build());
 
         return new AnswerCommentInfos(answerCommentInfos);

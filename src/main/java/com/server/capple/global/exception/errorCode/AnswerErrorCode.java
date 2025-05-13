@@ -12,6 +12,7 @@ public enum AnswerErrorCode implements ErrorCodeInterface {
     ANSWER_NOT_FOUND("ANSWER001", "답변을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ANSWER_UNAUTHORIZED("ANSWER002", "답변에 대한 권한이 업습니다.", HttpStatus.FORBIDDEN),
     ANSWER_ALREADY_EXIST("ANSWER003", "이미 답변한 질문입니다.", HttpStatus.BAD_REQUEST),
+    ANSWER_COUNT_CHANGE_FAILED("ANSWER004", "답변 좋아요에 실패했습니다.", HttpStatus.LOCKED),
     ;
 
     private final String code;

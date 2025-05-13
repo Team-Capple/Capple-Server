@@ -3,14 +3,12 @@ package com.server.capple.domain.boardCommentReport.controller;
 import com.server.capple.domain.boardCommentReport.dto.BoardCommentReportRequest;
 import com.server.capple.domain.boardCommentReport.dto.BoardCommentReportResponse;
 import com.server.capple.domain.boardCommentReport.entity.BoardCommentReportType;
-import com.server.capple.domain.boardCommentReport.service.BoardCommentReportService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -25,10 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class BoardCommentReportControllerTest extends ControllerTestConfig {
-
-    @MockBean
-    private BoardCommentReportService boardCommentReportService;
-
     @Test
     @DisplayName("게시글 댓글 신고 API 테스트")
     public void updateBoardCommentTest() throws Exception {

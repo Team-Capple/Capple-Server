@@ -1,7 +1,6 @@
 package com.server.capple.domain.boardComment.controller;
 
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
-import com.server.capple.domain.boardComment.service.BoardCommentService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ControllerTestConfig;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -28,10 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class BoardCommentControllerTest extends ControllerTestConfig {
-
-    @MockBean
-    private BoardCommentService boardCommentService;
-
     @Test
     @DisplayName("게시글 댓글 생성 API 테스트")
     public void createBoardCommentTest() throws Exception {
@@ -153,7 +147,7 @@ public class BoardCommentControllerTest extends ControllerTestConfig {
                 .andExpect(jsonPath("$.result.numberOfElements").value(1))
                 .andExpect(jsonPath("$.result.content[0].boardCommentId").value(1L))
                 .andExpect(jsonPath("$.result.content[0].content").value("댓글"))
-                .andExpect(jsonPath("$.result.content[0].heartCount").value(2L))
+                .andExpect(jsonPath("$.result.content[0].heartCount").value(2))
                 .andExpect(jsonPath("$.result.content[0].isLiked").value(true));
     }
 }

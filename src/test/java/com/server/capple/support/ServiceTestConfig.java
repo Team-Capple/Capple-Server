@@ -2,9 +2,11 @@ package com.server.capple.support;
 
 import com.server.capple.domain.answer.dto.AnswerRequest;
 import com.server.capple.domain.answer.entity.Answer;
+import com.server.capple.domain.answer.repository.AnswerHeartRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.board.entity.Board;
 import com.server.capple.domain.board.entity.BoardType;
+import com.server.capple.domain.board.repository.BoardHeartRepository;
 import com.server.capple.domain.board.repository.BoardRepository;
 import com.server.capple.domain.boardComment.dto.BoardCommentRequest;
 import com.server.capple.domain.boardComment.entity.BoardComment;
@@ -18,10 +20,13 @@ import com.server.capple.domain.member.repository.MemberRepository;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.entity.QuestionStatus;
 import com.server.capple.domain.question.repository.QuestionRepository;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -42,7 +47,11 @@ public abstract class ServiceTestConfig {
     @Autowired
     protected BoardRepository boardRepository;
     @Autowired
-    BoardCommentRepository boardCommentRepository;
+    protected BoardCommentRepository boardCommentRepository;
+    @Autowired
+    protected AnswerHeartRepository answerHeartRepository;
+    @Autowired
+    protected BoardHeartRepository boardHeartRepository;
     protected Member member;
     protected Question liveQuestion;
     protected Question pendingQuestion;
@@ -53,7 +62,11 @@ public abstract class ServiceTestConfig {
     protected AnswerComment answerComment;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    protected RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+    @Autowired
+    protected EntityManager entityManager;
 
     @BeforeEach
     public void setUp() {
@@ -66,6 +79,27 @@ public abstract class ServiceTestConfig {
         boardComment = createBoardComment();
         answerComment = createAnswerComment();
         redisTemplate.getConnectionFactory().getConnection().flushAll();
+    }
+
+    @AfterEach
+    void tearDown() {
+        jdbcTemplate.execute("DELETE FROM notification");
+        jdbcTemplate.execute("DELETE FROM notification_log");
+        jdbcTemplate.execute("DELETE FROM answer_subscribe_member");
+        jdbcTemplate.execute("DELETE FROM answer_comment");
+        jdbcTemplate.execute("DELETE FROM answer_heart");
+        jdbcTemplate.execute("DELETE FROM answer");
+        jdbcTemplate.execute("DELETE FROM board_subscribe_member");
+        jdbcTemplate.execute("DELETE FROM board_comment_report");
+        jdbcTemplate.execute("DELETE FROM board_comment_heart");
+        jdbcTemplate.execute("DELETE FROM board_comment");
+        jdbcTemplate.execute("DELETE FROM board_heart");
+        jdbcTemplate.execute("DELETE FROM board_report");
+        jdbcTemplate.execute("DELETE FROM board");
+        jdbcTemplate.execute("DELETE FROM question_subscribe_member");
+        jdbcTemplate.execute("DELETE FROM question");
+        jdbcTemplate.execute("DELETE FROM member");
+        redisTemplate.delete(redisTemplate.keys("*"));
     }
 
     protected Member createMember() {
@@ -115,6 +149,8 @@ public abstract class ServiceTestConfig {
                 .content("나는 무자비한 사람이 좋아")
                 .question(liveQuestion)
                 .member(member)
+                .commentCount(0)
+                .heartCount(0)
                 .build()
         );
     }
@@ -131,7 +167,7 @@ public abstract class ServiceTestConfig {
                         .boardType(BoardType.FREEBOARD)
                         .writer(member)
                         .content("오늘 밥먹을 사람!")
-                        .commentCount(0)
+                        .commentCount(1)
                         .heartCount(0)
                         .isReport(FALSE)
                         .build());
@@ -163,6 +199,7 @@ public abstract class ServiceTestConfig {
                 .member(member)
                 .answer(answer)
                 .content("답변에 대한 댓글이어유")
+                .heartCount(0)
                 .build()
         );
     }

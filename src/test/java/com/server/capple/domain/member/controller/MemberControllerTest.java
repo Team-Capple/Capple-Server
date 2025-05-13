@@ -3,13 +3,11 @@ package com.server.capple.domain.member.controller;
 import com.server.capple.domain.member.dto.MemberRequest;
 import com.server.capple.domain.member.dto.MemberResponse;
 import com.server.capple.domain.member.entity.Member;
-import com.server.capple.domain.member.service.MemberService;
 import com.server.capple.support.ControllerTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -33,9 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class MemberControllerTest extends ControllerTestConfig {
-
-    @MockBean private MemberService memberService;
-
     @Test
     @DisplayName("프로필 조회 API 테스트")
     public void getMyPageMemberInfoTest() throws Exception {
