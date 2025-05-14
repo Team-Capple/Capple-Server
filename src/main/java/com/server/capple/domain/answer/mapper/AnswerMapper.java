@@ -31,7 +31,7 @@ public class AnswerMapper {
                 .content(answerInfoDto.getAnswer().getContent())
                 .isMine(answerInfoDto.getWriterId().equals(memberId))
                 .isReported(answerInfoDto.getIsReported())
-                .isLiked(answerInfoDto.getIsLiked())
+                .isLiked(answerInfoDto.getIsLiked() == null ? false : answerInfoDto.getIsLiked())
                 .writeAt(answerInfoDto.getAnswer().getCreatedAt().toString())
                 .commentCount(answerInfoDto.getAnswer().getCommentCount())
                 .heartCount(answerInfoDto.getAnswer().getHeartCount())
@@ -50,7 +50,7 @@ public class AnswerMapper {
                 .heartCount(memberAnswer.getAnswer().getHeartCount())
                 .commentCount(memberAnswer.getAnswer().getCommentCount())
                 .writeAt(memberAnswer.getAnswer().getCreatedAt().toString())
-                .isLiked(memberAnswer.getIsLiked())
+                .isLiked(memberAnswer.getIsLiked() == null ? false : memberAnswer.getIsLiked())
                 .build();
     }
 }
