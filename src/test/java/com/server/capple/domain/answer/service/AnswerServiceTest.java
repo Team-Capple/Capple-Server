@@ -124,6 +124,7 @@ public class AnswerServiceTest extends ServiceTestConfig {
         SliceResponse<MemberAnswerInfo> memberAnswer = answerService.getMemberAnswer(member, null, PageRequest.of(0, 1000, Sort.by(Sort.Direction.DESC, "createdAt")));
         //then
         assertEquals(memberAnswer.getContent().get(0).getContent(), "나는 무자비한 사람이 좋아");
+        assertEquals(memberAnswer.getContent().get(0).getIsLiked(), false);
     }
 
     @Test
