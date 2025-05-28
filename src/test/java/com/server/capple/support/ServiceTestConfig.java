@@ -87,6 +87,7 @@ public abstract class ServiceTestConfig {
         jdbcTemplate.execute("DELETE FROM notification_log");
         jdbcTemplate.execute("DELETE FROM answer_subscribe_member");
         jdbcTemplate.execute("DELETE FROM answer_comment");
+        jdbcTemplate.execute("DELETE FROM answer_comment_heart");
         jdbcTemplate.execute("DELETE FROM answer_heart");
         jdbcTemplate.execute("DELETE FROM answer");
         jdbcTemplate.execute("DELETE FROM board_subscribe_member");
