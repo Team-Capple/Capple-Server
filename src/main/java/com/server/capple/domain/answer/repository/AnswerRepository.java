@@ -30,17 +30,33 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     boolean existsByQuestionAndMember(Question question, Member member);
 
+//    @Query("SELECT a AS answer, " +
+//        "(r IS NOT NULL) AS isReported, " +
+//        "a.member.id AS writerId, " +
+//        "a.member.profileImage AS writerProfileImage, " +
+//        "a.member.nickname AS writerNickname," +
+//        "a.member.academyGeneration AS writerAcademyGeneration " +
+//        "FROM Answer a " +
+//        "LEFT JOIN " +
+//        "Report r ON r.answer = a " +
+//        "WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.question.id = :questionId")
+//    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, Long lastIndex, Pageable pageable);
+    
     @Query("SELECT a AS answer, " +
-        "(r IS NOT NULL) AS isReported, " +
-        "a.member.id AS writerId, " +
-        "a.member.profileImage AS writerProfileImage, " +
-        "a.member.nickname AS writerNickname," +
-        "a.member.academyGeneration AS writerAcademyGeneration " +
-        "FROM Answer a " +
-        "LEFT JOIN " +
-        "Report r ON r.answer = a " +
-        "WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.question.id = :questionId")
-    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, Long lastIndex, Pageable pageable);
+            "(r IS NOT NULL) AS isReported, " +
+            "a.member.id AS writerId, " +
+            "a.member.profileImage AS writerProfileImage, " +
+            "a.member.nickname AS writerNickname, " +
+            "a.member.academyGeneration AS writerAcademyGeneration, " +
+            "CASE WHEN ah.id IS NOT NULL THEN TRUE ELSE FALSE END AS isLiked " +
+            "FROM Answer a " +
+            "LEFT JOIN Report r ON r.answer = a " +
+            "LEFT JOIN AnswerHeart ah ON ah.answer = a AND ah.member = :member AND ah.isLiked = TRUE " +
+            "WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.question.id = :questionId")
+    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId,
+                                              @Param("lastIndex") Long lastIndex,
+                                              @Param("member") Member member,
+                                              Pageable pageable);
 
     @Query("""
         SELECT

@@ -16,6 +16,7 @@ import com.server.capple.domain.answer.repository.AnswerHeartRepository;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.domain.member.service.MemberService;
+import com.server.capple.domain.member.service.MemberServiceImpl;
 import com.server.capple.domain.notifiaction.service.NotificationService;
 import com.server.capple.domain.question.entity.Question;
 import com.server.capple.domain.question.service.QuestionService;
@@ -54,6 +55,7 @@ public class AnswerServiceImpl implements AnswerService {
     private final AnswerHeartRepository answerHeartRepository;
     private final AnswerHeartMapper answerHeartMapper;
     private final AnswerConcurrentService answerConcurrentService;
+    private final MemberServiceImpl memberServiceImpl;
 
     @Transactional
     @Override
@@ -133,7 +135,8 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
 
-        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, pageable);
+        Member member = memberServiceImpl.findMember(memberId);
+        Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, member, pageable);
         lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
             answerInfoDto -> answerMapper.toAnswerInfo(
