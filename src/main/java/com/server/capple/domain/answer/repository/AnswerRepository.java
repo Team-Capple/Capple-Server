@@ -41,7 +41,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 //        "Report r ON r.answer = a " +
 //        "WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.question.id = :questionId")
 //    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, Long lastIndex, Pageable pageable);
-    
+
     @Query("SELECT a AS answer, " +
             "(r IS NOT NULL) AS isReported, " +
             "a.member.id AS writerId, " +
@@ -53,10 +53,7 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
             "LEFT JOIN Report r ON r.answer = a " +
             "LEFT JOIN AnswerHeart ah ON ah.answer = a AND ah.member = :member AND ah.isLiked = TRUE " +
             "WHERE (a.id < :lastIndex OR :lastIndex IS NULL) AND a.question.id = :questionId")
-    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId,
-                                              @Param("lastIndex") Long lastIndex,
-                                              @Param("member") Member member,
-                                              Pageable pageable);
+    Slice<AnswerInfoInterface> findByQuestion(@Param("questionId") Long questionId, @Param("lastIndex") Long lastIndex, @Param("member") Member member, Pageable pageable);
 
     @Query("""
         SELECT

@@ -107,8 +107,6 @@ public class AnswerServiceImpl implements AnswerService {
         return new AnswerResponse.AnswerId(answerId);
     }
 
-
-    //답변 좋아요 / 취소
     @Override
     @Transactional
     public AnswerLike toggleAnswerHeart(Member loginMember, Long answerId) {
@@ -135,7 +133,7 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public SliceResponse<AnswerInfo> getAnswerList(Long memberId, Long questionId, Long lastIndex, Pageable pageable) {
 
-        Member member = memberServiceImpl.findMember(memberId);
+        Member member = memberService.findMember(memberId);
         Slice<AnswerInfoInterface> answerInfoSliceInterface = answerRepository.findByQuestion(questionId, lastIndex, member, pageable);
         lastIndex = getLastIndexFromAnswerInfoInterface(answerInfoSliceInterface);
         return SliceResponse.toSliceResponse(answerInfoSliceInterface, answerInfoSliceInterface.getContent().stream().map(
