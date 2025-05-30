@@ -66,6 +66,7 @@ public class AnswerCommentConcurrentServiceTest extends ConcurrentTestsConfig {
 
     @AfterEach
     void tearDown() {
+        answerCommentHeartRepository.deleteAllInBatch();
         answerCommentRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
         questionRepository.deleteAllInBatch();
@@ -79,7 +80,7 @@ public class AnswerCommentConcurrentServiceTest extends ConcurrentTestsConfig {
     void answerCommentSetHeartCountTest() {
         // given
         // when
-        answerCommentService.heartAnswerComment(writer, answerComment.getId());
+        answerCommentService.toggleAnswerCommentHeart(writer, answerComment.getId());
 
         // then
         answerComment = answerCommentRepository.findById(answerComment.getId()).get();
@@ -117,7 +118,7 @@ public class AnswerCommentConcurrentServiceTest extends ConcurrentTestsConfig {
             int finalI = i;
             executorService.submit(() -> {
                 try {
-                    answerCommentService.heartAnswerComment(members.get(finalI), answerComment.getId());
+                    answerCommentService.toggleAnswerCommentHeart(members.get(finalI), answerComment.getId());
                 } catch (RestApiException e) {
                     increaseHeartFailedCnt.incrementAndGet();
                 } finally {
