@@ -3,6 +3,7 @@ package com.server.capple.support;
 import com.server.capple.domain.answer.repository.AnswerRepository;
 import com.server.capple.domain.answer.service.AnswerConcurrentService;
 import com.server.capple.domain.answer.service.AnswerService;
+import com.server.capple.domain.answerComment.repository.AnswerCommentHeartRepository;
 import com.server.capple.domain.answerComment.repository.AnswerCommentRepository;
 import com.server.capple.domain.answerComment.service.AnswerCommentConcurrentService;
 import com.server.capple.domain.answerComment.service.AnswerCommentService;
@@ -53,6 +54,8 @@ public abstract class ConcurrentTestsConfig {
     protected AnswerRepository answerRepository;
     @Autowired
     protected AnswerCommentRepository answerCommentRepository;
+    @Autowired
+    protected AnswerCommentHeartRepository answercommentHeartRepository;
     @Autowired
     protected AnswerCommentConcurrentService answerCommentConcurrentService;
     @Autowired
