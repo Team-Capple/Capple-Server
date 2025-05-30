@@ -164,18 +164,6 @@ public abstract class ControllerTestConfig {
             .build();
     }
 
-//    protected AnswerCommentInfos getAnswerCommentInfos() {
-//        List<AnswerCommentInfo> answerCommentInfos = List.of(AnswerCommentInfo.builder()
-//            .answerCommentId(1L)
-//            .writerId(member.getId())
-//            .content("댓글 1")
-//            .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
-//            .heartCount(3)
-//            .build());
-//
-//        return new AnswerCommentInfos(answerCommentInfos);
-//    }
-
     protected SliceResponse<AnswerCommentInfo> getSliceAnswerCommentInfos() {
         List<AnswerCommentInfo> answerCommentInfos = List.of(AnswerCommentInfo.builder()
                 .answerCommentId(1L)

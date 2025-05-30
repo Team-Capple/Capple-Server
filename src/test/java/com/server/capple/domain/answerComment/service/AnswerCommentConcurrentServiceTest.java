@@ -66,7 +66,7 @@ public class AnswerCommentConcurrentServiceTest extends ConcurrentTestsConfig {
 
     @AfterEach
     void tearDown() {
-        answercommentHeartRepository.deleteAllInBatch();
+        answerCommentHeartRepository.deleteAllInBatch();
         answerCommentRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
         questionRepository.deleteAllInBatch();

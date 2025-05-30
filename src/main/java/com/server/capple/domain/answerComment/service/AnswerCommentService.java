@@ -14,7 +14,6 @@ public interface AnswerCommentService {
     AnswerCommentId deleteAnswerComment(Member member, Long commentId);
     AnswerCommentId updateAnswerComment(Member member, Long commentId, AnswerCommentRequest request);
     AnswerCommentLike toggleAnswerCommentHeart(Member member, Long commentId);
-//    SliceResponse<AnswerCommentInfos> getAnswerCommentInfos(Long answerId);
     SliceResponse<AnswerCommentInfo> getAnswerCommentInfos(Long answerId, Long memberId, Long lastIndex, Pageable pageable);
 
 }

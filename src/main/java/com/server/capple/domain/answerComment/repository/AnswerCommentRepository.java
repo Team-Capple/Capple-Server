@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AnswerCommentRepository extends JpaRepository<AnswerComment, Long> {
-//    @Query("SELECT ac FROM AnswerComment ac WHERE ac.answer.id = :answerId ORDER BY ac.createdAt")
-//    Slice<AnswerCommentRDBDao.AnswerCommentInfoInterface> findAnswerCommentByAnswerId(@Param("answerId") Long answerId, @Param("member") Member member, @Param("lastIndex") Long lastIndex, Pageable pageable);
+
 @Query("SELECT ac AS answerComment, " +
         "ac.member AS writer, " +
         "ac.content AS content, " +

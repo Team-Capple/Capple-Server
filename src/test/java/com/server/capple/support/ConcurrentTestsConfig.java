@@ -55,7 +55,7 @@ public abstract class ConcurrentTestsConfig {
     @Autowired
     protected AnswerCommentRepository answerCommentRepository;
     @Autowired
-    protected AnswerCommentHeartRepository answercommentHeartRepository;
+    protected AnswerCommentHeartRepository answerCommentHeartRepository;
     @Autowired
     protected AnswerCommentConcurrentService answerCommentConcurrentService;
     @Autowired

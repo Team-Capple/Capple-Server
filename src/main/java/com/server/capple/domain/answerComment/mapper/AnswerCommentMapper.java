@@ -18,16 +18,6 @@ public class AnswerCommentMapper {
                 .build();
     }
 
-//    public AnswerCommentInfo toAnswerCommentInfo(AnswerComment comment) {
-//        return AnswerCommentInfo.builder()
-//                .answerCommentId(comment.getId())
-//                .writerId(comment.getMember().getId())
-//                .content(comment.getContent())
-//                .heartCount(comment.getHeartCount())
-//                .createdAt(comment.getCreatedAt())
-//                .build();
-//    }
-
     public AnswerCommentInfo toAnswerCommentInfo(AnswerCommentRDBDao.AnswerCommentInfoInterface answerCommentInfoDto, Long memberId) {
         return AnswerCommentInfo.builder()
                 .answerCommentId(answerCommentInfoDto.getAnswerComment().getId())
