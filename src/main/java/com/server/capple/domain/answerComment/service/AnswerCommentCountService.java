@@ -27,10 +27,4 @@ public class AnswerCommentCountService {
     public CompletableFuture<Integer> updateAnswerCommentCount(Long answerId) {
         return CompletableFuture.completedFuture(answerCommentRepository.getAnswerCommentCountByAnswerId(answerId));
     }
-
-    @Cacheable(value = "answerCommentCountByMember", key = "#member.id", cacheManager = "oneDayExpireCacheManager")
-    public Integer getAnswerCommentCountByMember(Member member) { return answerCommentRepository.getAnswerCommentCountByMember(member);}
-
-    @CacheEvict(value = "answerCommentCountByMember", key = "#member.id", cacheManager = "oneDayExpireCacheManager")
-    public void expireMembersAnswerCommentedCount(Member member) {}
 }

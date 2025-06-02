@@ -25,6 +25,7 @@ import com.server.capple.global.exception.errorCode.CommentErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     private final AnswerConcurrentService answerConcurrentService;
     private final AnswerCommentCountService answerCommentCountService;
     private final AnswerCommentHeartMapper answerCommentHeartMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /* 댓글 작성 */
     @Override
@@ -56,6 +58,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
         Member loginMember = memberService.findMember(member.getId());
         Answer answer = answerService.findAnswer(answerId);
         AnswerComment answerComment = answerCommentRepository.save(answerCommentMapper.toAnswerCommentEntity(loginMember, answer, request.getAnswerComment()));
+        applicationEventPublisher.publishEvent(new AnswerCommentCountChangedEvent(answerId, loginMember));
         notificationService.sendAnswerCommentNotification(answer, answerComment);
         if (!answerConcurrentService.increaseCommentCount(answer)) { // 답변 commentCount 증가
             throw new RestApiException(CommentErrorCode.COMMENT_COUNT_INCREASE_FAILED);
@@ -69,7 +72,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     public AnswerCommentId deleteAnswerComment(Member member, Long commentId) {
         AnswerComment answerComment = findAnswerComment(commentId);
         checkPermission(member, answerComment); // 유저 권한 체크
-
+        applicationEventPublisher.publishEvent(new AnswerCommentCountChangedEvent(answerComment.getAnswer().getId(), member));
         answerSubscribeMemberService.deleteAnswerSubscribeMemberByAnswerId(answerComment.getAnswer().getId());
         if (!answerConcurrentService.decreaseCommentCount(answerComment.getAnswer())) { // 답변 commentCount 감소
             throw new RestApiException(CommentErrorCode.COMMENT_COUNT_DECREASE_FAILED);
@@ -160,8 +163,7 @@ public class AnswerCommentServiceImpl implements AnswerCommentService{
     }
 
     @TransactionalEventListener(classes = AnswerCommentServiceImpl.AnswerCommentCountChangedEvent.class, phase = TransactionPhase.AFTER_COMPLETION)
-    public void handleQuestionCreatedEvent(AnswerCommentServiceImpl.AnswerCommentCountChangedEvent event) {
+    public void handleAnswerCommentCountChangedEvent(AnswerCommentServiceImpl.AnswerCommentCountChangedEvent event) {
         answerCommentCountService.updateAnswerCommentCount(event.getAnswerId());
-        answerCommentCountService.expireMembersAnswerCommentedCount(event.getMember());
     }
 }
