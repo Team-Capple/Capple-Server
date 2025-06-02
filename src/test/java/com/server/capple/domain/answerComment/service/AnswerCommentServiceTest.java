@@ -1,21 +1,22 @@
 package com.server.capple.domain.answerComment.service;
 
 import com.server.capple.domain.answerComment.dto.AnswerCommentRequest;
-import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentHeart;
-import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.AnswerCommentInfos;
+import com.server.capple.domain.answerComment.dto.AnswerCommentResponse;
 import com.server.capple.domain.answerComment.entity.AnswerComment;
 import com.server.capple.domain.notifiaction.service.NotificationService;
+import com.server.capple.global.common.SliceResponse;
 import com.server.capple.support.ServiceTestConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -79,10 +80,10 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
 
     @Test
     @DisplayName("답변 댓글 좋아요/취소 토글 테스트")
-    public void heartAnswerCommentTest() {
+    public void toggleAnswerCommentHeartTest() {
         //1. 좋아요
         //given
-        AnswerCommentHeart liked = answerCommentService.heartAnswerComment(member, answerComment.getId());
+        AnswerCommentResponse.AnswerCommentLike liked = answerCommentService.toggleAnswerCommentHeart(member, answerComment.getId());
 
         //then
         assertEquals(answerComment.getId(), liked.getAnswerCommentId());
@@ -91,7 +92,7 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
 
         //2. 좋아요 취소
         //given
-        AnswerCommentHeart unLiked = answerCommentService.heartAnswerComment(member, answerComment.getId());
+        AnswerCommentResponse.AnswerCommentLike unLiked = answerCommentService.toggleAnswerCommentHeart(member, answerComment.getId());
 
         //then
         assertEquals(answerComment.getId(), unLiked.getAnswerCommentId());
@@ -103,24 +104,32 @@ public class AnswerCommentServiceTest extends ServiceTestConfig {
     @DisplayName("답변 댓글 조회 테스트")
     public void getAnswerCommentsTest() {
         //when
-        AnswerCommentInfos response = answerCommentService.getAnswerCommentInfos(answer.getId());
+        SliceResponse<AnswerCommentResponse.AnswerCommentInfo> response =
+                answerCommentService.getAnswerCommentInfos(answer.getId(), member.getId(), null, Pageable.ofSize(10));
 
-        //then
-        assertEquals(member.getId(), response.getAnswerCommentInfos().get(0).getWriterId());
-        assertEquals("답변에 대한 댓글이어유", response.getAnswerCommentInfos().get(0).getContent());
-        assertEquals(0, response.getAnswerCommentInfos().get(0).getHeartCount());
+        // then
+        List<AnswerCommentResponse.AnswerCommentInfo> content = response.getContent();
+        assertEquals(member.getId(), content.get(0).getWriterId());
+        assertEquals("답변에 대한 댓글이어유", content.get(0).getContent());
+        assertEquals(0, content.get(0).getHeartCount());
+        assertFalse(content.get(0).getIsLiked());
+        assertTrue(content.get(0).getIsMine());
     }
 
     @Test
     @DisplayName("좋아한 답변 댓글 조회 테스트")
     public void getAnswerCommentsWithHeartTest() {
         //given
-        AnswerCommentHeart liked = answerCommentService.heartAnswerComment(member, answerComment.getId());
+        AnswerCommentResponse.AnswerCommentLike liked = answerCommentService.toggleAnswerCommentHeart(member, answerComment.getId());
 
         //when
-        AnswerCommentInfos response = answerCommentService.getAnswerCommentInfos(answer.getId());
+        SliceResponse<AnswerCommentResponse.AnswerCommentInfo> response =
+                answerCommentService.getAnswerCommentInfos(answer.getId(), member.getId(), null, Pageable.ofSize(10));
+
 
         //then
-        assertEquals(1, response.getAnswerCommentInfos().get(0).getHeartCount());
+        assertEquals(1, response.getContent().get(0).getHeartCount());
+        assertTrue(response.getContent().get(0).getIsLiked());
+        assertTrue(response.getContent().get(0).getIsMine());
     }
 }

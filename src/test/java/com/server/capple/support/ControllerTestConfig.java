@@ -164,15 +164,22 @@ public abstract class ControllerTestConfig {
             .build();
     }
 
-    protected AnswerCommentInfos getAnswerCommentInfos() {
+    protected SliceResponse<AnswerCommentInfo> getSliceAnswerCommentInfos() {
         List<AnswerCommentInfo> answerCommentInfos = List.of(AnswerCommentInfo.builder()
-            .answerCommentId(1L)
-            .writerId(member.getId())
-            .content("댓글 1")
-            .createdAt(LocalDateTime.of(2022, 11, 1, 12, 02))
-            .heartCount(3)
-            .build());
+                .answerCommentId(1L)
+                .writerId(member.getId())
+                .content("댓글 1")
+                .createdAt(LocalDateTime.of(2022, 11, 1, 12, 2))
+                .heartCount(3)
+                .isLiked(true)
+                .isMine(true)
+                .build());
 
-        return new AnswerCommentInfos(answerCommentInfos);
+        return SliceResponse.<AnswerCommentInfo>builder()
+                .size(10)
+                .content(answerCommentInfos)
+                .numberOfElements(1)
+                .hasNext(FALSE)
+                .build();
     }
 }
