@@ -31,7 +31,6 @@ public class AnswerCommentResponse {
         private String content;
         private Integer heartCount;
         private Boolean isLiked;
-        @JsonProperty("isMine")
         private Boolean isMine;
         private LocalDateTime createdAt;
     }
