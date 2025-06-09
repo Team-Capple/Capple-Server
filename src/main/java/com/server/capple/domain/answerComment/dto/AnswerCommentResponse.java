@@ -1,5 +1,6 @@
 package com.server.capple.domain.answerComment.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,20 +17,22 @@ public class AnswerCommentResponse {
 
     @Getter
     @AllArgsConstructor
-    public static class AnswerCommentHeart {
+    public static class AnswerCommentLike {
         private Long answerCommentId;
         private Boolean isLiked;
     }
 
     @Getter
+    @AllArgsConstructor
     @Builder
     public static class AnswerCommentInfo {
         private Long answerCommentId;
         private Long writerId;
         private String content;
         private Integer heartCount;
+        private Boolean isLiked;
+        private Boolean isMine;
         private LocalDateTime createdAt;
-
     }
 
     @Getter

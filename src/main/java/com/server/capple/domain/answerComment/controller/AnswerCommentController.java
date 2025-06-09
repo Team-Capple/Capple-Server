@@ -6,10 +6,14 @@ import com.server.capple.domain.answerComment.dto.AnswerCommentResponse.*;
 import com.server.capple.domain.answerComment.service.AnswerCommentService;
 import com.server.capple.domain.member.entity.Member;
 import com.server.capple.global.common.BaseResponse;
+import com.server.capple.global.common.SliceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "답변 댓글 API", description = "답변 댓글 API입니다.")
@@ -40,14 +44,22 @@ public class AnswerCommentController {
 
     @Operation(summary = "답변 댓글 좋아요/취소 토글 API", description = " 답변 댓글 좋아요/취소 토글 API 입니다. pathvariable 으로 commentId를 주세요.")
     @PatchMapping("/heart/{commentId}")
-    public BaseResponse<AnswerCommentHeart> heartAnswerComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
-        return BaseResponse.onSuccess(answerCommentService.heartAnswerComment(member, commentId));
+    public BaseResponse<AnswerCommentLike> heartAnswerComment(@AuthMember Member member, @PathVariable(value = "commentId") Long commentId) {
+        return BaseResponse.onSuccess(answerCommentService.toggleAnswerCommentHeart(member, commentId));
     }
 
-    @Operation(summary = "답변에 대한 댓글 조회 API", description = " 답변에 대한 댓글 조회 API 입니다. pathvariable 으로 answerId를 주세요.")
+    @Operation(summary = "답변에 대한 댓글 조회 API", description = " 답변에 대한 댓글 조회 API 입니다. pathvariable 으로 answerId를 주세요."
+            + "pathVariable으로 answerId 주세요.<BR>**첫 번째 조회 시 threshold를 비워 보내고, 이후 조회 시 앞선 조회의 반환값으로 받은 threshold를 보내주세요.**")
     @GetMapping("/{answerId}")
-    public BaseResponse<AnswerCommentInfos> getAnswerCommentInfos(@PathVariable(value = "answerId") Long answerId) {
-        return BaseResponse.onSuccess(answerCommentService.getAnswerCommentInfos(answerId));
+    public BaseResponse<SliceResponse<AnswerCommentInfo>> getAnswerCommentInfos(
+            @AuthMember Member member,
+            @Parameter(description = "답변 식별자")
+            @PathVariable(value = "answerId") Long answerId,
+            @Parameter(description = "이전 조회의 마지막 index")
+            @RequestParam(required = false, name = "threshold") Long lastIndex,
+            @Parameter(description = "조회할 페이지 크기")
+            @RequestParam(defaultValue = "1000", required = false) Integer pageSize) {
+        return BaseResponse.onSuccess(answerCommentService.getAnswerCommentInfos(answerId, member.getId(), lastIndex,  PageRequest.of(0, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))));
     }
 
 }
